@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Finneas — Ask the right questions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --field:        oklch(0.962 0.014 286);
+  --field-2:      oklch(0.948 0.018 288);
+  --surface:      oklch(0.995 0.004 286);
+  --surface-2:    oklch(0.978 0.008 286);
+  --surface-3:    oklch(0.935 0.014 288);
+
+  --ink:          oklch(0.255 0.045 285);
+  --ink-2:        oklch(0.420 0.030 285);
+  --ink-3:        oklch(0.560 0.022 286);
+  --ink-4:        oklch(0.680 0.016 287);
+
+  --line:         oklch(0.905 0.012 287);
+  --line-2:       oklch(0.870 0.014 287);
+  --line-strong:  oklch(0.820 0.018 287);
+
+  --accent:       oklch(0.560 0.150 285);
+  --accent-2:     oklch(0.640 0.140 288);
+  --accent-soft:  oklch(0.920 0.040 287);
+  --accent-ink:   oklch(0.380 0.130 285);
+
+  --orb-1: oklch(0.870 0.130 165);
+  --orb-2: oklch(0.840 0.110 200);
+  --orb-3: oklch(0.800 0.110 250);
+  --orb-4: oklch(0.760 0.140 305);
+  --orb-5: oklch(0.820 0.090 340);
+
+  --font-ui:    "Sora", system-ui, -apple-system, sans-serif;
+  --font-serif: "Newsreader", Georgia, serif;
+  --font-mono:  "Space Mono", ui-monospace, monospace;
+
+  --r-md: 12px; --r-lg: 18px; --r-xl: 26px; --r-pill: 999px;
+
+  --sh-1: 0 1px 2px oklch(0.4 0.04 285 / 0.05), 0 1px 3px oklch(0.4 0.04 285 / 0.04);
+  --sh-2: 0 2px 8px oklch(0.4 0.04 285 / 0.06), 0 6px 18px oklch(0.4 0.04 285 / 0.06);
+  --sh-3: 0 8px 30px oklch(0.35 0.05 285 / 0.12), 0 2px 8px oklch(0.35 0.05 285 / 0.06);
+  --sh-float: 0 18px 50px oklch(0.30 0.06 285 / 0.16), 0 4px 14px oklch(0.30 0.06 285 / 0.08);
+  --sh-deep: 0 40px 90px oklch(0.20 0.06 285 / 0.30), 0 12px 30px oklch(0.20 0.06 285 / 0.18);
+}
+
+*{ box-sizing: border-box; }
+html{ scroll-behavior: smooth; scroll-snap-type: y proximity; }
+body{
+  margin:0; font-family: var(--font-ui); background: var(--field); color: var(--ink);
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+  font-size:16px; line-height:1.5; overflow-x:hidden;
+}
+button{ font-family: inherit; cursor: pointer; }
+input{ font-family: inherit; }
+::selection{ background: var(--accent-soft); }
+a{ color: inherit; text-decoration: none; }
+
+/* ---------- primitives ---------- */
+.eyebrow{ font-family: var(--font-mono); font-size:12px; letter-spacing:0.26em; text-transform:uppercase; color: var(--ink-4); font-weight:400; }
+.serif{ font-family: var(--font-serif); }
+.btn{
+  display:inline-flex; align-items:center; justify-content:center; gap:9px;
+  padding:13px 24px; border-radius: var(--r-pill); font-size:15px; font-weight:600; letter-spacing:.005em;
+  border:1px solid transparent; transition: all .2s cubic-bezier(.22,.9,.3,1); white-space:nowrap;
+}
+.btn-primary{ background: var(--ink); color:#fff; }
+.btn-primary:hover{ background: oklch(0.32 0.06 285); transform: translateY(-2px); box-shadow: var(--sh-2); }
+.btn-ghost{ background: transparent; color: var(--ink-2); border-color: var(--line-2); }
+.btn-ghost:hover{ background: var(--surface-2); color: var(--ink); border-color: var(--line-strong); }
+.btn-lg{ padding:16px 30px; font-size:16.5px; }
+
+/* ---------- orb ---------- */
+.orb{ position:relative; border-radius:50%; flex:none; isolation:isolate; }
+.orb-core{
+  position:absolute; inset:0; border-radius:50%; overflow:hidden;
+  background:
+    radial-gradient(120% 120% at 32% 26%, oklch(0.98 0.02 200 / 0.95) 0%, transparent 38%),
+    conic-gradient(from 200deg, var(--orb-1), var(--orb-2), var(--orb-3), var(--orb-4), var(--orb-5), var(--orb-1));
+  box-shadow: inset 0 0 14px oklch(1 0 0 / 0.35), inset -4px -6px 16px oklch(0.45 0.1 290 / 0.35);
+  animation: orbspin 16s linear infinite;
+}
+.orb-core::after{
+  content:""; position:absolute; inset:0; border-radius:50%;
+  background: radial-gradient(80% 70% at 30% 22%, oklch(1 0 0 / 0.55), transparent 45%); mix-blend-mode:screen;
+}
+.orb-glow{
+  position:absolute; inset:-30%; border-radius:50%; z-index:-1;
+  background: radial-gradient(circle, var(--orb-3), transparent 62%); opacity:.4; filter:blur(10px);
+  animation: orbpulse 6s ease-in-out infinite;
+}
+.orb-spark{ position:absolute; z-index:2; pointer-events:none; width:46%; height:46%; left:20%; top:18%; animation: sparktwinkle 4.5s ease-in-out infinite; }
+@keyframes orbspin{ to{ transform: rotate(360deg);} }
+@keyframes orbpulse{ 0%,100%{ opacity:.3; transform:scale(.96);} 50%{ opacity:.55; transform:scale(1.08);} }
+@keyframes sparktwinkle{ 0%,100%{ opacity:.55; transform:scale(.82) rotate(0);} 50%{ opacity:1; transform:scale(1) rotate(8deg);} }
+
+/* ---------- nav ---------- */
+.nav{
+  position:fixed; top:0; left:0; right:0; z-index:100;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:18px clamp(20px,5vw,56px);
+  background: oklch(0.962 0.014 286 / 0); transition: background .3s ease, box-shadow .3s ease, padding .3s ease;
+}
+.nav[data-solid="true"]{ background: oklch(0.965 0.012 286 / 0.82); backdrop-filter: blur(14px); box-shadow: 0 1px 0 var(--line); padding-top:13px; padding-bottom:13px; }
+.brand{ display:flex; align-items:center; gap:11px; }
+.brand-name{ font-weight:700; font-size:20px; letter-spacing:-0.02em; color: var(--ink); }
+.nav[data-theme="dark"]{ background: oklch(0.20 0.04 285 / 0); }
+.nav[data-theme="dark"][data-solid="true"]{ background: oklch(0.20 0.04 285 / 0.6); box-shadow:none; }
+.nav[data-theme="dark"] .brand-name{ color: oklch(0.97 0.01 286); }
+.nav[data-theme="dark"] .btn-primary{ background: oklch(0.97 0.01 286); color: var(--ink); }
+.nav[data-theme="dark"] .btn-primary:hover{ background:#fff; }
+
+/* ---------- beats ---------- */
+.beat{ position:relative; min-height:100svh; scroll-snap-align: start; display:flex; flex-direction:column; }
+.wrap{ width:100%; max-width:1240px; margin:0 auto; padding-left:clamp(20px,5vw,56px); padding-right:clamp(20px,5vw,56px); }
+
+/* ============ BEAT 1 ============ */
+.b1{ justify-content:center; padding-top:82px; padding-bottom:0; overflow:hidden; }
+.b1-bg{ position:absolute; inset:0; z-index:0; pointer-events:none;
+  background:
+   radial-gradient(60% 50% at 50% 22%, oklch(0.91 0.05 288 / 0.5), transparent 70%),
+   radial-gradient(40% 40% at 82% 60%, oklch(0.88 0.06 200 / 0.28), transparent 70%);
+}
+.b1-inner{ position:relative; z-index:1; display:flex; flex-direction:column; align-items:center; text-align:center; flex:1; }
+.b1 .orb-wrap{ margin-bottom:12px; }
+.hero-h{
+  font-family: var(--font-ui); font-weight:800; letter-spacing:-0.035em; line-height:0.97;
+  font-size: clamp(38px, 6.4vw, 80px); margin:8px 0 0; color: var(--ink);
+}
+.hero-h .dim{ color: var(--ink-4); }
+.hero-sub{ color: var(--ink-3); font-size: clamp(15px,1.7vw,18px); line-height:1.5; max-width:540px; margin:16px auto 0; }
+
+/* ask composer */
+.ask{
+  margin:24px auto 0; width:100%; max-width:660px;
+  display:flex; align-items:center; gap:8px; padding:9px 9px 9px 24px;
+  background: var(--surface); border:1px solid var(--line-2); border-radius: var(--r-pill);
+  box-shadow: var(--sh-3); transition: border-color .18s, box-shadow .18s;
+}
+.ask:focus-within{ border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-soft), var(--sh-3); }
+.ask .ask-orb{ flex:none; margin-right:4px; }
+.ask input{ flex:1; min-width:0; border:none; background:none; outline:none; font-size:16px; color: var(--ink); padding:10px 0; }
+.ask input::placeholder{ color: var(--ink-4); }
+.ask .send{
+  width:48px; height:48px; border-radius:50%; border:none; background: var(--ink); color:#fff;
+  display:flex; align-items:center; justify-content:center; flex:none; transition: all .18s;
+}
+.ask .send:hover{ background: var(--accent); transform: scale(1.06); }
+
+/* ticker */
+.ticker-band{ margin-top:auto; padding:22px 0 26px; position:relative; z-index:1; }
+.ticker-lead{ text-align:center; margin-bottom:12px; }
+.ticker{ overflow:hidden; -webkit-mask:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent); mask:linear-gradient(90deg,transparent,#000 7%,#000 93%,transparent); }
+.ticker + .ticker{ margin-top:12px; }
+.ticker-track{ display:flex; gap:13px; width:max-content; animation: marquee 60s linear infinite; }
+.ticker.rev .ticker-track{ animation-direction: reverse; animation-duration:72s; }
+.ticker:hover .ticker-track{ animation-play-state: paused; }
+@keyframes marquee{ to{ transform: translateX(-50%); } }
+.qchip{
+  display:inline-flex; align-items:center; gap:9px; padding:11px 19px; border-radius: var(--r-pill);
+  background: var(--surface); border:1px solid var(--line); box-shadow: var(--sh-1);
+  font-size:15px; font-weight:500; color: var(--ink-2); white-space:nowrap; transition: all .16s;
+}
+.qchip:hover{ border-color: var(--accent); color: var(--accent-ink); transform: translateY(-2px); box-shadow: var(--sh-2); }
+.qchip .q-ic{ color: var(--accent); opacity:.85; }
+
+/* ============ BEAT 2 ============ */
+.b2{ background: var(--field-2); justify-content:center; padding:118px 0 90px; overflow:hidden; }
+.b2-grid{ display:grid; grid-template-columns: 0.92fr 1.08fr; gap: clamp(36px,5vw,80px); align-items:center; }
+.b2-copy{ max-width:480px; }
+.b2-h{ font-family: var(--font-ui); font-weight:800; letter-spacing:-0.03em; line-height:1.0; font-size: clamp(40px,5.2vw,68px); margin:18px 0 0; color: var(--ink); }
+.b2-sub{ color: var(--ink-3); font-size:18px; line-height:1.6; margin:22px 0 0; }
+.b2-cta{ display:flex; align-items:center; gap:16px; margin-top:34px; flex-wrap:wrap; }
+.store-note{ font-size:13.5px; color: var(--ink-4); display:flex; align-items:center; gap:7px; }
+.store-note .dot{ width:5px;height:5px;border-radius:50%;background:var(--ink-4); }
+
+.shot-stage{ position:relative; }
+.frame{ border-radius:14px; overflow:hidden; background: var(--surface); border:1px solid var(--line-2); box-shadow: var(--sh-deep); }
+.frame-bar{ display:flex; align-items:center; gap:8px; padding:11px 14px; background: var(--surface-2); border-bottom:1px solid var(--line); }
+.tl{ display:flex; gap:7px; }
+.tl span{ width:11px; height:11px; border-radius:50%; background: var(--line-strong); }
+.tl span:nth-child(1){ background: oklch(0.72 0.15 28); }
+.tl span:nth-child(2){ background: oklch(0.82 0.13 85); }
+.tl span:nth-child(3){ background: oklch(0.78 0.12 150); }
+.frame-url{ flex:1; display:flex; justify-content:center; }
+.frame-url span{ font-family: var(--font-mono); font-size:12px; color: var(--ink-4); background: var(--surface); border:1px solid var(--line); padding:4px 16px; border-radius: var(--r-pill); }
+.frame img{ display:block; width:100%; height:auto; }
+
+.showcase{ position:relative; }
+.showcase-frame{ position:relative; z-index:2; transform: perspective(1700px) rotateY(-6deg) rotateX(1.5deg); transform-origin:right center; }
+.showcase-stack{ position:relative; aspect-ratio: 1440 / 900; background: var(--surface-2); }
+.sc-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position: top center; opacity:0; transition: opacity .6s ease; }
+.sc-img.is-active{ opacity:1; }
+.showcase-tabs{ display:flex; gap:8px; justify-content:center; margin-top:20px; }
+.sc-tab{ padding:9px 18px; border-radius: var(--r-pill); border:1px solid var(--line); background: var(--surface); color: var(--ink-3); font-size:13.5px; font-weight:600; transition: all .16s; }
+.sc-tab:hover{ color: var(--ink); border-color: var(--line-strong); }
+.sc-tab.is-active{ background: var(--ink); color:#fff; border-color: transparent; }
+.sc-tab.is-active:hover{ color:#fff; }
+
+/* ============ BEAT 3 ============ */
+.b3{ background: oklch(0.218 0.042 285); color: oklch(0.94 0.012 286); justify-content:center; padding:120px 0 96px; overflow:hidden; }
+.b3-bg{ position:absolute; inset:0; z-index:0; pointer-events:none;
+  background: radial-gradient(50% 45% at 50% 44%, oklch(0.45 0.08 285 / 0.5), transparent 72%); }
+.b3 .wrap{ position:relative; z-index:1; }
+.b3-head{ text-align:center; max-width:760px; margin:0 auto; }
+.b3 .eyebrow{ color: oklch(0.70 0.05 288); }
+.b3-h{ font-family: var(--font-ui); font-weight:800; letter-spacing:-0.03em; line-height:1.02; font-size: clamp(40px,5.2vw,66px); margin:16px 0 0; color: oklch(0.97 0.01 286); }
+.b3-sub{ color: oklch(0.78 0.02 288); font-size: clamp(17px,2vw,20px); line-height:1.6; margin:22px auto 0; max-width:640px; }
+
+.team-flow{ position:relative; margin-top:clamp(44px,6vw,76px); display:flex; flex-direction:column; align-items:center; gap:clamp(26px,3.4vw,44px); }
+.team-wires{ position:absolute; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+.team-row{ position:relative; z-index:1; width:100%; display:grid; grid-template-columns: repeat(3,1fr); gap:clamp(16px,2.4vw,30px); }
+.lane-label{ position:absolute; left:0; top:-26px; font-family: var(--font-mono); font-size:11px; letter-spacing:.24em; text-transform:uppercase; color: oklch(0.66 0.04 288); }
+
+.guide-card{
+  display:flex; flex-direction:column; gap:11px; padding:20px; border-radius: var(--r-lg);
+  background: oklch(0.27 0.045 285 / 0.7); border:1px solid oklch(0.42 0.05 285 / 0.5);
+  backdrop-filter: blur(6px); transition: all .2s;
+}
+.guide-card:hover{ transform: translateY(-3px); border-color: oklch(0.58 0.10 285 / 0.7); background: oklch(0.30 0.05 285 / 0.8); }
+.guide-ic{ width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+  background: oklch(0.34 0.06 285); border:1px solid oklch(0.46 0.07 285 / 0.6); }
+.guide-tag{ font-family: var(--font-mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color: oklch(0.66 0.05 288); }
+.guide-title{ font-family: var(--font-serif); font-size:21px; font-weight:500; color: oklch(0.97 0.01 286); line-height:1.12; }
+.guide-desc{ font-size:13.5px; color: oklch(0.74 0.02 288); line-height:1.45; }
+
+.team-orb{ position:relative; z-index:2; display:flex; flex-direction:column; align-items:center; gap:14px; padding:8px 0; }
+.team-orb .tlabel{ text-align:center; }
+.team-orb .tlabel b{ font-size:16px; font-weight:600; color: oklch(0.97 0.01 286); }
+.team-orb .tlabel span{ display:block; font-size:13px; color: oklch(0.70 0.03 288); margin-top:3px; }
+
+.crew-card{
+  display:flex; flex-direction:column; gap:13px; padding:20px; border-radius: var(--r-lg);
+  background: oklch(0.27 0.045 285 / 0.7); border:1px solid oklch(0.42 0.05 285 / 0.5); backdrop-filter: blur(6px); transition: all .2s;
+}
+.crew-card:hover{ transform: translateY(-3px); border-color: oklch(0.58 0.10 285 / 0.7); background: oklch(0.30 0.05 285 / 0.8); }
+.crew-top{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.crew-goal{ font-size:16px; font-weight:600; color: oklch(0.97 0.01 286); }
+.crew-avs{ display:flex; }
+.crew-avs .av{ margin-left:-9px; box-shadow:0 0 0 2px oklch(0.27 0.045 285); }
+.crew-avs .av:first-child{ margin-left:0; }
+.av{
+  border-radius:50%; flex:none; display:flex; align-items:center; justify-content:center;
+  color:#fff; font-weight:600; font-family: var(--font-ui);
+}
+.crew-status{ display:inline-flex; align-items:center; gap:7px; font-size:12.5px; color: oklch(0.74 0.02 288); }
+.crew-status .live{ width:7px; height:7px; border-radius:50%; background: var(--orb-1); box-shadow:0 0 0 0 var(--orb-1); animation: livepulse 2s ease-in-out infinite; }
+@keyframes livepulse{ 0%{ box-shadow:0 0 0 0 oklch(0.87 0.13 165 / .5);} 70%{ box-shadow:0 0 0 7px oklch(0.87 0.13 165 / 0);} 100%{ box-shadow:0 0 0 0 oklch(0.87 0.13 165 / 0);} }
+.crew-roles{ font-size:12.5px; color: oklch(0.68 0.02 288); line-height:1.4; }
+
+.b3-cta{ display:flex; justify-content:center; margin-top:clamp(44px,5vw,68px); }
+
+/* footer */
+.foot{ background: oklch(0.218 0.042 285); color: oklch(0.7 0.02 288); padding:30px 0 38px; }
+.foot .wrap{ display:flex; align-items:center; justify-content:space-between; gap:18px; flex-wrap:wrap; border-top:1px solid oklch(0.34 0.04 285); padding-top:26px; }
+.foot-links{ display:flex; gap:24px; font-size:14px; }
+.foot-links a:hover{ color: oklch(0.92 0.01 286); }
+.foot .brand-name{ color: oklch(0.94 0.01 286); }
+.foot small{ font-size:13px; color: oklch(0.6 0.02 288); }
+
+/* reveal */
+.reveal{ opacity:0; transform: translateY(22px); transition: opacity .7s cubic-bezier(.22,.9,.3,1), transform .7s cubic-bezier(.22,.9,.3,1); }
+.reveal.in{ opacity:1; transform:none; }
+.reveal.d1{ transition-delay:.08s; } .reveal.d2{ transition-delay:.16s; } .reveal.d3{ transition-delay:.24s; } .reveal.d4{ transition-delay:.32s; }
+
+/* responsive */
+@media (max-width: 920px){
+  .b2-grid{ grid-template-columns:1fr; gap:48px; }
+  .b2-copy{ max-width:none; }
+  .showcase-frame{ transform:none; }
+  .team-wires{ display:none; }
+  .team-row{ grid-template-columns:1fr; gap:14px; }
+  .lane-label{ position:static; margin-bottom:12px; display:block; }
+  .team-flow{ gap:30px; }
+}
+@media (max-width: 560px){
+  .nav{ padding:14px 18px; }
+  .b1{ padding-top:92px; }
+  .ask{ padding-left:16px; }
+  .ask .ask-orb{ display:none; }
+  .ask input{ font-size:16px; }
+  .b2-cta{ gap:12px; }
+}
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  *{ animation-duration:.001ms !important; animation-iteration-count:1 !important; }
+  .orb-core{ animation:none !important; }
+  .ticker-track{ animation:none !important; }
+  .reveal{ opacity:1; transform:none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ======================= NAV ======================= -->
+<nav class="nav" id="nav" data-solid="false">
+  <a class="brand" href="#beat1">
+    <span class="orb" style="width:32px;height:32px;"><span class="orb-core"></span>
+      <svg class="orb-spark" viewBox="0 0 24 24"><path d="M12 0 C12.6 6.4 17.6 11.4 24 12 C17.6 12.6 12.6 17.6 12 24 C11.4 17.6 6.4 12.6 0 12 C6.4 11.4 11.4 6.4 12 0 Z" fill="white" opacity="0.95"/></svg>
+    </span>
+    <span class="brand-name">Finneas</span>
+  </a>
+  <button class="btn btn-primary">Get Started</button>
+</nav>
+
+<!-- ======================= BEAT 1 ======================= -->
+<section class="beat b1" id="beat1" data-screen-label="Beat 1 — Ask the right questions">
+  <div class="b1-bg"></div>
+  <div class="wrap b1-inner">
+    <div class="orb-wrap reveal in">
+      <span class="orb" style="width:56px;height:56px;"><span class="orb-glow"></span><span class="orb-core"></span>
+        <svg class="orb-spark" viewBox="0 0 24 24"><path d="M12 0 C12.6 6.4 17.6 11.4 24 12 C17.6 12.6 12.6 17.6 12 24 C11.4 17.6 6.4 12.6 0 12 C6.4 11.4 11.4 6.4 12 0 Z" fill="white" opacity="0.95"/></svg>
+      </span>
+    </div>
+    <div class="eyebrow reveal in d1">Finneas</div>
+    <h1 class="hero-h reveal in d1">Ask the right questions.<br /><span class="dim">Make smarter decisions.</span></h1>
+    <p class="hero-sub reveal in d2">Finance can be overwhelming. Bring the big decision or the quiet worry — Finneas helps you ask the right questions and find the next right move.</p>
+
+    <div class="ask reveal in d2">
+      <span class="ask-orb orb" style="width:34px;height:34px;"><span class="orb-core"></span></span>
+      <input id="askInput" type="text" placeholder="Ask Finneas anything…" aria-label="Ask Finneas a question" />
+      <button class="send" aria-label="Send">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="ticker-band reveal in d3">
+    <div class="wrap ticker-lead"><div class="eyebrow">What people are asking</div></div>
+    <div class="ticker" id="ticker1"><div class="ticker-track"></div></div>
+    <div class="ticker rev" id="ticker2"><div class="ticker-track"></div></div>
+  </div>
+</section>
+
+<!-- ======================= BEAT 2 ======================= -->
+<section class="beat b2" id="beat2" data-screen-label="Beat 2 — Focus your financial life">
+  <div class="wrap">
+    <div class="b2-grid">
+      <div class="b2-copy">
+        <div class="eyebrow reveal">Your whole picture</div>
+        <h2 class="b2-h reveal d1">Focus your<br />financial life.</h2>
+        <p class="b2-sub reveal d2">Talk it through, map the scenarios, and never miss what's next. Finneas keeps your whole financial life in one calm, connected place — so you always know your next move.</p>
+        <div class="b2-cta reveal d3">
+          <button class="btn btn-primary btn-lg">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.05 12.04c-.02-2.3 1.88-3.4 1.96-3.46-1.07-1.56-2.74-1.78-3.33-1.8-1.42-.14-2.77.83-3.49.83-.72 0-1.83-.81-3.01-.79-1.55.02-2.98.9-3.78 2.29-1.61 2.8-.41 6.95 1.16 9.22.77 1.11 1.69 2.36 2.89 2.31 1.16-.05 1.6-.75 3-.75s1.79.75 3.01.72c1.24-.02 2.03-1.13 2.79-2.25.88-1.29 1.24-2.54 1.26-2.6-.03-.01-2.42-.93-2.44-3.68zM14.8 5.2c.64-.78 1.07-1.86.95-2.94-.92.04-2.04.61-2.7 1.39-.59.69-1.11 1.79-.97 2.85 1.03.08 2.08-.52 2.72-1.3z"/></svg>
+            Download the App
+          </button>
+          <span class="store-note">Free on iOS<span class="dot"></span>Android</span>
+        </div>
+      </div>
+
+      <div class="showcase reveal d2">
+        <div class="frame showcase-frame">
+          <div class="frame-bar">
+            <div class="tl"><span></span><span></span><span></span></div>
+            <div class="frame-url"><span id="scUrl">app.finneas.com/chat</span></div>
+          </div>
+          <div class="showcase-stack">
+            <img class="sc-img is-active" data-i="0" src="assets/app-chat.png" alt="Finneas chat — talking through getting debt-free" />
+            <img class="sc-img" data-i="1" src="assets/app-workspace.png" alt="Finneas workspace — comparing payoff scenarios" loading="lazy" />
+            <img class="sc-img" data-i="2" src="assets/app-calendar.png" alt="Finneas calendar — upcoming money moments" loading="lazy" />
+          </div>
+        </div>
+        <div class="showcase-tabs">
+          <button class="sc-tab is-active" data-i="0">Chat</button>
+          <button class="sc-tab" data-i="1">Workspace</button>
+          <button class="sc-tab" data-i="2">Calendar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= BEAT 3 ======================= -->
+<section class="beat b3" id="beat3" data-screen-label="Beat 3 — Build your dream team">
+  <div class="b3-bg"></div>
+  <div class="wrap">
+    <div class="b3-head">
+      <div class="eyebrow reveal">The dream team</div>
+      <h2 class="b3-h reveal d1">Build your dream team.</h2>
+      <p class="b3-sub reveal d2">We've built the personal finance intelligence layer that helps you dream, plan, and act — to help you live the life you want.</p>
+    </div>
+
+    <div class="team-flow reveal d2">
+      <svg class="team-wires" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="wire" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="oklch(0.62 0.10 285)" stop-opacity="0.55"/>
+            <stop offset="1" stop-color="oklch(0.62 0.10 285)" stop-opacity="0.12"/>
+          </linearGradient>
+        </defs>
+        <g fill="none" stroke="url(#wire)" stroke-width="1.6" stroke-dasharray="5 7" stroke-linecap="round">
+          <path d="M166,120 C166,230 500,210 500,300"/>
+          <path d="M500,120 L500,300"/>
+          <path d="M833,120 C833,230 500,210 500,300"/>
+          <path d="M500,300 C500,390 166,370 166,480"/>
+          <path d="M500,300 L500,480"/>
+          <path d="M500,300 C500,390 833,370 833,480"/>
+        </g>
+      </svg>
+
+      <!-- Guides -->
+      <div class="team-row">
+        <span class="lane-label">Guides</span>
+        <div class="guide-card">
+          <span class="guide-ic" style="color:var(--orb-3)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+          <span class="guide-tag">Guided · 5–10 min</span>
+          <span class="guide-title">Money Audit</span>
+          <span class="guide-desc">A 360° diagnosis across seven levers of your financial life.</span>
+        </div>
+        <div class="guide-card">
+          <span class="guide-ic" style="color:var(--orb-2)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 9v11h5v-6h4v6h5V9"/></svg></span>
+          <span class="guide-tag">Guided · 60–90 sec</span>
+          <span class="guide-title">Rent vs Buy</span>
+          <span class="guide-desc">Three honest tiers plus real listing counts in your area.</span>
+        </div>
+        <div class="guide-card">
+          <span class="guide-ic" style="color:var(--orb-4)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9z"/></svg></span>
+          <span class="guide-tag">Guided plan</span>
+          <span class="guide-title">Getting debt-free</span>
+          <span class="guide-desc">The fastest safe path out, sequenced around your goals.</span>
+        </div>
+      </div>
+
+      <!-- Finneas -->
+      <div class="team-orb">
+        <span class="orb" style="width:78px;height:78px;"><span class="orb-glow"></span><span class="orb-core"></span>
+          <svg class="orb-spark" viewBox="0 0 24 24"><path d="M12 0 C12.6 6.4 17.6 11.4 24 12 C17.6 12.6 12.6 17.6 12 24 C11.4 17.6 6.4 12.6 0 12 C6.4 11.4 11.4 6.4 12 0 Z" fill="white" opacity="0.95"/></svg>
+        </span>
+        <div class="tlabel"><b>Finneas</b><span>Your intelligence layer</span></div>
+      </div>
+
+      <!-- Goal crews -->
+      <div class="team-row">
+        <span class="lane-label">Goal crews</span>
+        <div class="crew-card">
+          <div class="crew-top">
+            <span class="crew-goal">Getting debt-free</span>
+            <div class="crew-avs" data-crew="debt"></div>
+          </div>
+          <span class="crew-roles">Loan · Credit · Budget agents</span>
+          <span class="crew-status"><span class="live"></span>3 agents working</span>
+        </div>
+        <div class="crew-card">
+          <div class="crew-top">
+            <span class="crew-goal">Buying a home</span>
+            <div class="crew-avs" data-crew="home"></div>
+          </div>
+          <span class="crew-roles">Housing · Budget · Tax agents</span>
+          <span class="crew-status"><span class="live"></span>Planning together</span>
+        </div>
+        <div class="crew-card">
+          <div class="crew-top">
+            <span class="crew-goal">Retire by 60</span>
+            <div class="crew-avs" data-crew="retire"></div>
+          </div>
+          <span class="crew-roles">Invest · Tax agents</span>
+          <span class="crew-status"><span class="live"></span>Monitoring</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="b3-cta reveal d2">
+      <button class="btn btn-primary btn-lg" style="background:oklch(0.97 0.01 286); color:var(--ink);">Get Started <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 6l6 6-6 6"/></svg></button>
+    </div>
+  </div>
+</section>
+
+<!-- ======================= FOOTER ======================= -->
+<footer class="foot">
+  <div class="wrap">
+    <a class="brand" href="#beat1">
+      <span class="orb" style="width:26px;height:26px;"><span class="orb-core"></span></span>
+      <span class="brand-name" style="font-size:17px;">Finneas</span>
+    </a>
+    <div class="foot-links">
+      <a href="#beat1">Product</a>
+      <a href="#beat2">Dashboard</a>
+      <a href="#beat3">Agents</a>
+      <a href="#beat1">Download</a>
+    </div>
+    <small>© 2026 Finneas. Plans are suggestions, not advice.</small>
+  </div>
+</footer>
+
+<script>
+(function(){
+  /* ----- ticker chips ----- */
+  var QUESTIONS = [
+    ["bolt","Help me get debt-free"],
+    ["goals","Can I afford to buy a home?"],
+    ["sparkle","Something feels off about my money"],
+    ["doc","Should I refinance my student loans?"],
+    ["chart","How much do I need to retire?"],
+    ["bank","Am I saving enough each month?"],
+    ["goals","Rent or buy in this market?"],
+    ["sparkle","Can we afford a baby?"],
+    ["bolt","What should I do with a bonus?"],
+    ["shield","Will I be okay if I lose my job?"],
+    ["chart","How do I start investing?"],
+    ["doc","Are my subscriptions out of control?"],
+    ["bank","How do I build an emergency fund?"],
+    ["goals","When can I stop working?"]
+  ];
+  var ICONS = {
+    bolt:'M13 2L3 14h9l-1 8 10-12h-9z',
+    goals:'M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z M12 12h.01',
+    sparkle:'M12 3l1.9 5.6L19.5 10l-5.6 1.9L12 17l-1.9-5.1L4.5 10l5.6-1.4z',
+    doc:'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M9 13h6 M9 17h4',
+    chart:'M3 3v18h18 M7 15l3-4 3 2 4-6',
+    bank:'M3 21h18 M5 21V9l7-5 7 5v12 M9 21v-6h6v6',
+    shield:'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'
+  };
+  function chipHTML(ic,label){
+    var d = (ICONS[ic]||'').split(' M').map(function(seg,i){ return '<path d="'+(i?'M':'')+seg+'"/>'; }).join('');
+    return '<button class="qchip"><svg class="q-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+d+'</svg>'+label+'</button>';
+  }
+  function fillTicker(id, list){
+    var html = list.map(function(q){ return chipHTML(q[0],q[1]); }).join('');
+    var track = document.querySelector('#'+id+' .ticker-track');
+    track.innerHTML = html + html; // duplicate for seamless loop
+  }
+  var half = Math.ceil(QUESTIONS.length/2);
+  fillTicker('ticker1', QUESTIONS.slice(0, half));
+  fillTicker('ticker2', QUESTIONS.slice(half).concat(QUESTIONS.slice(0,2)));
+
+  /* clicking a question fills the composer */
+  var askInput = document.getElementById('askInput');
+  document.addEventListener('click', function(e){
+    var chip = e.target.closest && e.target.closest('.qchip');
+    if(chip){ askInput.value = chip.textContent.trim(); askInput.focus(); window.scrollTo({top:0, behavior:'smooth'}); }
+  });
+
+  /* ----- typed placeholder ----- */
+  var PH = ["Ask Finneas anything…","Can I afford to buy a home?","Should I refinance my loans?","Something feels off about my money…","How much do I need to retire?"];
+  var pi=0, ci=0, deleting=false, paused=0;
+  function tick(){
+    if(document.activeElement === askInput){ setTimeout(tick, 400); return; }
+    var full = PH[pi];
+    if(paused>0){ paused--; setTimeout(tick, 40); return; }
+    if(!deleting){
+      ci++; askInput.setAttribute('placeholder', full.slice(0,ci));
+      if(ci>=full.length){ deleting=true; paused = pi===0?70:55; }
+    } else {
+      ci--; askInput.setAttribute('placeholder', full.slice(0,ci));
+      if(ci<=0){ deleting=false; pi=(pi+1)%PH.length; paused=6; }
+    }
+    setTimeout(tick, deleting?28:(pi===0?14:52));
+  }
+  setTimeout(tick, 1400);
+
+  /* ----- crew avatars ----- */
+  var AGENTS = { loan:[250,'L'], credit:[165,'C'], budget:[305,'B'], housing:[200,'H'], tax:[70,'T'], invest:[340,'I'] };
+  var CREWS = { debt:['loan','credit','budget'], home:['housing','budget','tax'], retire:['invest','tax'] };
+  function avatar(id, size){
+    var a = AGENTS[id]; var h=a[0];
+    return '<span class="av" style="width:'+size+'px;height:'+size+'px;font-size:'+(size*0.42)+'px;'+
+      'background:radial-gradient(120% 120% at 30% 25%, oklch(0.82 0.11 '+h+'), oklch(0.55 0.16 '+h+'));">'+a[1]+'</span>';
+  }
+  document.querySelectorAll('.crew-avs').forEach(function(el){
+    var crew = CREWS[el.getAttribute('data-crew')] || [];
+    el.innerHTML = crew.map(function(id){ return avatar(id, 30); }).join('');
+  });
+
+  /* ----- beat 2 showcase rotation ----- */
+  (function(){
+    var imgs = [].slice.call(document.querySelectorAll('.sc-img'));
+    var tabs = [].slice.call(document.querySelectorAll('.sc-tab'));
+    var urlEl = document.getElementById('scUrl');
+    var urls = ['app.finneas.com/chat','app.finneas.com/workspace','app.finneas.com/calendar'];
+    if(!imgs.length) return;
+    var cur = 0, timer = null, paused = false;
+    function show(i){
+      cur = i;
+      imgs.forEach(function(el,n){ el.classList.toggle('is-active', n===i); });
+      tabs.forEach(function(el,n){ el.classList.toggle('is-active', n===i); });
+      if(urlEl) urlEl.textContent = urls[i];
+    }
+    function next(){ if(!paused) show((cur+1) % imgs.length); }
+    function start(){ stop(); timer = setInterval(next, 3400); }
+    function stop(){ if(timer) clearInterval(timer); }
+    tabs.forEach(function(el,n){ el.addEventListener('click', function(){ show(n); start(); }); });
+    var showcase = document.querySelector('.showcase');
+    if(showcase){
+      showcase.addEventListener('mouseenter', function(){ paused = true; });
+      showcase.addEventListener('mouseleave', function(){ paused = false; });
+    }
+    start();
+  })();
+
+  /* ----- nav solid + theme ----- */
+  var nav = document.getElementById('nav');
+  var beat3 = document.getElementById('beat3');
+  function onScroll(){ nav.setAttribute('data-solid', window.scrollY > 24 ? 'true':'false'); }
+  onScroll(); window.addEventListener('scroll', onScroll, {passive:true});
+
+  if('IntersectionObserver' in window){
+    /* dark nav when beat3 covers the top of viewport */
+    new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        var r = beat3.getBoundingClientRect();
+        var dark = r.top <= 70 && r.bottom >= 70;
+        nav.setAttribute('data-theme', dark ? 'dark':'light');
+      });
+    }, {threshold:[0,0.01,0.5,1], rootMargin:'-69px 0px 0px 0px'}).observe(beat3);
+    window.addEventListener('scroll', function(){
+      var r = beat3.getBoundingClientRect();
+      nav.setAttribute('data-theme', (r.top <= 70 && r.bottom >= 70) ? 'dark':'light');
+    }, {passive:true});
+
+    /* reveal on scroll */
+    var ro = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); ro.unobserve(en.target); } });
+    }, {threshold:0.18});
+    document.querySelectorAll('.reveal:not(.in)').forEach(function(el){ ro.observe(el); });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in'); });
+  }
+})();
+</script>
+</body>
+</html>
