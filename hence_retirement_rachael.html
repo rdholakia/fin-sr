@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finneas — What's My Number?</title>
+<style>
+  :root{
+    --bg:#0e1424; --panel:#161e33; --panel2:#1d2740; --ink:#eaf0ff; --muted:#94a3c4;
+    --accent:#5b8cff; --accent2:#36d6a0; --warn:#ffb86b; --bad:#ff6b8b; --line:#2a3656;
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:radial-gradient(1200px 600px at 70% -10%, #1b2b4d 0, transparent 60%), var(--bg);
+    background-color:var(--bg);
+    color:var(--ink);
+    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:0 20px 120px}
+  /* sticky number bar */
+  .bar{position:sticky;top:0;z-index:20;background:rgba(14,20,36,.86);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .bar-inner{max-width:880px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .brand{font-weight:700;letter-spacing:.3px;font-size:15px;color:var(--ink);opacity:.9}
+  .brand small{color:var(--muted);font-weight:500}
+  .bar-num{margin-left:auto;text-align:right}
+  .bar-num .big{font-size:24px;font-weight:800;color:#fff;letter-spacing:-.5px}
+  .bar-num .sub{font-size:12px;color:var(--muted)}
+  .bar-num .big.dim{color:var(--muted);font-weight:600;font-size:16px}
+  /* progress dots */
+  .dots{display:flex;gap:6px;width:100%;margin-top:10px}
+  .dots i{height:4px;border-radius:3px;background:var(--line);flex:1;transition:.3s}
+  .dots i.done{background:var(--accent)}
+  .dots i.cur{background:var(--accent2)}
+  h1{font-size:30px;line-height:1.15;margin:34px 0 10px;letter-spacing:-.6px}
+  h2{font-size:22px;margin:30px 0 6px;letter-spacing:-.3px}
+  h3{font-size:15px;margin:18px 0 8px;color:var(--ink)}
+  p{color:#cdd6ee}
+  .lead{color:var(--muted);font-size:16px;margin-top:0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px 18px;margin:14px 0}
+  .card.tight{padding:14px}
+  .row{display:flex;gap:12px;align-items:center}
+  .row.wrap{flex-wrap:wrap}
+  .grid{display:grid;gap:12px}
+  .grid.two{grid-template-columns:1fr 1fr}
+  @media(max-width:620px){.grid.two{grid-template-columns:1fr}}
+  label.fld{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
+  input[type=number],input[type=text],select,textarea{
+    width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    border-radius:10px;padding:10px 12px;font-size:15px;font-family:inherit
+  }
+  textarea{min-height:120px;resize:vertical}
+  .dropzone{border:2px dashed var(--line);border-radius:12px;padding:26px 16px;text-align:center;cursor:pointer;transition:.15s;background:var(--panel2)}
+  .dropzone:hover{border-color:var(--accent)}
+  .dropzone.drag{border-color:var(--accent2);background:rgba(54,214,160,.10)}
+  .dropzone > div{margin:3px 0}
+  input[type=range]{width:100%;accent-color:var(--accent)}
+  .slabel{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:2px}
+  .slabel b{font-size:15px;color:#fff}
+  .slabel span{font-size:13px;color:var(--muted)}
+  .btn{appearance:none;border:1px solid var(--line);background:var(--panel2);color:var(--ink);
+    padding:11px 18px;border-radius:11px;font-size:15px;font-weight:600;cursor:pointer;transition:.15s}
+  .btn:hover{border-color:var(--accent)}
+  .btn.primary{background:linear-gradient(180deg,#5b8cff,#3d6fe6);border-color:transparent;color:#fff}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.ghost{background:transparent}
+  .btn.sm{padding:7px 12px;font-size:13px;border-radius:9px}
+  .nav{display:flex;justify-content:space-between;margin-top:26px;gap:12px}
+  .pill{display:inline-flex;gap:7px;align-items:center;background:var(--panel2);border:1px solid var(--line);
+    padding:6px 11px;border-radius:999px;font-size:13px;color:var(--muted)}
+  .seg{display:inline-flex;background:var(--panel2);border:1px solid var(--line);border-radius:11px;overflow:hidden}
+  .seg button{appearance:none;background:transparent;border:0;color:var(--muted);padding:9px 14px;font-size:14px;cursor:pointer;font-family:inherit}
+  .seg button.on{background:var(--accent);color:#fff;font-weight:600}
+  .seg.sm button{padding:7px 9px;font-size:12.5px}
+  details{border:1px dashed var(--line);border-radius:10px;padding:0 12px;margin:8px 0;background:rgba(91,140,255,.05)}
+  details summary{cursor:pointer;color:var(--accent);font-size:13px;padding:9px 0;list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"ⓘ  ";opacity:.8}
+  details[open] summary{border-bottom:1px dashed var(--line);margin-bottom:8px}
+  details .body{font-size:13.5px;color:#c3cdea;padding-bottom:12px}
+  details .body cite{display:block;color:var(--muted);font-style:normal;font-size:12px;margin-top:6px}
+  .hint{font-size:13px;color:var(--muted)}
+  .num{font-variant-numeric:tabular-nums}
+  .big-number{font-size:52px;font-weight:850;letter-spacing:-1.5px;color:#fff;line-height:1;margin:6px 0}
+  .big-number.green{color:var(--accent2)}
+  .kpi{display:flex;gap:22px;flex-wrap:wrap;margin-top:8px}
+  .kpi div .v{font-size:22px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
+  .kpi div .l{font-size:12px;color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  table th,table td{text-align:left;padding:8px 8px;border-bottom:1px solid var(--line)}
+  table th{color:var(--muted);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+  table td.r,table th.r{text-align:right;font-variant-numeric:tabular-nums}
+  .tag{font-size:11px;padding:2px 8px;border-radius:6px;font-weight:600}
+  .tag.keep{background:rgba(54,214,160,.15);color:var(--accent2)}
+  .tag.reduce{background:rgba(255,184,107,.15);color:var(--warn)}
+  .tag.remove{background:rgba(255,107,139,.15);color:var(--bad)}
+  .meter{height:14px;border-radius:8px;background:var(--panel2);overflow:hidden;border:1px solid var(--line)}
+  .meter > i{display:block;height:100%;background:linear-gradient(90deg,var(--bad),var(--warn),var(--accent2));}
+  .mc-bars{display:flex;align-items:flex-end;gap:3px;height:120px;margin-top:10px}
+  .mc-bars i{flex:1;background:var(--accent);border-radius:3px 3px 0 0;opacity:.8;min-height:2px}
+  svg{display:block;width:100%;height:auto}
+  .note{font-size:12.5px;color:var(--muted);border-left:2px solid var(--line);padding-left:10px;margin:10px 0}
+  .scenario-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+  .scenario-row:last-child{border:0}
+  .scenario-row .bn{font-size:20px;font-weight:800;color:#fff;font-variant-numeric:tabular-nums}
+  .disclaim{font-size:11.5px;color:var(--muted);text-align:center;margin-top:40px;opacity:.8}
+</style>
+</head>
+<body>
+<div class="bar">
+  <div class="bar-inner">
+    <div class="brand">Finneas <small>· what's my number?</small></div>
+    <div class="bar-num">
+      <div class="big dim" id="navNumber">—</div>
+      <div class="sub" id="navSub">build your number as you go</div>
+    </div>
+    <div class="dots" id="dots"></div>
+  </div>
+</div>
+
+<div class="wrap"><div id="app"></div></div>
+
+<script>
+/* =========================================================================
+   FINNEAS — calculation engine + UI.  Single file, vanilla JS, no deps.
+   Everything is in TODAY'S DOLLARS using real (inflation-adjusted) returns.
+   ========================================================================= */
+
+/* ----- DEFAULTS (research-grounded; treat as editable parameters) -------- */
+const DEFAULTS = {
+  currentAge: 45,
+  retirementAge: 65,
+  longevityAge: 92,          // plan to a longevity age, not avg life expectancy
+  realReturn: 0.05,          // derived from `conservatism` (arithmetic mean real return) [Kitces]
+  volatility: 0.11,          // FIXED — our point of view; users don't set this (no one can estimate it)
+  withdrawalRate: 0.04,      // derived from `conservatism` (4% rule = Balanced) [Bengen]
+  conservatism: 2,           // 0..4 → drives the assumed real return (and, for display, an implied withdrawal rate)
+  confidenceTarget: 0.85,    // the number is SIZED so it survives this share of simulated market histories
+  ssScenario: 'partial',     // full | partial | none  (program-solvency choice)
+  ssClaimAge: 67,            // benefits start here; early retirees face a gap
+  income: 120000,            // PRIMARY person's current income -> their SS estimate
+  aimeFactor: 0.8,           // scale current income to a ~career-average for the AIME (most people earned less earlier)
+  // --- spouse (couple only): modeled as a second life on the primary's age axis ---
+  spouseIncome: 0,           // spouse's own earnings (0 = single-earner couple → 50% spousal benefit)
+  spouseAgeGap: 0,           // spouse age − primary age (e.g. +2 means spouse is 2 yrs older)
+  spouseClaimAge: 67,        // spouse's SS claim age
+  spouseLongevityAge: 92,    // spouse's plan-to age
+  survivorFactor: 0.62,      // a one-person (survivor) household spends ~62% of the couple's spending
+  // account mix drives the endogenous tax calc; shown as an editable assumption
+  mixPreTax: 70, mixRoth: 15, mixTaxable: 15,
+  household: 'couple',       // 'couple' (two people) | 'single' — chosen at the start; drives filing + per-person costs
+  filing: 'married',         // derived from household (couple→married, single→single)
+  stateTax: 4,               // default ~typical effective state rate (%); editable, set 0 for no-tax/exempt states
+  spendingSmile: true,       // real spending drifts DOWN ~1%/yr [Blanchett]
+  smileDecline: 0.01,
+  smileAnchorAge: 65,        // decline is anchored to AGE (not years-since-retirement): your spend at 73 is your spend at 73
+  // opinionated, research-backed care default (NOT a free slider)
+  ltcOnset: 84, ltcAnnual: 75000,        // ~Genworth ranges (per person, from onset through end of plan)
+  elevatedCare: false, eltcOnset: 72, eltcAnnual: 100000,
+  lateLifeHousing: 'inplace', // 'inplace' | 'community'
+  communityMoveAge: 80,       // age you'd move to senior living
+  communityAnnual: 60000,     // senior-living fee PER PERSON-ish (×communityFactor for a couple); replaces home costs + care
+  preMedicareAnnual: 8000,   // ACA premiums (62->65 gap) PER PERSON — ×2 for a couple
+  medicareAnnual: 2600,      // Medicare Part B+D PER PERSON from 65 — ×2 for a couple; IRMAA added for high MAGI
+  // optional add-ins
+  floorIncome: 0,            // guaranteed pension/annuity (annual, today's $)
+  rentalIncome: 0,           // real-estate/rental income (annual gross, today's $, flat real, taxable, NOT Social Security)
+  bridgeIncome: 0,           // part-time earnings in early retirement
+  bridgeStopAge: 68,         // age you stop part-time work (income applies retirement age → this age)
+  // what you already have (drives the coast trajectory)
+  currentSavings: 100000,    // invested assets today
+  annualContribution: 20000, // added per year until retirement
+  // lifestyle tiers
+  leanFactor: 0.75, fatFactor: 1.35,
+};
+
+/* ----- sample Monarch-style expense export (annual $) -------------------- */
+const SAMPLE = [
+  {name:'Mortgage (principal + interest)', amount:36000, action:'reduce', keepPct:15, note:'paid off by retirement'},
+  {name:'Property tax + insurance',amount:9000, action:'keep',   keepPct:100},
+  {name:'Utilities',             amount:6000,  action:'keep',   keepPct:100},
+  {name:'Groceries',             amount:14000, action:'keep',   keepPct:100},
+  {name:'Dining out',            amount:9000,  action:'keep',   keepPct:100},
+  {name:'Transportation',        amount:9000,  action:'reduce', keepPct:70, note:'one fewer commute'},
+  {name:'Healthcare (routine)',  amount:7000,  action:'keep',   keepPct:100},
+  {name:"Kids' private school",  amount:30000, action:'remove', keepPct:0, note:'time-limited'},
+  {name:'Travel',                amount:14000, action:'keep',   keepPct:100, note:'often UP early in retirement'},
+  {name:'Shopping',              amount:8000,  action:'keep',   keepPct:100},
+  {name:'Entertainment',         amount:5000,  action:'keep',   keepPct:100},
+  {name:'Rental property purchase',amount:40000,action:'remove',keepPct:0, note:'investment, not lifestyle'},
+  {name:'Subscriptions',         amount:2000,  action:'keep',   keepPct:100},
+  {name:'Miscellaneous',         amount:6000,  action:'keep',   keepPct:100},
+];
+
+/* ----- state ------------------------------------------------------------- */
+let state = JSON.parse(JSON.stringify(DEFAULTS));
+state.expenseMode = null;          // 'sample' | 'manual' | 'csv'
+state.categories = [];
+state.results = null;
+let step = 0;
+
+/* ----- helpers ----------------------------------------------------------- */
+const $ = id => document.getElementById(id);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const people=()=> state.household==='couple' ? 2 : 1;        // max household size (both alive)
+/* ----- two lives on the primary's age axis (spouse = primary age + gap) --- */
+const isCouple=()=> state.household==='couple';
+// last (exclusive) primary-age the household plan must fund — the later of the two deaths
+function householdEnd(){ return isCouple() ? Math.max(state.longevityAge, state.spouseLongevityAge - state.spouseAgeGap) : state.longevityAge; }
+// who's alive at primary age `a` (ages R..L-1 are lived/funded; L is the death age)
+function lives(a){
+  const sa = a + state.spouseAgeGap;
+  const pAlive = a < state.longevityAge;
+  const sAlive = isCouple() && sa < state.spouseLongevityAge;
+  return {sa, pAlive, sAlive, n:(pAlive?1:0)+(sAlive?1:0)};
+}
+function survivorFactorAt(a){ return (isCouple() && lives(a).n===1) ? state.survivorFactor : 1; }   // only when a COUPLE drops to one survivor
+function filingAt(a){ return lives(a).n>=2 ? 'married' : 'single'; }                 // single after the first death (widow's tax)
+const money = x => '$'+Math.round(x).toLocaleString('en-US');
+const moneyK = x => Math.abs(x)>=1e6 ? '$'+(x/1e6).toFixed(2)+'M' : '$'+Math.round(x/1000)+'k';
+const pct = x => (x*100).toFixed(0)+'%';
+
+/* ----- tax model (simplified 2024; single + married, with SS taxability) - */
+const STD_DED = {married:29200, single:14600};
+const BRACKETS = {
+  married:[[0,.10],[23200,.12],[94300,.22],[201050,.24],[383900,.32],[487450,.35],[731200,.37]],
+  single :[[0,.10],[11600,.12],[47150,.22],[100525,.24],[191950,.32],[243725,.35],[609350,.37]],
+};
+const SS_THRESH = {married:[32000,44000], single:[25000,34000]};
+function federalOrdinary(income, filing){
+  const ti = Math.max(0, income - STD_DED[filing]);
+  const br = BRACKETS[filing];
+  let tax=0;
+  for(let i=0;i<br.length;i++){
+    const lo=br[i][0], rate=br[i][1];
+    const hi = i+1<br.length ? br[i+1][0] : Infinity;
+    if(ti>lo) tax += (Math.min(ti,hi)-lo)*rate;
+  }
+  return tax;
+}
+// IRS-style taxable portion of Social Security (simplified two-tier)
+function taxableSS(ss, otherIncome, filing){
+  if(ss<=0) return 0;
+  const [base,second]=SS_THRESH[filing];
+  const prov = otherIncome + 0.5*ss;                 // provisional income
+  if(prov<=base) return 0;
+  if(prov<=second) return Math.min(0.5*ss, 0.5*(prov-base));
+  const lower = Math.min(0.5*ss, 0.5*(second-base));
+  return Math.min(0.85*ss, 0.85*(prov-second)+lower);
+}
+// long-term capital-gains brackets (2024): 0% / 15% / 20% breakpoints by filing.
+// Gains STACK on top of ordinary taxable income — so the rate depends on total income.
+const LTCG = {married:[94050,583750], single:[47025,518900]};
+function capGainsTax(gains, ordinaryTaxable, filing){
+  if(gains<=0) return 0;
+  const [t0,t15]=LTCG[filing];
+  const lo=ordinaryTaxable, hi=ordinaryTaxable+gains;
+  const at15=Math.max(0, Math.min(hi,t15)-Math.max(lo,t0));   // portion in the 15% band
+  const at20=Math.max(0, hi-Math.max(lo,t15));                 // portion above the 15% band
+  return at15*0.15 + at20*0.20;                                // anything below t0 is taxed 0%
+}
+// total tax for a year given the GROSS portfolio withdrawal + other income.
+// SS is taxed via provisional income; pension/bridge count as ordinary income;
+// taxable-account gains use the real LTCG 0/15/20% brackets stacked on ordinary income.
+function totalTax(gross, ss, otherOrdinary, filing){
+  filing = filing || state.filing;
+  const pre  = gross*(state.mixPreTax/100);          // pre-tax withdrawals = ordinary
+  const taxbl= gross*(state.mixTaxable/100);          // taxable-account withdrawals
+  const gains= taxbl*0.5;                             // ~half of a taxable withdrawal assumed realized gain
+  const ordinaryNonSS = pre + (otherOrdinary||0);     // Roth portion = untaxed
+  const tSS = taxableSS(ss||0, ordinaryNonSS+gains, filing);
+  const ordinary = ordinaryNonSS + tSS;
+  const ordTaxable = ordinary - STD_DED[filing];     // may go negative — unused deduction shelters gains (IRS rule)
+  const fed = federalOrdinary(ordinary, filing) + capGainsTax(gains, ordTaxable, filing);
+  const st  = (ordinaryNonSS + gains) * (state.stateTax/100);   // most states exempt Social Security, so don't tax tSS
+  return fed + st;
+}
+// solve gross withdrawal G such that G - tax(G, ...) = netNeed  (fixed point)
+function grossUp(netNeed, ss, otherOrdinary, filing){
+  if(netNeed<=0) return 0;
+  let g = netNeed;
+  for(let i=0;i<10;i++){ g = netNeed + totalTax(g, ss, otherOrdinary, filing); }
+  return g;
+}
+
+/* ----- Social Security: per-person benefits (simplified bend points, 2024) - */
+// one person's monthly PIA from their own income (career-average haircut via aimeFactor)
+function piaMonthly(income){
+  const aime = Math.min((income||0)*state.aimeFactor, 168600)/12;
+  return 0.9*Math.min(aime,1174) + 0.32*Math.max(0,Math.min(aime,7078)-1174) + 0.15*Math.max(0,aime-7078);
+}
+// benefit multiplier for claiming before/after FRA 67
+function claimFactor(claimAge){
+  const fra=67, a=clamp(claimAge||67,62,70);
+  if(a>=fra) return 1 + 0.08*(a-fra);              // delayed credits ~+8%/yr (≈ +24% at 70)
+  const early=fra-a, r3=Math.min(early,3)*0.0667, r5=Math.max(0,early-3)*0.05;
+  return Math.max(0.6, 1 - r3 - r5);               // ≈ 0.70 at age 62
+}
+function ssClaimFactor(){ return claimFactor(state.ssClaimAge); }   // back-compat (primary), used by claimPct copy
+const ssScale=()=> state.ssScenario==='none' ? 0 : (state.ssScenario==='full'?1.0:0.75);
+// each person's own annual benefit at their own claim age (before the scenario scale)
+function primaryBenefit(){ return piaMonthly(state.income)*12 * claimFactor(state.ssClaimAge); }
+function spouseBenefit(){
+  if(!isCouple()) return 0;
+  const own = piaMonthly(state.spouseIncome)*12 * claimFactor(state.spouseClaimAge);
+  const spousal = 0.5 * piaMonthly(state.income)*12 * Math.min(1, claimFactor(state.spouseClaimAge)); // spousal earns no delayed credit
+  return Math.max(own, spousal);                   // dual entitlement: you get the larger of your own or spousal
+}
+// household SS at primary age `a`, respecting each person's claim gate and the survivor step-up
+function ssHouseholdAt(a){
+  const L=lives(a); if(L.n===0) return 0;
+  const bP=primaryBenefit(), bS=spouseBenefit();
+  let ss;
+  if(L.n===2){ ss=(a>=state.ssClaimAge?bP:0) + (L.sa>=state.spouseClaimAge?bS:0); }
+  else {                                           // one survivor → keeps the LARGER check, once they've claimed
+    const claimed = L.pAlive ? a>=state.ssClaimAge : L.sa>=state.spouseClaimAge;
+    ss = claimed ? Math.max(bP,bS) : 0;
+  }
+  return ss * ssScale();
+}
+// SS "as if already claimed" (used for the steady level; the pre-claim gap is reserved separately)
+function ssClaimedAt(a){
+  const L=lives(a); if(L.n===0) return 0;
+  const ss = L.n===2 ? primaryBenefit()+spouseBenefit() : Math.max(primaryBenefit(),spouseBenefit());
+  return ss * ssScale();
+}
+// both-alive claimed household benefit at current claim ages — for display/headline tax gross-up
+function annualSS(){ return (primaryBenefit()+spouseBenefit()) * ssScale(); }
+
+/* ----- per-year need trajectory ------------------------------------------ */
+// retirement-adjusted amount for one line. reduce/increase both use keepPct (% of today): <100 trims, >100 bumps up
+function adjusted(c){ const f = c.action==='keep'?1 : c.action==='remove'?0 : (c.keepPct/100); return c.amount*f; }
+function baseSpending(){ return state.categories.reduce((s,c)=>s+adjusted(c),0); }
+// healthcare is exempt from the spending decline — it tends to hold or rise with age
+const HEALTH_CAT=/health|medical|dental|vision|prescription|pharmacy|doctor|physician|hospital|clinic|co-?pay|urgent\s*care|therapy|psych|\blab\b|medicare/i;
+const FITNESS_CAT=/fitness|gym|wellness|yoga|pilates|exercise/i;   // discretionary — must NOT be held flat as healthcare
+function healthcareBase(){ return state.categories.reduce((s,c)=> s + ((HEALTH_CAT.test(c.name)&&!FITNESS_CAT.test(c.name))?adjusted(c):0), 0); }
+// home carrying costs that go away if you move to senior living (mortgage/tax/insurance/upkeep/utilities)
+const HOUSE_CAT=/hous|mortgage|rent|property|homeowner|\bhoa\b|maintenance|upkeep|utilit|home\s*insurance|home\s*improvement|home\s*service|home\s*repair|furnish|lawn|garden|yard/i;
+function housingKept(){ return state.categories.reduce((s,c)=> s + (HOUSE_CAT.test(c.name)?adjusted(c):0), 0); }
+// later-life move to senior living
+function inCommunity(age){ return state.lateLifeHousing==='community' && age>=state.communityMoveAge; }
+function communityFactor(){ return 1.6; }   // a couple shares one unit (~1.6× a single's fee, not 2×)
+function communityAt(age){ return inCommunity(age) ? state.communityAnnual*(lives(age).n>=2?communityFactor():1.0) : 0; }
+function spendingAt(age, base){
+  const hc = healthcareBase();
+  const decline = state.spendingSmile ? Math.pow(1-state.smileDecline, Math.max(0, age-state.smileAnchorAge)) : 1;  // age-anchored
+  let s = (base - hc)*decline + hc;            // discretionary drifts down; healthcare holds steady
+  if(inCommunity(age)) s = Math.max(0, s - housingKept());   // moving to senior living removes home costs
+  return s * survivorFactorAt(age);            // a one-person (survivor) household spends less
+}
+// long-term care, modeled PER PERSON: each runs from their own onset through their own end of life
+function ltcAt(age){
+  if(inCommunity(age)) return 0;   // senior-living fee already bundles care
+  const L=lives(age); let c=0;
+  const annual = state.elevatedCare ? state.eltcAnnual : state.ltcAnnual;
+  const onsetP = Math.min(state.elevatedCare?state.eltcOnset:state.ltcOnset, state.longevityAge-1);
+  const onsetS = Math.min(state.elevatedCare?state.eltcOnset:state.ltcOnset, state.spouseLongevityAge-1);
+  if(L.pAlive && age>=onsetP) c+=annual;
+  if(L.sAlive && L.sa>=onsetS) c+=annual;
+  return c;
+}
+// pre-Medicare (ACA) and Medicare are charged PER PERSON, each crossing 65 at their own age
+function preMedicareAt(age){
+  if(age<state.retirementAge) return 0;        // household retires together at R
+  const L=lives(age); let p=0;
+  if(L.pAlive && age<65)   p+=state.preMedicareAnnual;
+  if(L.sAlive && L.sa<65)  p+=state.preMedicareAnnual;
+  return p;
+}
+function medicareAt(age){
+  const L=lives(age); let m=0;
+  if(L.pAlive && age>=65)  m+=state.medicareAnnual;
+  if(L.sAlive && L.sa>=65) m+=state.medicareAnnual;
+  return m;
+}
+function medicareCount(age){ const L=lives(age); return (L.pAlive&&age>=65?1:0)+(L.sAlive&&L.sa>=65?1:0); }
+function ssAt(age){ return ssHouseholdAt(age); }   // back-compat alias → claim-gated, survivor-aware
+function bridgeAt(age){ return age < Math.max(state.retirementAge, state.bridgeStopAge) ? state.bridgeIncome : 0; }
+// NET amount the portfolio must supply that year (before tax gross-up)
+function netNeedAt(age, base){
+  const need = spendingAt(age,base) + ltcAt(age) + preMedicareAt(age) + medicareAt(age) + communityAt(age)
+             - ssHouseholdAt(age) - state.floorIncome - state.rentalIncome - bridgeAt(age);
+  return Math.max(0, need);
+}
+
+/* ----- conservatism: one dial drives growth + drawdown together ---------- */
+const CONS=[
+  {label:'Very cautious', r:0.040, wOffset:-0.006},
+  {label:'Cautious',      r:0.045, wOffset:-0.003},
+  {label:'Balanced',      r:0.050, wOffset: 0.000},
+  {label:'Optimistic',    r:0.055, wOffset:+0.003},
+  {label:'Aggressive',    r:0.060, wOffset:+0.006},
+];
+// safe withdrawal rate falls as the retirement horizon lengthens (SWR-vs-horizon research)
+function baseW(years){
+  const pts=[[15,0.055],[20,0.050],[25,0.045],[30,0.040],[35,0.037],[40,0.034],[45,0.032],[50,0.030]];
+  if(years<=pts[0][0]) return pts[0][1];
+  if(years>=pts[pts.length-1][0]) return pts[pts.length-1][1];
+  for(let i=0;i<pts.length-1;i++){
+    const [a,wa]=pts[i],[b,wb]=pts[i+1];
+    if(years>=a && years<=b) return wa+(wb-wa)*(years-a)/(b-a);
+  }
+  return 0.04;
+}
+function applyConservatism(){
+  const c=CONS[Math.max(0,Math.min(CONS.length-1, state.conservatism|0))];
+  state.realReturn=c.r;                                              // volatility stays fixed — our point of view
+  const years=Math.max(1, householdEnd()-state.retirementAge);       // fund until the LATER of the two deaths
+  state.withdrawalRate=clamp(baseW(years)+c.wOffset, 0.025, 0.055);  // horizon-adjusted; conservatism shifts it
+}
+
+/* ----- the core compute -------------------------------------------------- */
+// IRMAA: simplified income-based Medicare surcharge (annual household estimate)
+// returns the PER-PERSON annual Part B+D surcharge (caller multiplies by people())
+function irmaaAnnual(magi){
+  const t = state.filing==='married'
+    ? [[206000,0],[258000,994],[322000,2480],[386000,3970],[750000,5440],[Infinity,6004]]
+    : [[103000,0],[129000,994],[161000,2480],[193000,3970],[500000,5440],[Infinity,6004]];
+  for(const [lim,amt] of t){ if(magi<=lim) return amt; }
+  return 0;
+}
+// the headline number for the CURRENT state — pure, mutates nothing.
+// Builds the full per-year gross-withdrawal trajectory (two-life, per-year filing, all costs incl. care)
+// then SIZES the number via confidenceSim so it survives the target share of simulated markets.
+// optional baseOverride lets the lifestyle tiers reuse this exact engine with a scaled spend.
+function headlineNumber(baseOverride){
+  const realBase = baseSpending();
+  const base = baseOverride!=null ? baseOverride : realBase;
+  const hcFrac = realBase>0 ? healthcareBase()/realBase : 0;   // keep healthcare's share when a tier scales the base
+  const R=state.retirementAge, Lhh=householdEnd();
+  const otherOrd = a => state.floorIncome + state.rentalIncome + bridgeAt(a);
+  const spendOf = a => {
+    const hc = base*hcFrac;
+    const decline = state.spendingSmile ? Math.pow(1-state.smileDecline, Math.max(0, a-state.smileAnchorAge)) : 1;  // age-anchored
+    let s = (base-hc)*decline + hc;
+    if(inCommunity(a)) s = Math.max(0, s - housingKept());      // senior-living removes home costs
+    return s * survivorFactorAt(a);                             // survivor spends less
+  };
+  // per-year NET need (everything netted) → gross-up for tax at that year's filing status
+  const ages=[], net=[], gross=[]; let netSum=0, grossSum=0;
+  for(let a=R;a<Lhh;a++){
+    const nd = Math.max(0, spendOf(a) + ltcAt(a) + preMedicareAt(a) + medicareAt(a) + communityAt(a)
+                          - ssHouseholdAt(a) - state.floorIncome - state.rentalIncome - bridgeAt(a));
+    const g = grossUp(nd, ssHouseholdAt(a), otherOrd(a), filingAt(a));
+    ages.push(a); net.push(nd); gross.push(g); netSum+=nd; grossSum+=g;
+  }
+  const n=ages.length;
+  // IRMAA (usually $0): estimate from the average gross, add as a per-beneficiary surcharge from 65 if it bites
+  const avgGross0 = n? grossSum/n : 0;
+  const magi = avgGross0*(state.mixPreTax/100) + avgGross0*(state.mixTaxable/100)*0.5
+             + state.floorIncome + state.rentalIncome + 0.85*annualSS();
+  const irmaa = irmaaAnnual(magi);
+  if(irmaa>0){ netSum=0; grossSum=0;
+    for(let k=0;k<n;k++){ const a=ages[k];
+      net[k] += (a>=65 ? irmaa*medicareCount(a) : 0);
+      gross[k] = grossUp(net[k], ssHouseholdAt(a), otherOrd(a), filingAt(a));
+      netSum+=net[k]; grossSum+=gross[k];
+    }
+  }
+  const sim = confidenceSim(gross, state.confidenceTarget);
+  const number = sim.number;
+  const effTax = grossSum>0 ? (grossSum-netSum)/grossSum : 0;
+  const repGross = n ? grossSum/n : 0;                          // average annual portfolio draw (before tax)
+  const impliedW = number>0 ? repGross/number : 0;              // implied draw rate (for display)
+  return {number, success:sim.success, p10:sim.p10, p50:sim.p50, p90:sim.p90, endings:sim.endings,
+          ages, grossNeed:gross, effTax, repGross, impliedW, base};
+}
+function compute(){
+  applyConservatism();
+  if(!state.categories.length){ state.results=null; return; }
+  const base = baseSpending();
+  const R=state.retirementAge, L=householdEnd(), r=state.realReturn;
+
+  const h = headlineNumber();
+  const number = h.number;
+
+  // marginal benefit of delaying retirement one year — both framings
+  let delayDrop=0, delayContribSaved=0;
+  if(R+1 < L){
+    const sR=state.retirementAge; state.retirementAge=R+1;
+    const h2=headlineNumber();
+    state.retirementAge=sR;
+    delayDrop = Math.max(0, number - h2.number);
+    const cur=state.currentAge;
+    const reqC=(T,n)=>{ if(n<=0||r<=0) return 0; const g=Math.pow(1+r,n); return Math.max(0,(T - state.currentSavings*g)/((g-1)/r)); };
+    delayContribSaved = Math.max(0, reqC(number, R-cur) - reqC(h2.number, R+1-cur));
+  }
+
+  // gross spending curve (for the sparkline) over the household horizon
+  const spendCurve = h.ages.map(a => spendingAt(a,base)+ltcAt(a)+preMedicareAt(a)+medicareAt(a)+communityAt(a));
+  // the confidence view is the SAME calculation that sized the number — they can't disagree
+  const mc = {successRate:h.success, p10:h.p10, p50:h.p50, p90:h.p90, endings:h.endings};
+  const coast = coastData(number);
+
+  state.results = {
+    base, repGross:h.repGross, effTax:h.effTax, impliedW:h.impliedW, number, confidence:state.confidenceTarget,
+    effW:h.impliedW, horizon:L-R, delayDrop, delayContribSaved,
+    grossIncome:h.repGross, netIncome: base, liveIncome: base,
+    ss: annualSS(), ages:h.ages, grossNeed:h.grossNeed, spendCurve, mc, coast,
+    // tiers run through the SAME engine (each sized to the same confidence) with a scaled spend
+    lean: headlineNumber(base*state.leanFactor).number, fat: headlineNumber(base*state.fatFactor).number,
+  };
+}
+// coast trajectory: balance needed to coast by age vs. your projected balance
+function coastData(number){
+  const r=state.realReturn, R=state.retirementAge, cur=Math.min(state.currentAge, R);
+  const ages=[], needed=[], projected=[]; let coastAge=null;
+  const fv=(n)=> state.currentSavings*Math.pow(1+r,n) + (r>0? state.annualContribution*((Math.pow(1+r,n)-1)/r) : state.annualContribution*n);
+  for(let a=cur;a<=R;a++){
+    const need = number/Math.pow(1+r, R-a), proj = fv(a-cur);
+    ages.push(a); needed.push(need); projected.push(proj);
+    if(coastAge===null && proj>=need) coastAge=a;
+  }
+  return {ages, needed, projected, coastAge, todayNeeded: number/Math.pow(1+r, R-cur), atRetire: fv(R-cur)};
+}
+// seeded PRNG (mulberry32) so results are reproducible run-to-run instead of jittering
+let _rngState = 0;
+function srandom(){ _rngState = (_rngState + 0x6D2B79F5)|0; let t = Math.imul(_rngState ^ (_rngState>>>15), 1|_rngState); t = (t + Math.imul(t ^ (t>>>7), 61|t)) ^ t; return ((t ^ (t>>>14))>>>0)/4294967296; }
+// Box-Muller normal (drawn from the seeded stream)
+function randn(){ let u=0,v=0; while(!u)u=srandom(); while(!v)v=srandom();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+const MC_PATHS=3000;   // single source of truth for the path count (copy reads this too)
+// Confidence-sized number: instead of a withdrawal-rate guess, we SOLVE for the pot that survives a
+// target share of simulated market histories. Single pass: for each random return path, the minimum
+// starting pot that survives it is exactly the PV of the withdrawal stream at THAT path's returns
+// (B_min = Σ grossNeed[i] / Π_{j<i}(1+r_j)). The number that survives `target` of paths is the
+// target-percentile of B_min. Ending balances are linear in the start: end = totalGrowth·(number − B_min).
+// This makes the headline and the confidence view ONE calculation — they can never contradict.
+function confidenceSim(grossNeed, target, paths=MC_PATHS){
+  const n=grossNeed.length;
+  if(!n) return {number:0, success:1, p10:0, p50:0, p90:0, endings:[0]};
+  _rngState = 0x9e3779b9|0;                       // fixed seed → deterministic, consistent across calls
+  const bmin=new Float64Array(paths), grow=new Float64Array(paths);
+  for(let p=0;p<paths;p++){
+    let growth=1, pv=0;
+    for(let i=0;i<n;i++){
+      pv += grossNeed[i]/growth;                  // discount each withdrawal by growth BEFORE that year
+      growth *= (1 + state.realReturn + state.volatility*randn());
+    }
+    bmin[p]=pv; grow[p]=growth;
+  }
+  const sorted=Float64Array.from(bmin).sort();
+  const number=sorted[clamp(Math.floor(target*(paths-1)),0,paths-1)];
+  const endings=new Array(paths); let success=0;
+  for(let p=0;p<paths;p++){ const e=grow[p]*(number-bmin[p]); endings[p]=e>0?e:0; if(number>=bmin[p])success++; }
+  endings.sort((a,b)=>a-b);
+  const eq=f=>endings[clamp(Math.floor(f*(paths-1)),0,paths-1)];
+  return {number, success:success/paths, p10:eq(.10), p50:eq(.50), p90:eq(.90), endings};
+}
+
+/* ----- reasonableness check: is the built spending plausible? ------------ */
+const BENCH_65PLUS = 57000;   // ~avg US household 65+ annual spending (BLS CES) — VERIFY
+function reasonableness(){
+  const today = state.categories.reduce((s,c)=>s+c.amount,0);
+  const base  = baseSpending();
+  const rep   = today>0 ? base/today : 0;
+  const flags=[];
+  const rp = Math.round(rep*100);
+  if(today>0 && rep<0.55 && base < BENCH_65PLUS*0.95)
+    flags.push({t:'warn',m:`You're projecting only <b>${rp}%</b> of today's spending, and <b>${money(base)}/yr</b> is below a typical 65+ household — double-check you didn't over-strip an essential.`});
+  else if(today>0 && rep<0.55)
+    flags.push({t:'ok',m:`You're projecting <b>${rp}%</b> of today's spending — lower than today, but that's expected when you've removed one-time or investment items (a property purchase, tuition). In absolute terms <b>${money(base)}/yr</b> is comfortable.`});
+  else if(today>0 && rep>1.15)
+    flags.push({t:'note',m:`You're projecting <b>${rp}%</b> of today's spending — more than today. Intentional (e.g. big travel plans)? Otherwise worth a second look.`});
+  else if(today>0)
+    flags.push({t:'ok',m:`You're projecting <b>${rp}%</b> of today's spending — inside the normal ~70–85% range.`});
+  const hay = state.categories.map(c=>c.name.toLowerCase()).join(' ');
+  if(!['hous','rent','mortgage'].some(k=>hay.includes(k))) flags.push({t:'warn',m:'No <b>housing</b> line detected — most retirees still have housing costs (property tax, upkeep, or rent).'});
+  else if(state.lateLifeHousing!=='community' && housingKept()<4000) flags.push({t:'warn',m:'Your retirement <b>housing cost is near $0</b> — even a paid-off home has property tax, insurance, and upkeep. Keep a housing line (or model moving to senior living in the assumptions).'});
+  if(!['food','grocer'].some(k=>hay.includes(k)))          flags.push({t:'warn',m:'No <b>food / groceries</b> line detected.'});
+  if(!['health','medical'].some(k=>hay.includes(k)))       flags.push({t:'warn',m:'No routine <b>healthcare</b> line detected — it usually rises in retirement.'});
+  if(base<25000)                                            flags.push({t:'warn',m:`<b>${money(base)}/yr</b> is very low for a household — make sure essentials are covered.`});
+  return {today, base, rep, flags};
+}
+function reasonablenessCard(){
+  const z=reasonableness();
+  const icon=t=>t==='warn'?'⚠':t==='note'?'•':'✓';
+  const col =t=>t==='warn'?'var(--warn)':t==='note'?'var(--muted)':'var(--accent2)';
+  const rows=z.flags.map(f=>`<div style="display:flex;gap:9px;align-items:flex-start;margin:7px 0">
+      <span style="color:${col(f.t)};font-weight:700">${icon(f.t)}</span>
+      <span style="font-size:13.5px;color:#cdd6ee">${f.m}</span></div>`).join('');
+  return `<div class="card">
+    <h3 style="margin-top:2px">Reasonableness check</h3>
+    <p class="hint">A gut-check on the spending you built — the sanity test a number like this deserves.</p>
+    ${rows}
+    <div class="note" style="margin-top:10px">For context, the average U.S. household age 65+ spends roughly <b>${money(BENCH_65PLUS)}/yr</b> in total; you built <b>${money(z.base)}/yr</b>.
+      <span style="display:block;color:var(--muted);font-size:11px;margin-top:4px">Rough benchmark from U.S. government spending data (Bureau of Labor Statistics).</span></div>
+  </div>`;
+}
+
+/* ===================== UI / STEPS ======================================== */
+const STEPS=[stIntro, stBudget, stIncome, stLevers, stAssumptions, stReveal, stConfidence, stCoast, stTiers];
+
+function renderApp(){
+  compute();
+  $('app').innerHTML = STEPS[step]();
+  // progress dots
+  $('dots').innerHTML = STEPS.map((_,i)=>`<i class="${i<step?'done':i===step?'cur':''}"></i>`).join('');
+  updateLive();
+  // NOTE: no auto-scroll here — in-step re-renders (action buttons, toggles) must keep your place.
+}
+function nav(html){
+  const back = step>0 ? `<button class="btn ghost" onclick="go(-1)">← Back</button>` : `<span></span>`;
+  const next = step<STEPS.length-1 ? `<button class="btn primary" onclick="go(1)" ${canAdvance()?'':'disabled style="opacity:.45;cursor:not-allowed"'}>Continue →</button>` : `<button class="btn primary" onclick="reset()">↻ Start over</button>`;
+  return html + `<div class="nav">${back}${next}</div>`;
+}
+function canAdvance(){
+  if(step===1) return state.categories.length>0;
+  return true;
+}
+window.go = d => { step=clamp(step+d,0,STEPS.length-1); renderApp(); window.scrollTo({top:0,behavior:'smooth'}); };
+window.reset = ()=>{ state=JSON.parse(JSON.stringify(DEFAULTS)); state.expenseMode=null; state.categories=[]; step=0; renderApp(); window.scrollTo({top:0,behavior:'smooth'}); };
+
+/* ---- live updates (no full re-render; keeps input focus) ---------------- */
+function setVal(key,val,asNum=true){ state[key]= asNum?parseFloat(val):val; compute(); updateLive(); }
+function setValR(key,val,asNum=true){ state[key]= asNum?parseFloat(val):val; renderApp(); }
+function updateLive(){
+  const r=state.results;
+  if($('navNumber')){
+    if(r){ $('navNumber').textContent=money(r.number); $('navNumber').classList.remove('dim');
+           $('navSub').textContent='≈ '+money(r.netIncome)+'/yr to live on'; }
+    else { $('navNumber').textContent='—'; $('navNumber').classList.add('dim'); $('navSub').textContent='build your number as you go'; }
+  }
+  // refresh any slider value labels present on the page
+  document.querySelectorAll('[data-live]').forEach(el=>{ el.textContent = liveText(el.getAttribute('data-live')); });
+  // refresh dynamic result blocks if their container is present
+  if($('revBlock')&&r) $('revBlock').innerHTML = revInner(r);
+  if($('mcBlock')&&r)  $('mcBlock').innerHTML  = mcInner(r);
+  // coast: update only the headline + chart so the savings/contribution inputs keep focus
+  if($('coastHead')&&r) $('coastHead').innerHTML = coastHeadHTML(r);
+  if($('coastChart')&&r) $('coastChart').innerHTML = coastChart(r.coast);
+  if($('tierBlock')&&r) $('tierBlock').innerHTML = tierInner(r);
+  if($('extraSummary')) $('extraSummary').textContent = money(baseSpending());
+}
+function liveText(k){
+  switch(k){
+    case 'ssEst': return money(annualSS())+'/yr';
+    case 'cons': return CONS[state.conservatism|0].label;
+    case 'consDetail': return `Assumes ~${(state.realReturn*100).toFixed(1)}% real growth, then sizes your number so it survives ${pct(state.confidenceTarget)} of simulated markets. More cautious = lower assumed return = bigger, safer number. We stress-test the order of returns on the confidence step.`;
+    case 'w': return state.results? pct(state.results.impliedW) : '—';
+    case 'r': return (state.realReturn*100).toFixed(1)+'%';
+    case 'vol': return (state.volatility*100).toFixed(0)+'%';
+    case 'retAge': return state.retirementAge;
+    case 'longAge': return state.longevityAge;
+    case 'curAge': return state.currentAge;
+    case 'claim': return state.ssClaimAge;
+    case 'state': return state.stateTax+'%';
+    case 'bridgeInc': return money(state.bridgeIncome);
+    case 'floor': return money(state.floorIncome);
+    case 'rental': return money(state.rentalIncome);
+    case 'bridgeStop': return Math.max(state.retirementAge, state.bridgeStopAge);
+    case 'moveAge': return state.communityMoveAge;
+    case 'delayEdu': { const r=state.results; if(!r||!(r.delayDrop>0)) return 'Retiring later lowers your number — nudge it up a year to see by how much.'; let s=`Retiring at ${state.retirementAge+1} instead of ${state.retirementAge} would drop your number ~${money(r.delayDrop)}`; if(r.delayContribSaved>0) s+=`, or let you save ~${money(r.delayContribSaved)}/yr less between now and then`; return s+'.'; }
+    case 'claim2': return state.ssClaimAge;
+    case 'ssBenefit': return money(annualSS());
+    case 'claimPct': { const p=Math.round((ssClaimFactor()-1)*100); return `(${p>=0?'+':''}${p}% vs. claiming at 67)`; }
+    case 'spouseGap': { const g=state.spouseAgeGap; return g===0?'same age':`${Math.abs(g)} yr ${g>0?'older':'younger'}`; }
+    case 'spouseLong': return state.spouseLongevityAge;
+    case 'spouseClaim': return state.spouseClaimAge;
+    case 'survivorEdu': { const end=householdEnd(); const widow = isCouple() && Math.min(state.longevityAge, state.spouseLongevityAge - state.spouseAgeGap) < end;
+      return widow ? `When the first spouse passes (around age ${Math.min(state.longevityAge, state.spouseLongevityAge - state.spouseAgeGap)}), we drop spending to ~${pct(state.survivorFactor)}, stop the smaller Social Security check, and switch to single-filer taxes for the survivor.` : `Your plan runs until the later of the two of you (age ${end}). Set different ages to see the survivor years.`; }
+    case 'mix': return `${state.mixPreTax}/${state.mixRoth}/${state.mixTaxable}`;
+  }
+  return '';
+}
+
+/* ---- STEP 0: intro ------------------------------------------------------ */
+function stIntro(){
+  return nav(`
+   <h1>What's your <span style="color:var(--accent2)">number</span>?</h1>
+   <p class="lead">Your "number" is the total amount you need saved and invested to retire. Most tools hand it to you as a black box. Finneas does the opposite: you'll <b>build</b> it from what you actually spend — and see every assumption inside it, explained as you go.</p>
+   <div class="card tight" style="margin-top:14px">
+     <div class="slabel"><b>Who are you planning for?</b></div>
+     <div class="seg" style="margin-top:8px">
+       <button class="${state.household==='couple'?'on':''}" onclick="setHousehold('couple')">My household (two people)</button>
+       <button class="${state.household==='single'?'on':''}" onclick="setHousehold('single')">Just me</button>
+     </div>
+     <p class="hint" style="margin-top:8px">This sets your tax filing and scales the per-person costs (healthcare, Medicare, long-term care) and your Social Security estimate.</p>
+     <p class="hint" style="margin-top:6px;color:var(--muted)">For a couple, we model both of you as two lives on one timeline — each with your own income, claim age, and longevity — and we account for the change when the first spouse passes. We still assume you retire together (same retirement age).</p>
+   </div>
+   <div class="card">
+     <h3 style="margin-top:4px">By the end you'll know</h3>
+     <p style="margin:6px 0">① <b>Your number</b>, translated into the real spending money it gives you each year.<br>
+     ② <b>How confident</b> that number is once you account for real market ups and downs.<br>
+     ③ Your <b>coast point</b> — the savings balance that, even if you never add another dollar, grows on its own into your number by the time you retire.</p>
+   </div>
+   <p class="note">Every dollar here is in <b>today's money</b> — already adjusted for future inflation, so it's easy to picture.</p>
+   <details><summary>How is this different from my advisor's portal?</summary>
+     <div class="body">Advisor tools usually assume your retirement spending is some fixed ratio of today's spending, then hide the dials (how fast you spend down, taxes, market risk, how long you live). Finneas starts from your real expenses, strips out what won't carry forward (a rental-property purchase isn't lifestyle; private-school tuition ends), and puts every assumption in your hands.</div>
+   </details>
+   <p class="hint">Takes ~3 minutes. Nothing is sent anywhere — it all runs in your browser.</p>
+  `);
+}
+
+/* ---- STEP 1: expenses --------------------------------------------------- */
+function stBudget(){
+  const mode=state.expenseMode;
+  let body=`<h2>What will you actually spend in retirement?</h2>
+   <p class="lead">Start from what you really spend now, then decide line by line what carries into retirement — keep it, trim it, drop it, or bump it up.</p>
+   <div class="row wrap" style="margin:14px 0">
+     <button class="btn ${mode==='sample'?'primary':''}" onclick="pickMode('sample')">Use sample data</button>
+     <button class="btn ${mode==='manual'?'primary':''}" onclick="pickMode('manual')">Enter big-ticket items</button>
+     <button class="btn ${mode==='csv'?'primary':''}" onclick="pickMode('csv')">Import / paste CSV</button>
+   </div>`;
+  if(mode==='csv'){
+    body+=`<div class="card">
+      <div class="dropzone" ondrop="onCSVDrop(event)" ondragover="onCSVDragOver(event)" ondragleave="onCSVDragLeave(event)" onclick="document.getElementById('csvFile').click()">
+        <div style="font-size:15px;font-weight:700;color:#fff">Drop your transactions CSV here</div>
+        <div class="hint">or click to choose a file — handles thousands of rows, no pasting</div>
+        <input type="file" id="csvFile" accept=".csv,text/csv,text/plain" style="display:none" onchange="onCSVFile(this)">
+      </div>
+      <div class="hint" style="text-align:center;margin:12px 0 8px">— or paste it below —</div>
+      <label class="fld">Full transactions export (with <code>Category</code> and <code>Amount</code> columns) — or simple <code>category, amount</code> rows</label>
+      <textarea id="csvText" placeholder="Date,Merchant,Category,Account,Amount&#10;2025-03-02,Whole Foods,Groceries,Checking,-184.20&#10;2025-03-03,Shell,Transportation,Credit Card,-52.10&#10;..."></textarea>
+      <p class="hint" style="margin-top:8px">Paste the whole file — even 1,000+ transactions is fine. We total spending by category and automatically drop transfers, card payments, and income, and detect your paycheck income for the next step.</p>
+      ${state.csvNote?`<p class="hint" style="color:var(--accent2);margin-top:6px">✓ ${state.csvNote}</p>`:''}
+      <div style="margin-top:10px"><button class="btn sm primary" onclick="parseCSV()">Total it up →</button></div></div>`;
+  }
+  if(mode==='manual' && !state.categories.length){
+    state.categories=[{name:'Housing',amount:24000,action:'keep',keepPct:100},
+                      {name:'Food',amount:14000,action:'keep',keepPct:100},
+                      {name:'Healthcare',amount:7000,action:'keep',keepPct:100},
+                      {name:'Travel',amount:10000,action:'keep',keepPct:100}];
+  }
+  if(state.categories.length){
+    body+=`<details><summary>Why this step matters most</summary><div class="body">This is the difference between a real number and a guess. A one-time rental-property purchase is an <i>investment</i>, not lifestyle. Private-school tuition ends. A paid-off mortgage drops your housing cost. And some things go <i>up</i> — many people travel more early in retirement, and healthcare rises with age.</div></details>
+    <div class="card"><table><thead><tr><th>Category · today's spend</th><th>In retirement</th></tr></thead><tbody>`;
+    state.categories.forEach((c,i)=>{
+      const adj=(c.action==='reduce'||c.action==='increase');
+      body+=`<tr>
+        <td>
+          <input type="text" value="${c.name}" style="width:150px;max-width:100%" oninput="editCat(${i},'name',this.value,false)">
+          <div style="margin-top:4px"><span class="hint">today&nbsp;$</span><input type="number" value="${c.amount}" style="width:100px;padding:4px 8px;display:inline-block" oninput="editCat(${i},'amount',this.value,true)"></div>
+          ${c.note?`<div class="hint">${c.note}</div>`:''}
+        </td>
+        <td>
+          <div class="seg sm">
+            <button class="${c.action==='keep'?'on':''}" onclick="setAct(${i},'keep')">Keep</button>
+            <button class="${c.action==='reduce'?'on':''}" onclick="setAct(${i},'reduce')">Reduce</button>
+            <button class="${c.action==='increase'?'on':''}" onclick="setAct(${i},'increase')">Increase</button>
+            <button class="${c.action==='remove'?'on':''}" onclick="setAct(${i},'remove')">Remove</button>
+          </div>
+          ${adj?`<div class="hint" style="margin-top:5px">to <input type="number" value="${c.keepPct}" style="width:62px;display:inline-block;padding:4px 6px" oninput="editCat(${i},'keepPct',this.value,true)">% of today</div>`:''}
+          <div style="margin-top:7px"><span class="hint">counts as&nbsp;</span><b class="num" id="res${i}">${money(adjusted(c))}</b></div>
+        </td>
+      </tr>`;
+    });
+    body+=`</tbody></table>
+      <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid var(--line);padding-top:12px">
+        <button class="btn sm" onclick="addCat()">+ Add line</button>
+        <div style="text-align:right"><div class="hint">Your retirement spending (today's $)</div><b class="num" style="font-size:20px;color:var(--accent2)" id="extraSummary">${money(baseSpending())}</b></div>
+      </div></div>`;
+    body += lifestyleCard();
+  }
+  return nav(body);
+}
+function lifestyleCard(){
+  const DISC=/travel|vacation|dining|restaurant|hobb|recreation|entertain|gift|leisure|club|home ?improvement/i;
+  const items=state.categories.map((c,i)=>({c,i})).filter(x=>DISC.test(x.c.name) && x.c.action!=='remove');
+  if(!items.length) return '';
+  const rows=items.map(({c,i})=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin:8px 0;flex-wrap:wrap">
+     <div><b>${c.name}</b> <span class="hint">— ${money(c.amount)} today${c.action==='increase'?` → <span style="color:var(--accent2)">${money(adjusted(c))}</span>`:''}</span></div>
+     <div class="seg sm"><button class="${c.action!=='increase'?'on':''}" onclick="bump(${i},100)">as-is</button><button class="${c.action==='increase'&&c.keepPct==125?'on':''}" onclick="bump(${i},125)">+25%</button><button class="${c.action==='increase'&&c.keepPct==150?'on':''}" onclick="bump(${i},150)">+50%</button></div>
+   </div>`).join('');
+  return `<div class="card">
+    <h3 style="margin-top:2px">Want to live it up a little?</h3>
+    <p class="hint">Retirement is when you finally have time to spend. These categories often <i>rise</i> — bump up the ones that fit your dream (travel, dining, hobbies, gifts to family). Healthcare also tends to creep up with age.</p>
+    ${rows}
+  </div>`;
+}
+window.bump=(i,pct)=>{ const c=state.categories[i]; if(pct<=100){c.action='keep';c.keepPct=100;} else {c.action='increase';c.keepPct=pct;} renderApp(); };
+window.pickMode=m=>{ state.expenseMode=m; state.csvNote=''; state.incomeFromFile=false; state.detectedIncome=0; if(m==='sample'){state.categories=JSON.parse(JSON.stringify(SAMPLE));} else {state.categories=[];} renderApp(); };
+window.setHousehold=v=>{ state.household=v; state.filing = v==='couple'?'married':'single'; renderApp(); };
+// CSV line splitter that respects quoted fields (merchant names can contain commas)
+function splitCSVLine(line){
+  const out=[]; let cur='', q=false;
+  for(let i=0;i<line.length;i++){ const ch=line[i];
+    if(ch==='"'){ if(q && line[i+1]==='"'){cur+='"';i++;} else q=!q; }
+    else if(ch===',' && !q){ out.push(cur); cur=''; }
+    else cur+=ch;
+  }
+  out.push(cur); return out;
+}
+// noise categories to drop from a transactions export (avoid double-counting / non-lifestyle)
+const SKIP_CAT=/transfer|credit card payment|\bpayment\b|paycheck|income|salary|interest|dividend|reimburse|refund|deposit|venmo|zelle/i;
+// earned income (for the Social Security estimate) — wages AND self-employment/farm (both count toward SS),
+// NOT passive rental/investment income. "farm income"/"business income" two-word to avoid matching a Farm EXPENSE category.
+const INCOME_CAT=/paycheck|payroll|\bsalary\b|\bwages?\b|self.?employ|schedule\s*c|1099|consult|freelance|commission|\bbonus\b|business income|farm income|earned income/i;
+function ingestCSV(txt){
+  txt=(txt||'').trim(); if(!txt) return;
+  const lines=txt.split(/\r?\n/).filter(l=>l.trim());
+  if(!lines.length) return;
+  const head=splitCSVLine(lines[0]).map(h=>h.toLowerCase().trim());
+  const ci=head.findIndex(h=>h==='category');
+  const ai=head.findIndex(h=>h==='amount');
+  let cats, dropped=0;
+  if(ci>=0 && ai>=0){
+    // FULL TRANSACTIONS EXPORT → aggregate by category
+    const sums={}; let inc=0;
+    for(let i=1;i<lines.length;i++){
+      const c=splitCSVLine(lines[i]); if(c.length<=Math.max(ci,ai)) continue;
+      const cat=(c[ci]||'Uncategorized').trim();
+      const amt=parseFloat((c[ai]||'').replace(/[^0-9.\-]/g,''))||0;
+      sums[cat]=(sums[cat]||0)+amt;
+      if(amt>0 && INCOME_CAT.test(cat)) inc+=amt;   // detect earned income for the SS estimate
+    }
+    state.detectedIncome=Math.round(inc);
+    state.incomeFromFile = inc>0;
+    if(inc>0) state.income=Math.round(inc);
+    // fallback: positive-net categories we couldn't confirm as earned income (e.g., self-employment labeled oddly)
+    state.incomeUnsure = inc===0 && Object.keys(sums).some(c=> sums[c]>5000 && !SKIP_CAT.test(c));
+    cats=Object.keys(sums).map(name=>{
+      const net=sums[name];
+      const spend=Math.round(Math.abs(Math.min(0,net)));   // expenses are negative in Monarch
+      const skip=SKIP_CAT.test(name);
+      if(skip||spend<=0) dropped++;
+      return {name, amount:spend, _skip:skip};
+    }).filter(c=>c.amount>0 && !c._skip)
+      .map(c=>({name:c.name, amount:c.amount, action:'keep', keepPct:100}))
+      .sort((a,b)=>b.amount-a.amount);
+    state.csvNote=`Totaled ${lines.length-1} transactions into ${cats.length} categories${dropped?`, dropped ${dropped} transfer/income line${dropped>1?'s':''}`:''}.`;
+  } else {
+    // SIMPLE "category, amount" rows
+    cats=lines.map(l=>{const p=splitCSVLine(l);return {name:(p[0]||'Item').trim(),amount:parseFloat((p[1]||'0').replace(/[^0-9.]/g,''))||0,action:'keep',keepPct:100};}).filter(c=>c.amount>0);
+    state.csvNote=`Loaded ${cats.length} categories.`;
+  }
+  state.categories=cats; renderApp();
+}
+window.parseCSV=()=>{ const ta=$('csvText'); ingestCSV(ta?ta.value:''); };
+function readCSVFile(f){
+  if(!f) return;
+  if(f.size>20*1024*1024){ state.csvNote='That file is unusually large (>20MB) — try exporting just last year.'; renderApp(); return; }
+  const rd=new FileReader();
+  rd.onload=e=>ingestCSV(e.target.result);
+  rd.onerror=()=>{ state.csvNote='Could not read that file — try pasting the contents instead.'; renderApp(); };
+  rd.readAsText(f);
+}
+window.onCSVFile=(input)=>{ readCSVFile(input.files && input.files[0]); };
+window.onCSVDrop=(ev)=>{ ev.preventDefault(); ev.currentTarget.classList.remove('drag'); readCSVFile(ev.dataTransfer.files && ev.dataTransfer.files[0]); };
+window.onCSVDragOver=(ev)=>{ ev.preventDefault(); ev.currentTarget.classList.add('drag'); };
+window.onCSVDragLeave=(ev)=>{ ev.currentTarget.classList.remove('drag'); };
+window.editCat=(i,k,v,n)=>{ state.categories[i][k]= n?parseFloat(v)||0:v; compute();
+  if($('res'+i)) $('res'+i).textContent=money(adjusted(state.categories[i]));
+  updateLive(); };
+window.addCat=()=>{ state.categories.push({name:'New line',amount:0,action:'keep',keepPct:100}); renderApp(); };
+window.delCat=i=>{ state.categories.splice(i,1); renderApp(); };
+
+window.setAct=(i,a)=>{ const c=state.categories[i]; c.action=a;
+  if(a==='increase' && (!c.keepPct || c.keepPct<=100)) c.keepPct=130;   // start as a real increase
+  if(a==='reduce'   && (!c.keepPct || c.keepPct>=100)) c.keepPct=50;    // start as a real reduction
+  renderApp(); };
+
+/* ---- STEP 3: income ----------------------------------------------------- */
+function stIncome(){
+  return nav(`<h2>Your current income</h2>
+   <p class="lead">This is only used to estimate your Social Security benefit.</p>
+   <div class="card" style="max-width:440px">
+     <label class="fld">${isCouple()?'Your':'Your'} current income (gross, before tax)${isCouple()?' — just you':''}</label>
+     <input type="number" value="${state.income}" oninput="setVal('income',this.value)">
+     ${isCouple()?`<label class="fld" style="margin-top:12px">Your spouse's current income (0 if they didn't work for pay — they'll get the ~50% spousal benefit)</label>
+     <input type="number" value="${state.spouseIncome}" oninput="setVal('spouseIncome',this.value)">`:''}
+     ${state.incomeFromFile?`<p class="hint" style="color:var(--accent2);margin-top:8px">✓ Pre-filled ~${money(state.detectedIncome)}/yr from paycheck / self-employment deposits in your upload${isCouple()?' (we put it all under "you" — split it with your spouse above if you both earned)':''}. Heads-up: deposits are usually <b>take-home</b> (net) pay, and self-employment income is often net of expenses — Social Security is based on <b>gross</b> earnings, so adjust up if needed.</p>`:''}
+     ${state.incomeUnsure?`<p class="hint" style="color:var(--warn);margin-top:8px">⚠ We saw deposits in your file but couldn't confirm they're earned income (common for self-employment or farm income labeled unusually). Please enter your gross income above.</p>`:''}
+     <div class="hint" style="margin-top:10px">Estimated Social Security${isCouple()?' (household)':''}: <b class="num" data-live="ssEst">${liveText('ssEst')}</b> <span class="hint">(at your chosen scenario)</span></div>
+     <p class="hint" style="margin-top:10px;color:var(--muted)">We estimate your benefit from today's income scaled to a <b>career average</b> (~${pct(state.aimeFactor)} — most people earned less earlier on). Your real benefit depends on your full earnings history; for an exact figure, use the estimate on your <b>SSA statement</b> (ssa.gov).</p>
+   </div>
+   <details><summary>How we estimate Social Security</summary><div class="body">We estimate your benefit using Social Security's official formula, based on your income (up to the annual cap that Social Security taxes), then scale it by the scenario you choose on the next screen. It's a planning estimate — your real benefit depends on your full earnings history and the age you claim.<cite>Method: SSA primary-insurance-amount bend points (2024).</cite></div></details>`);
+}
+
+/* ---- STEP 4: levers ----------------------------------------------------- */
+function slider(key,label,min,max,scaledKey,liveKey,extra){
+  const val = state[key];
+  return `<div class="card tight">
+    <div class="slabel"><b>${label}</b><span data-live="${liveKey}">${liveText(liveKey)}</span></div>
+    <input type="range" min="${min}" max="${max}" step="${extra.step}" value="${extra.raw?val:val*extra.mul}" oninput="setVal('${key}', ${extra.div?`this.value/${extra.div}`:'this.value'})">
+    ${extra.sub?`<div class="hint" style="margin-top:6px">${extra.sub}</div>`:''}
+    ${extra.help?`<details><summary>${extra.help.q}</summary><div class="body">${extra.help.a}${extra.help.cite?`<cite>${extra.help.cite}</cite>`:''}</div></details>`:''}
+  </div>`;
+}
+function consCard(){
+  return `<div class="card tight">
+    <div class="slabel"><b>How conservative do you want to be?</b><span data-live="cons">${liveText('cons')}</span></div>
+    <input type="range" min="0" max="4" step="1" value="${state.conservatism}" oninput="setVal('conservatism', this.value)">
+    <div class="hint" style="display:flex;justify-content:space-between;margin-top:2px"><span>← cautious · bigger, safer number</span><span>optimistic · smaller number →</span></div>
+    <div class="hint" style="margin-top:8px" data-live="consDetail">${liveText('consDetail')}</div>
+    <details><summary>What am I actually setting here?</summary><div class="body">This one dial sets three expert assumptions together, so you don't have to:<br>
+      • <b>How your money grows</b> — what your investments earn each year after inflation (we use ~4–6%). Being too optimistic here is the most common and most damaging retirement-planning mistake.<br>
+      • <b>How much you draw down</b> — your safe withdrawal rate. The famous &quot;4% rule&quot; is a ~30-year benchmark; we automatically lower it for longer retirements, and this slider shifts it (cautious = lower = bigger number; you can still land at 3% or below).<br>
+      • <b>Market bumpiness</b> — we deliberately <i>don't</i> let you set this (almost no one can estimate it). We hold it at a realistic level and stress-test your plan against real market ups and downs on the confidence step.
+      <cite>Bengen 1994 (the 4% rule); Pfau / Kitces (sequence-of-returns risk).</cite></div></details>
+  </div>`;
+}
+function stLevers(){
+  return nav(`<h2>Set your assumptions</h2>
+   <p class="lead">These are the settings advisors usually hide. Adjust them and watch your number update above.</p>
+   ${consCard()}
+   <div class="card tight">
+     <div class="slabel"><b>Retirement age</b><span data-live="retAge">${state.retirementAge}</span></div>
+     <input type="range" min="50" max="75" step="1" value="${state.retirementAge}" oninput="setVal('retirementAge',this.value)">
+     <div class="hint" style="margin-top:6px;color:var(--accent2)" data-live="delayEdu">${liveText('delayEdu')}</div>
+   </div>
+   <div class="grid two">
+     ${slider('longevityAge',isCouple()?'Plan until age (you)':'Plan until age',80,100,null,'longAge',{step:1,raw:true,help:{q:'Why plan to 92+?',a:'Planning to average life expectancy means ~half of people outlive their money. Planning to a longevity age (90–95) is the standard safe practice.'}})}
+     ${slider('currentAge','Your current age',25,70,null,'curAge',{step:1,raw:true})}
+   </div>
+   ${isCouple()?`<div class="card tight">
+     <div class="slabel"><b>Your spouse</b><span class="hint">we model them as a second life on your timeline</span></div>
+     <div class="grid two" style="margin-top:8px">
+       <div>
+         <div class="slabel"><b>Spouse's age vs. you</b><span data-live="spouseGap">${liveText('spouseGap')}</span></div>
+         <input type="range" min="-10" max="10" step="1" value="${state.spouseAgeGap}" oninput="setVal('spouseAgeGap',this.value)">
+       </div>
+       <div>
+         <div class="slabel"><b>Spouse plans until age</b><span data-live="spouseLong">${state.spouseLongevityAge}</span></div>
+         <input type="range" min="80" max="100" step="1" value="${state.spouseLongevityAge}" oninput="setVal('spouseLongevityAge',this.value)">
+       </div>
+     </div>
+     <p class="hint" data-live="survivorEdu" style="margin-top:8px;color:var(--accent2)">${liveText('survivorEdu')}</p>
+   </div>`:''}
+
+   <h3 style="margin-top:24px">Other income (optional)</h3>
+   <p class="hint" style="margin-top:0">Anything here brings in money and lowers what your portfolio has to carry.</p>
+   <div class="card">
+     <h3 style="margin-top:2px">Real estate / rental income</h3>
+     <p class="hint">Rental income you expect in retirement, in today's dollars (before tax). Taxable, assumed to rise with inflation, and not counted toward Social Security.</p>
+     <div class="slabel" style="margin-top:8px"><b>Annual rental income</b><span data-live="rental">${money(state.rentalIncome)}</span></div>
+     <input type="range" min="0" max="120000" step="1000" value="${state.rentalIncome}" oninput="setVal('rentalIncome',this.value)">
+   </div>
+   <div class="card">
+     <h3 style="margin-top:2px">Guaranteed income for life</h3>
+     <p class="hint">A pension or annuity that pays no matter what.</p>
+     <div class="slabel" style="margin-top:8px"><b>Annual guaranteed income</b><span data-live="floor">${money(state.floorIncome)}</span></div>
+     <input type="range" min="0" max="80000" step="1000" value="${state.floorIncome}" oninput="setVal('floorIncome',this.value)">
+   </div>
+   <div class="card">
+     <h3 style="margin-top:2px">Planning to work a bit in early retirement?</h3>
+     <p class="hint">Do you plan to do some part-time work or consulting after you retire? Even a few years of income early on takes big pressure off your savings.</p>
+     <div class="slabel" style="margin-top:8px"><b>How much per year?</b><span data-live="bridgeInc">${money(state.bridgeIncome)}</span></div>
+     <input type="range" min="0" max="60000" step="1000" value="${state.bridgeIncome}" oninput="setVal('bridgeIncome',this.value)">
+     <div class="slabel" style="margin-top:12px"><b>Until what age?</b><span data-live="bridgeStop">${Math.max(state.retirementAge,state.bridgeStopAge)}</span></div>
+     <input type="range" min="${state.retirementAge}" max="80" step="1" value="${Math.max(state.retirementAge,state.bridgeStopAge)}" oninput="setVal('bridgeStopAge',this.value)">
+   </div>`);
+}
+
+/* ---- STEP 5: assumptions ------------------------------------------------ */
+function stAssumptions(){
+  const r=state.results||{};
+  return nav(`<h2>The assumptions we made for you</h2>
+   <p class="lead">Some things you genuinely can't estimate about yourself. We take a research-backed stance — shown here, and editable.</p>
+
+   <div class="card">
+     <h3 style="margin-top:2px">Long-term care &amp; late-life medical</h3>
+     <p class="hint">Most people can't predict their own care needs, so a slider would be false precision. We bake in a research-backed default instead.</p>
+     <div class="row wrap" style="margin-top:8px">
+       <button class="btn sm ${!state.elevatedCare?'primary':''}" onclick="setValR('elevatedCare',0,false)">Typical default</button>
+       <button class="btn sm ${state.elevatedCare?'primary':''}" onclick="setValR('elevatedCare',1,false)">I have known elevated needs</button>
+     </div>
+     <p class="hint" style="margin-top:8px">${state.elevatedCare
+        ? `Assuming ${money(state.eltcAnnual)}/yr of care per person from age ${state.eltcOnset} through the end of the plan${isCouple()?` — each spouse at their own late life, up to ~${money(state.eltcAnnual*2)}/yr if both need care at once`:''}. Earlier onset, higher cost.`
+        : `Assuming ${money(state.ltcAnnual)}/yr of care per person from age ${state.ltcOnset} through the end of the plan${isCouple()?` (each spouse at their own late life — up to ~${money(state.ltcAnnual*2)}/yr if both need care at once)`:''}, plus ~${money(state.medicareAnnual)}/yr of Medicare premiums per person from 65.`}</p>
+     <details open><summary>How we model spending &amp; care over time</summary><div class="body">Two things happen as you age: your <b>discretionary spending gently declines</b> (people slow down — the "retirement spending smile," which lowers the number ~20% vs. assuming flat spending), while <b>healthcare holds steady and care costs rise late in life</b>. So we keep routine healthcare flat (not declining), add Medicare premiums from 65, and layer in a long-term-care block: roughly 70% of people over 65 need some care, from in-home aides to nursing facilities. The "elevated needs" path (e.g. a chronic condition like MS) shifts onset earlier and costs higher.<cite>Blanchett/Morningstar (spending smile); Genworth Cost of Care (verify figures at build).</cite></div></details>
+   </div>
+
+   <div class="card">
+     <h3 style="margin-top:2px">Later-life housing</h3>
+     <p class="hint">Many people eventually move from their home into senior living (independent → assisted), which replaces home costs and bundles in care. Choose your plan:</p>
+     <div class="seg" style="margin:8px 0">
+       <button class="${state.lateLifeHousing==='inplace'?'on':''}" onclick="setValR('lateLifeHousing','inplace',false)">Stay in my home</button>
+       <button class="${state.lateLifeHousing==='community'?'on':''}" onclick="setValR('lateLifeHousing','community',false)">Move to senior living</button>
+     </div>
+     ${state.lateLifeHousing==='community'?`
+       <div class="slabel" style="margin-top:10px"><b>Move at age</b><span data-live="moveAge">${state.communityMoveAge}</span></div>
+       <input type="range" min="70" max="${state.longevityAge-1}" step="1" value="${Math.min(state.communityMoveAge,state.longevityAge-1)}" oninput="setVal('communityMoveAge',this.value)">
+       <p class="hint" style="margin-top:8px">From age ${state.communityMoveAge} we assume ~<b>${money(state.communityAnnual*communityFactor())}/yr</b> in senior-living fees${state.household==='couple'?' (two people)':''}, drop your home carrying costs, and treat that fee as covering late-life care.</p>
+     `:''}
+     <details><summary>How common is this?</summary><div class="body">A meaningful share of people — often cited around a quarter to a third — eventually move into some form of senior living. Independent living runs ~$3k/mo; assisted living ~$5–6k/mo and bundles care. Modeling it <b>replaces</b> your home costs and the in-home care block rather than stacking on top.<cite>Directional; verify current Genworth figures at build.</cite></div></details>
+   </div>
+
+   ${state.retirementAge<65?`<div class="card">
+     <h3 style="margin-top:2px">Pre-Medicare healthcare (ages ${state.retirementAge}–65)</h3>
+     <p class="hint">Retiring before 65 means buying your own coverage before Medicare kicks in — often the biggest surprise cost for early retirees. We assume about <b>${money(state.preMedicareAnnual*people())}/yr</b> in ACA premiums for those years${state.household==='couple'?' (two people)':''}, baked into your number.</p>
+   </div>`:''}
+
+   <div class="card">
+     <h3 style="margin-top:2px">Social Security</h3>
+     <p class="hint">The trust fund may face a shortfall in the 2030s, so we default to a cautious <b>~75%</b> of today's schedule. Choose how cautious to be:</p>
+     <div class="seg" style="margin:8px 0">
+       <button class="${state.ssScenario==='full'?'on':''}" onclick="setValR('ssScenario','full',false)">Pays in full</button>
+       <button class="${state.ssScenario==='partial'?'on':''}" onclick="setValR('ssScenario','partial',false)">~75% (default)</button>
+       <button class="${state.ssScenario==='none'?'on':''}" onclick="setValR('ssScenario','none',false)">Assume $0</button>
+     </div>
+     <div class="slabel" style="margin-top:10px"><b>${isCouple()?'Your claiming age':'Claiming age'}</b><span data-live="claim">${state.ssClaimAge}</span></div>
+     <input type="range" min="62" max="70" step="1" value="${state.ssClaimAge}" oninput="setVal('ssClaimAge',this.value)">
+     ${isCouple()?`<div class="slabel" style="margin-top:10px"><b>Spouse's claiming age</b><span data-live="spouseClaim">${state.spouseClaimAge}</span></div>
+     <input type="range" min="62" max="70" step="1" value="${state.spouseClaimAge}" oninput="setVal('spouseClaimAge',this.value)">`:''}
+     <p class="hint" style="margin-top:8px">${isCouple()?'Your combined household':'Your'} benefit is about <b class="num" data-live="ssBenefit">${money(annualSS())}</b>/yr${isCouple()?` — each of you claims your own (the lower earner gets the larger of their own or ~50% of the higher earner's), and the survivor keeps the bigger check`:` <span data-live="claimPct">${liveText('claimPct')}</span>`}.</p>
+     <details open><summary>Should I wait to claim?</summary><div class="body">Every year you wait (up to 70) raises your check about <b>8% for life</b> — inflation-protected, and it lifts a surviving spouse's benefit, so waiting is valuable <b>longevity insurance</b> if you live long. The catch: you give up those years of checks, so your portfolio bridges the gap (we've reserved for it). Waiting isn't always right — claim earlier if you need the income or expect a shorter life.</div></details>
+   </div>
+
+   <div class="card">
+     <h3 style="margin-top:2px">Taxes — computed from your withdrawal</h3>
+     <p class="hint">You don't have to guess your tax rate. We solve for the pre-tax withdrawal that leaves the spending you need — accounting for which accounts the money comes from <i>and</i> the taxable portion of your Social Security.</p>
+     <p class="hint" style="margin-top:10px">Filing status: <b>${state.filing==='married'?'married filing jointly':'single'}</b> (from your household choice at the start). Below, roughly how your savings split by account type (should total 100%) — not sure? The defaults are typical.</p>
+     <div class="grid two" style="margin-top:10px">
+       <div><label class="fld">Pre-tax (401k/IRA) %</label><input type="number" value="${state.mixPreTax}" oninput="setMix('mixPreTax',this.value)"></div>
+       <div><label class="fld">Roth %</label><input type="number" value="${state.mixRoth}" oninput="setMix('mixRoth',this.value)"></div>
+       <div><label class="fld">Taxable brokerage %</label><input type="number" value="${state.mixTaxable}" oninput="setMix('mixTaxable',this.value)"></div>
+       <div><label class="fld">State income tax % (defaulted to ~4%; set 0 if exempt)</label><input type="number" value="${state.stateTax}" oninput="setVal('stateTax',this.value)"></div>
+     </div>
+     <p class="hint" style="margin-top:10px">Account mix totals <b id="mixTotal">${state.mixPreTax+state.mixRoth+state.mixTaxable}%</b> · Estimated tax rate on your withdrawals: <b class="num" id="effTaxShown">${pct(r.effTax||0)}</b> — we calculate this for you, no guessing.</p>
+     <details><summary>Why account type changes your number</summary><div class="body">The same withdrawal is taxed very differently by source: pre-tax dollars are fully ordinary income, taxable-account gains get lower capital-gains rates, and Roth dollars are tax-free (Roth also avoids pushing up Social Security taxation and Medicare IRMAA — an income-based surcharge on Medicare premiums). We also tax the share of your Social Security that becomes taxable as your other income rises ("provisional income"), which is why a couple with little other income pays far less than a single filer drawing heavily from a pre-tax account.<cite>Kitces; MaxiFi / Kotlikoff. Federal brackets + SS taxability simplified (2024, ${state.filing==='single'?'single':'married'}).</cite></div></details>
+   </div>`);
+}
+window.setMix=(k,v)=>{ state[k]=parseFloat(v)||0; compute(); if($('effTaxShown'))$('effTaxShown').textContent=pct(state.results?state.results.effTax:0); if($('mixTotal'))$('mixTotal').textContent=(state.mixPreTax+state.mixRoth+state.mixTaxable)+'%'; updateLive(); };
+
+/* ---- STEP 6: reveal ----------------------------------------------------- */
+function revInner(r){
+  return `<div class="big-number num">${money(r.number)}</div>
+   <p class="lead">is your number — <b>sized so it lasts in ${pct(r.confidence)} of ${MC_PATHS.toLocaleString()} simulated market histories</b> across your ${r.horizon}-year plan, after Social Security and including the late-life care years.</p>
+   <div class="kpi" style="margin-top:14px">
+     <div><div class="v num">${money(r.base)}</div><div class="l">annual income you'll live on (today's $)</div></div>
+     <div><div class="v num">${money(r.grossIncome)}</div><div class="l">from your portfolio each year (before tax)</div></div>
+     <div><div class="v num">${money(r.ss)}</div><div class="l">covered by Social Security</div></div>
+     <div><div class="v num">${pct(r.effTax)}</div><div class="l">est. tax on withdrawals</div></div>
+   </div>
+   <div class="card" style="margin-top:18px">
+     <h3 style="margin-top:2px">Your spending path (today's $)</h3>
+     ${sparkline(r.spendCurve, r.ages)}
+     <p class="hint">${state.spendingSmile?'Declining "spending smile," with a late-life bump for care.':'Flat real spending (the more conservative assumption).'}</p>
+   </div>
+   ${reasonablenessCard()}
+   <div class="note">Built to survive <b>${pct(r.confidence)}</b> of simulated markets at a ${(state.realReturn*100).toFixed(1)}% assumed real return — about a <b>${pct(r.impliedW)}</b> average draw on the balance each year. Change any assumption and the number re-sizes to hold that confidence, so this screen never disagrees with the next one.</div>`;
+}
+function stReveal(){
+  return nav(`<h2 style="margin-bottom:0">Here's your number</h2>
+   <div id="revBlock">${state.results?revInner(state.results):''}</div>
+   <p class="hint" style="margin-top:14px">Want to change something? Every assumption is a step back — your number updates instantly. Next: does this number actually <b>survive real markets</b>?</p>`);
+}
+function sparkline(vals, ages){
+  if(!vals||!vals.length) return '';
+  const w=760,h=120,pad=8, max=Math.max(...vals)*1.1, min=0;
+  const x=i=>pad+i*(w-2*pad)/(vals.length-1);
+  const y=v=>h-pad-(v-min)/(max-min)*(h-2*pad);
+  let d='M'+vals.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' L');
+  let area=d+` L${x(vals.length-1).toFixed(1)},${h-pad} L${x(0).toFixed(1)},${h-pad} Z`;
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="height:120px">
+    <defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5b8cff" stop-opacity=".35"/><stop offset="1" stop-color="#5b8cff" stop-opacity="0"/></linearGradient></defs>
+    <path d="${area}" fill="url(#g)"/><path d="${d}" fill="none" stroke="#5b8cff" stroke-width="2.5"/>
+    <text x="${pad}" y="${h-2}" fill="#94a3c4" font-size="11">age ${ages[0]}</text>
+    <text x="${w-pad}" y="${h-2}" fill="#94a3c4" font-size="11" text-anchor="end">age ${ages[ages.length-1]}</text>
+  </svg>`;
+}
+
+/* ---- STEP 8: confidence (Monte Carlo) ----------------------------------- */
+function mcInner(r){
+  const s=r.mc.successRate;
+  const col = s>=.85?'var(--accent2)':s>=.7?'var(--warn)':'var(--bad)';
+  const verdict = s>=.9?'Very strong':s>=.8?'Solid':s>=.65?'Workable, with risk':'Fragile';
+  // histogram of endings (bucketed)
+  const ends=r.mc.endings, n=24, maxE=Math.max(...ends, r.number*2)||1;
+  const buckets=new Array(n).fill(0);
+  ends.forEach(e=>{const b=clamp(Math.floor(e/maxE*n),0,n-1); buckets[b]++;});
+  const mx=Math.max(...buckets)||1;
+  const bars=buckets.map(b=>`<i style="height:${(b/mx*100).toFixed(0)}%"></i>`).join('');
+  return `<div class="big-number num" style="color:${col}">${pct(s)}</div>
+   <p class="lead">Your number is <b>built to last in ${pct(r.confidence)} of markets</b> — we size it against ${MC_PATHS.toLocaleString()} simulated histories (good decades, bad decades, and everything between) so it covers all but the worst ~${pct(1-r.confidence)}. Across them it cleared <b style="color:${col}">${pct(s)}</b> to age ${householdEnd()}. <b style="color:${col}">${verdict}.</b> What's left at the end varies a lot:</p>
+   <div class="meter" style="margin:10px 0 4px"><i style="width:${(s*100).toFixed(0)}%"></i></div>
+   <div class="kpi" style="margin-top:16px">
+     <div><div class="v num">${moneyK(r.mc.p10)}</div><div class="l">a rough run — money left at age ${householdEnd()}</div></div>
+     <div><div class="v num">${moneyK(r.mc.p50)}</div><div class="l">a typical run</div></div>
+     <div><div class="v num">${moneyK(r.mc.p90)}</div><div class="l">a lucky run</div></div>
+   </div>
+   <div class="card" style="margin-top:16px">
+     <h3 style="margin-top:2px">How much money is left at age ${householdEnd()}, across ${MC_PATHS.toLocaleString()} simulated futures</h3>
+     <div class="mc-bars">${bars}</div>
+   </div>
+   <details open><summary>Why a single "expected return" wasn't enough</summary><div class="body">A fixed return quietly assumes markets behave the same every year. They don't — and the <b>order</b> of returns matters most in the first decade of retirement (the "red zone"), which can drive ~3/4 of your final outcome. So instead of guessing a "safe" withdrawal rate, we solve for the pot that survives ${pct(r.confidence)} of ${MC_PATHS.toLocaleString()} randomized paths — your number and this confidence are the <i>same</i> calculation, so they can't disagree. Spend less, retire later, claim Social Security later, or assume a higher return and the <b>number</b> drops while the confidence holds at ${pct(r.confidence)}.<cite>Pfau/Kitces; Milliman. Real returns ~ Normal(${(state.realReturn*100).toFixed(1)}%, ${(state.volatility*100).toFixed(0)}%).</cite></div></details>`;
+}
+function stConfidence(){
+  return nav(`<h2 style="margin-bottom:0">Will the number survive real markets?</h2>
+   <div id="mcBlock">${state.results?mcInner(state.results):''}</div>`);
+}
+
+/* ---- STEP 9: coast ------------------------------------------------------ */
+function coastHeadHTML(r){
+  const cd=r.coast, R=state.retirementAge;
+  if(cd.coastAge!=null && cd.coastAge<R)
+    return `<div class="big-number green num">age ${cd.coastAge}</div>
+      <p class="lead">At your current pace you could <b>stop adding to retirement savings around age ${cd.coastAge}</b> — from there, compounding alone carries you to your ${money(r.number)} number by ${R}.</p>`;
+  if(cd.atRetire>=r.number)
+    return `<div class="big-number green num">on track</div>
+      <p class="lead">You're projected to reach <b>${money(cd.atRetire)}</b> by age ${R} — enough for your ${money(r.number)} number. Keep contributing and you're there.</p>`;
+  const pctThere=Math.max(0,Math.round(cd.atRetire/r.number*100));
+  return `<div class="big-number num" style="color:var(--warn)">${pctThere}% of the way</div>
+    <p class="lead">At your current pace you'd reach about <b>${money(cd.atRetire)}</b> by age ${R} — roughly ${pctThere}% of your ${money(r.number)} number. Saving more <i>now</i> closes the gap fastest (try it below).</p>`;
+}
+function coastChart(cd){
+  const W=760,H=170,pad=10, n=cd.ages.length;
+  const max=Math.max(...cd.needed,...cd.projected)*1.12||1;
+  const X=i=> pad + (n<=1?0:i*(W-2*pad)/(n-1));
+  const Y=v=> H-pad-(v/max)*(H-2*pad);
+  const path=arr=> 'M'+arr.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' L');
+  let marker='';
+  if(cd.coastAge!=null){ const i=cd.ages.indexOf(cd.coastAge);
+    if(i>=0) marker=`<circle cx="${X(i).toFixed(1)}" cy="${Y(cd.projected[i]).toFixed(1)}" r="5" fill="var(--accent2)"/>
+      <text x="${(X(i)+8).toFixed(1)}" y="${(Y(cd.projected[i])-9).toFixed(1)}" fill="var(--accent2)" font-size="12" font-weight="700">coast @ ${cd.coastAge} · ${moneyK(cd.projected[i])}</text>`; }
+  const endProj=cd.projected[n-1], endNeed=cd.needed[n-1];
+  // small values table so the actual numbers are visible
+  const idx=a=>cd.ages.indexOf(a), first=cd.ages[0], last=cd.ages[n-1];
+  const rowFor=(label,a)=>{ const i=idx(a); if(i<0) return ''; return `<tr><td>${label} <span class="hint">(age ${a})</span></td><td class="r num">${money(cd.projected[i])}</td><td class="r num">${money(cd.needed[i])}</td></tr>`; };
+  let tbl=`<table style="margin-top:12px;font-size:13px"><thead><tr><th></th><th class="r">your savings</th><th class="r">needed to coast</th></tr></thead><tbody>`;
+  tbl+=rowFor('Today',first);
+  if(cd.coastAge!=null && cd.coastAge!==first && cd.coastAge!==last) tbl+=rowFor('Coast point',cd.coastAge);
+  tbl+=rowFor('At retirement',last);
+  tbl+='</tbody></table>';
+  return `<svg viewBox="0 0 ${W} ${H}" style="height:170px">
+      <path d="${path(cd.needed)}" fill="none" stroke="var(--warn)" stroke-width="2.5" stroke-dasharray="5 4"/>
+      <path d="${path(cd.projected)}" fill="none" stroke="var(--accent2)" stroke-width="2.5"/>
+      ${marker}
+      <text x="${X(n-1).toFixed(1)}" y="${(Y(endProj)-7).toFixed(1)}" fill="var(--accent2)" font-size="11" text-anchor="end">${moneyK(endProj)}</text>
+      <text x="${X(n-1).toFixed(1)}" y="${(Y(endNeed)+14).toFixed(1)}" fill="var(--warn)" font-size="11" text-anchor="end">${moneyK(endNeed)}</text>
+      <text x="${pad}" y="${H-2}" fill="#94a3c4" font-size="11">age ${first}</text>
+      <text x="${W-pad}" y="${H-2}" fill="#94a3c4" font-size="11" text-anchor="end">age ${last}</text>
+    </svg>
+    <div class="hint" style="display:flex;gap:18px;margin-top:6px">
+      <span style="color:var(--accent2)">● your projected savings</span>
+      <span style="color:var(--warn)">– – needed to coast</span>
+    </div>
+    ${tbl}`;
+}
+function coastInner(r){
+  const R=state.retirementAge, cur=state.currentAge;
+  if(cur>=R) return `<div class="note">You're at or past your planned retirement age (${R}), so there's no <b>coast</b> period to project — coasting is about when you can stop adding to savings <i>before</i> you retire. Your number above is what you need now. Lower your current age or raise your retirement age on the assumptions step to see this view.</div>`;
+  return `<div id="coastHead">${coastHeadHTML(r)}</div>
+   <div class="card" style="margin-top:14px">
+     <div class="grid two">
+       <div><label class="fld">What you have saved today</label><input type="number" value="${state.currentSavings}" oninput="setVal('currentSavings',this.value)"></div>
+       <div><label class="fld">What you add per year</label><input type="number" value="${state.annualContribution}" oninput="setVal('annualContribution',this.value)"></div>
+     </div>
+     <p class="hint" style="margin-top:10px">Raise either one and watch your coast age move earlier — a dollar saved at ${cur} compounds for ${Math.max(0,R-cur)} years, so <b>early dollars do the heavy lifting</b>.</p>
+     <p class="hint" style="margin-top:8px;color:var(--accent2)">Growing your savings at your assumed <b>${(state.realReturn*100).toFixed(1)}% real return</b> (after inflation — everything here is in today's dollars), set by the <b>"How conservative are you?"</b> dial on the assumptions step. Change that dial to change this. A calculator that shows bigger balances is likely using a higher <i>pre-inflation</i> rate (e.g. ~${(state.realReturn*100+2.5).toFixed(1)}% nominal ≈ this ${(state.realReturn*100).toFixed(1)}% real).</p>
+   </div>
+   <div class="card" style="margin-top:14px">
+     <h3 style="margin-top:2px">Your path to coasting</h3>
+     <div id="coastChart">${coastChart(r.coast)}</div>
+     <p class="hint">Where your savings line meets the "needed to coast" line is the age you could stop contributing. The dashed line rises because the longer you wait, the less time compounding has left to work.</p>
+   </div>
+   <div class="note" style="margin-top:14px">"Coasting" means you can stop <i>retirement</i> saving — you'd still cover day-to-day costs until you retire. This uses smooth growth at your ${(state.realReturn*100).toFixed(1)}% real return (in today's dollars); the confidence step is the reality-check on the destination.</div>`;
+}
+function stCoast(){
+  return nav(`<h2 style="margin-bottom:0">When can you stop saving?</h2>
+   <div id="coastBlock">${state.results?coastInner(state.results):''}</div>`);
+}
+
+/* ---- STEP 10: tiers ----------------------------------------------------- */
+function tierInner(r){
+  if(r.base<=0) return `<div class="note">Your built budget is <b>$0/yr</b>, so there's no lifestyle to scale — the number you see is just the baked-in care and Medicare reserves. Add some spending lines to compare lean / your / fat tiers.</div>`;
+  return `<div class="card">
+     <div class="scenario-row"><div><b>Lean</b><div class="hint">${money(r.base*state.leanFactor)}/yr spending · frugal, more freedom now</div></div><div class="bn num">${money(r.lean)}</div></div>
+     <div class="scenario-row"><div><b>Your number</b><div class="hint">${money(r.base)}/yr · the life you described</div></div><div class="bn num" style="color:var(--accent2)">${money(r.number)}</div></div>
+     <div class="scenario-row"><div><b>Fat</b><div class="hint">${money(r.base*state.fatFactor)}/yr · more travel, more cushion</div></div><div class="bn num">${money(r.fat)}</div></div>
+   </div>
+   <details open><summary>What people really mean by "my number"</summary><div class="body">"Lean FIRE" and "fat FIRE" (from the Financial Independence / Retire Early movement) describe the same idea: the number isn't one fact, it's a choice about the life you want. Spending a bit less can move your number by hundreds of thousands — and bring "enough" years closer. There's no right answer, only the trade-off that's right for you.</div></details>
+   <p class="hint" style="margin-top:14px">That's the whole point of Finneas: your number is something you <b>understand and own</b> — not a black box handed to you.</p>`;
+}
+function stTiers(){
+  return nav(`<h2>What different lifestyles cost</h2>
+   <p class="lead">Same assumptions, three spending levels — a frugal version, your version, and a more generous one.</p>
+   <div id="tierBlock">${state.results?tierInner(state.results):''}</div>
+   <p class="disclaim">Finneas is an educational prototype, not financial advice. Tax, Social Security, and long-term-care figures are simplified estimates — verify with a professional before making decisions.</p>`);
+}
+
+/* ----- boot -------------------------------------------------------------- */
+renderApp();
+</script>
+</body>
+</html>

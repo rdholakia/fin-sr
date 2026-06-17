@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap');
+:root {
+  --ink:#0f1a12;--ink-2:#3a4a3e;--ink-3:#7a8a7e;--rule:#dce8de;
+  --bg:#f2f6f2;--card:#fff;
+  --primary:#1a6b35;--primary-light:#eaf3ec;--primary-border:#b0d8ba;--primary-mid:#2d8a4a;
+  --amber:#b8720f;--amber-light:#fef7ec;--amber-border:#f0d8a8;
+  --red:#bf3124;--red-light:#fdf0ef;
+  --purple:#6a2abf;--purple-light:#f3eeff;
+  --mono:'DM Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+.app{max-width:430px;margin:0 auto;min-height:100vh;}
+
+/* NAV */
+.nav{background:var(--primary);padding:14px 20px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.nav-brand{font-family:'Libre Baskerville',serif;font-size:16px;font-weight:700;color:white;}
+.nav-back{font-size:13px;color:rgba(255,255,255,0.7);cursor:pointer;}
+.nav-placeholder{width:60px;}
+
+/* HERO */
+.hero{background:var(--primary);padding:4px 20px 0;color:white;}
+.hero-date{font-size:10px;text-transform:uppercase;letter-spacing:1.3px;color:rgba(255,255,255,0.45);margin-bottom:6px;}
+.hero-title{font-family:'Libre Baskerville',serif;font-size:20px;font-weight:400;line-height:1.25;color:white;margin-bottom:14px;}
+
+/* ── RING TOGGLE ── */
+.ring-toggle{display:grid;grid-template-columns:1fr 1fr;background:rgba(255,255,255,0.1);border-radius:10px;padding:3px;gap:3px;margin-bottom:16px;}
+.rt-btn{border-radius:7px;padding:7px 10px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;cursor:pointer;border:none;text-align:center;transition:all 0.18s;background:transparent;color:rgba(255,255,255,0.5);}
+.rt-btn.active{background:rgba(255,255,255,0.15);color:white;font-weight:600;}
+
+/* ── RINGS DISPLAY ── */
+.rings-view{display:none;}
+.rings-view.active{display:block;padding:0 0 4px;}
+
+.rings-svg-wrap{flex-shrink:0;position:relative;width:148px;height:148px;}
+.rings-svg-wrap svg{transform:rotate(-90deg);}
+.ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.ring-center-label{font-size:9px;text-transform:uppercase;letter-spacing:0.8px;color:rgba(255,255,255,0.38);margin-bottom:3px;}
+.ring-center-score{font-family:'Libre Baskerville',serif;font-size:30px;font-weight:700;color:white;letter-spacing:-1px;line-height:1;}
+.ring-center-sub{font-size:9px;color:rgba(255,255,255,0.35);margin-top:2px;}
+
+.rings-legend{flex:1;display:flex;flex-direction:column;gap:12px;}
+.rl-item{display:flex;align-items:flex-start;gap:8px;}
+.rl-swatch{width:10px;height:10px;border-radius:3px;flex-shrink:0;margin-top:3px;}
+.rl-main{flex:1;}
+.rl-label{font-size:10px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:1px;}
+.rl-val{font-size:15px;font-weight:600;color:white;line-height:1;letter-spacing:-0.3px;}
+.rl-sub{font-size:10px;color:rgba(255,255,255,0.3);margin-top:1px;}
+
+/* Map completeness strip */
+.completeness-strip{background:rgba(255,255,255,0.07);border-top:1px solid rgba(255,255,255,0.08);padding:9px 20px;display:flex;align-items:center;gap:10px;cursor:pointer;}
+.cs-track{flex:1;height:3px;background:rgba(255,255,255,0.15);border-radius:2px;overflow:hidden;}
+.cs-fill{height:100%;background:rgba(255,255,255,0.55);border-radius:2px;}
+.cs-label{font-size:11px;color:rgba(255,255,255,0.4);}
+.cs-pct{font-size:12px;font-weight:600;color:rgba(255,255,255,0.8);}
+.cs-cta{font-size:11px;color:rgba(255,255,255,0.4);white-space:nowrap;}
+
+/* SECTION */
+.gap{height:20px;}
+.section-label{padding:0 20px;font-size:11px;text-transform:uppercase;letter-spacing:1.1px;color:var(--ink-3);font-weight:500;margin-bottom:10px;}
+.section-label-row{padding:0 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.slr-label{font-size:11px;text-transform:uppercase;letter-spacing:1.1px;color:var(--ink-3);font-weight:500;}
+.slr-action{font-size:12px;color:var(--primary);font-weight:500;cursor:pointer;}
+
+/* GOAL CARDS with month dots */
+.goal-card{margin:0 20px 10px;background:var(--card);border:1.5px solid var(--rule);border-radius:14px;overflow:hidden;}
+.gc-header{padding:13px 16px 10px;display:flex;align-items:flex-start;gap:12px;}
+.gc-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.gc-main{flex:1;}
+.gc-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px;}
+.gc-meta{font-size:11px;color:var(--ink-3);}
+.gc-right{text-align:right;flex-shrink:0;}
+.gc-pct{font-size:18px;font-weight:700;letter-spacing:-0.5px;}
+.gc-timeline{font-size:10px;color:var(--ink-3);margin-top:1px;}
+
+.month-timeline{padding:10px 16px 14px;border-top:1px solid var(--rule);}
+.mt-label{font-size:10px;color:var(--ink-3);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;}
+.mt-label-faster{font-size:10px;color:var(--primary);font-weight:500;}
+.mt-dots{display:flex;gap:3px;flex-wrap:wrap;}
+.mt-dot{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;flex-shrink:0;transition:transform 0.15s;}
+.mt-dot.saved{background:var(--purple);color:white;}
+.mt-dot.remaining{background:var(--rule);color:transparent;}
+.mt-dot.faster{background:var(--primary-light);border:1.5px solid var(--primary-border);}
+.mt-dot.arrival{background:var(--primary);color:white;}
+.mt-dot.current-arrival{background:var(--ink-3);color:white;}
+.mt-note{font-size:11px;color:var(--ink-2);margin-top:8px;line-height:1.5;}
+.mt-note b{color:var(--primary);}
+
+/* SUGGESTED GOALS */
+.add-goal{margin:0 20px 10px;border:1.5px dashed var(--rule);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;background:var(--card);}
+.ag-icon{width:34px;height:34px;border-radius:9px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.ag-main{flex:1;}
+.ag-label{font-size:13px;font-weight:500;color:var(--primary);}
+.ag-sub{font-size:11px;color:var(--ink-3);margin-top:1px;}
+.ag-arr{font-size:14px;color:var(--primary-border);}
+
+/* SUGGESTED GOAL CHIP */
+.suggested-goals{padding:0 20px;display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.sg-chip{background:var(--card);border:1.5px solid var(--rule);border-radius:20px;padding:6px 14px;font-size:12px;font-weight:500;color:var(--ink-2);cursor:pointer;display:flex;align-items:center;gap:6px;transition:border-color 0.15s;}
+.sg-chip:hover{border-color:var(--primary-border);}
+.sg-chip-icon{font-size:14px;}
+
+/* ── ACTION CATEGORY CARDS ── */
+.action-cat{margin:0 20px 12px;background:var(--card);border:1.5px solid var(--rule);border-radius:14px;overflow:hidden;}
+
+/* Category header */
+.ac-head{padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;border-bottom:1px solid var(--rule);}
+.ac-head-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.ac-head-main{flex:1;}
+.ac-head-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:1px;}
+.ac-head-sub{font-size:11px;color:var(--ink-3);}
+.ac-head-right{text-align:right;flex-shrink:0;}
+.ac-head-count{font-size:13px;font-weight:700;color:var(--ink);}
+.ac-head-impact{font-size:10px;color:var(--ink-3);}
+.ac-chev{font-size:16px;color:var(--ink-3);transition:transform 0.2s;margin-left:6px;}
+.ac-chev.open{transform:rotate(90deg);}
+
+/* Items within category */
+.ac-item{padding:10px 16px;border-bottom:1px solid var(--rule);display:flex;align-items:center;gap:10px;cursor:pointer;}
+.ac-item:last-child{border-bottom:none;}
+.ac-item-tag{border-radius:5px;padding:2px 7px;font-size:10px;font-weight:600;flex-shrink:0;}
+.ac-item-label{flex:1;font-size:12px;font-weight:500;color:var(--ink);}
+.ac-item-sub{font-size:11px;color:var(--ink-3);margin-top:1px;}
+.ac-item-val{font-size:13px;font-weight:700;color:var(--primary);flex-shrink:0;}
+.ac-item-val.cost{color:var(--red);}
+.ac-item-arr{font-size:12px;color:var(--ink-3);margin-left:4px;}
+
+/* Raise cash redeployment footer */
+.ac-redeploy{padding:9px 16px;background:var(--primary-light);border-top:1px solid var(--primary-border);display:flex;align-items:center;gap:8px;}
+.ac-redeploy-arrow{font-size:14px;color:var(--primary);}
+.ac-redeploy-text{font-size:11px;color:var(--primary);line-height:1.4;}
+.ac-redeploy-text b{font-weight:600;}
+
+/* Vault capability prompt */
+.vault-cat{margin:0 20px 12px;background:var(--ink);border-radius:14px;overflow:hidden;}
+.vault-cat-head{padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.08);}
+.vch-icon{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.vch-main{flex:1;}
+.vch-title{font-size:13px;font-weight:700;color:white;margin-bottom:1px;}
+.vch-sub{font-size:11px;color:rgba(255,255,255,0.4);}
+.vault-cat-item{padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;align-items:flex-start;gap:10px;cursor:pointer;}
+.vault-cat-item:last-child{border-bottom:none;}
+.vci-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.2);flex-shrink:0;margin-top:5px;}
+.vci-main{flex:1;}
+.vci-label{font-size:12px;font-weight:500;color:rgba(255,255,255,0.8);margin-bottom:2px;}
+.vci-capability{font-size:11px;color:rgba(255,255,255,0.4);line-height:1.4;}
+.vci-arr{font-size:12px;color:rgba(255,255,255,0.25);align-self:center;margin-left:6px;}
+
+/* GUIDED ASK */
+.ask-prompt{margin:0 20px 12px;background:var(--primary-light);border:1.5px solid var(--primary-border);border-radius:14px;padding:14px 16px;}
+.ap-label{font-size:10px;text-transform:uppercase;letter-spacing:0.8px;color:var(--primary);font-weight:600;margin-bottom:8px;}
+.ap-questions{display:flex;flex-direction:column;gap:6px;}
+.ap-q{background:white;border:1px solid var(--primary-border);border-radius:8px;padding:9px 12px;font-size:12px;color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.ap-q-text{flex:1;line-height:1.4;}
+.ap-q-arr{font-size:13px;color:var(--primary);flex-shrink:0;}
+
+/* BOTTOM */
+.bottom-spacer{height:128px;}
+.ask-bar{position:fixed;bottom:62px;left:50%;transform:translateX(-50%);width:100%;max-width:430px;padding:8px 16px;background:rgba(242,246,242,0.96);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--rule);z-index:99;}
+.ask-inner{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--rule);border-radius:24px;padding:9px 14px;box-shadow:0 1px 6px rgba(0,0,0,0.06);cursor:pointer;}
+.ask-send{width:28px;height:28px;border-radius:50%;background:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.bottom-nav{background:rgba(255,255,255,0.94);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--rule);display:flex;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:100;}
+.bn-item{flex:1;padding:10px 4px 11px;text-align:center;cursor:pointer;}
+.bn-svg{display:block;margin:0 auto 3px;}
+.bn-label{font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--ink-3);}
+.bn-item.active .bn-label{color:var(--primary);font-weight:600;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="nav">
+    <div class="nav-back">‹ Home</div>
+    <div class="nav-brand">Hence</div>
+    <div class="nav-placeholder"></div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-date">Money Map · May 22, 2026</div>
+    <div class="hero-title">Your financial health,<br>two ways to see it.</div>
+
+    <!-- Ring toggle -->
+    <div class="ring-toggle">
+      <button class="rt-btn active" id="btn-stand" onclick="toggleRings('stand')">Where you stand</button>
+      <button class="rt-btn" id="btn-getting" onclick="toggleRings('getting')">How you're getting there</button>
+    </div>
+
+    <!-- WHERE YOU STAND rings: Retirement / Cushion / Biggest Goal -->
+    <div class="rings-view active" id="rings-stand" style="display:flex;align-items:center;gap:20px;padding:0 0 24px;">
+      <div class="rings-svg-wrap">
+        <svg width="148" height="148" viewBox="0 0 148 148">
+          <!-- Outer: Retirement 50% -->
+          <circle cx="74" cy="74" r="66" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="11"/>
+          <circle cx="74" cy="74" r="66" fill="none" stroke="#f08070" stroke-width="11"
+            stroke-dasharray="207 414" stroke-linecap="round"/>
+          <!-- Middle: Cushion 43% (2.6/6mo) -->
+          <circle cx="74" cy="74" r="51" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="11"/>
+          <circle cx="74" cy="74" r="51" fill="none" stroke="#f5c842" stroke-width="11"
+            stroke-dasharray="138 320" stroke-linecap="round"/>
+          <!-- Inner: Home Down Payment 38% -->
+          <circle cx="74" cy="74" r="36" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="11"/>
+          <circle cx="74" cy="74" r="36" fill="none" stroke="#c4a8f0" stroke-width="11"
+            stroke-dasharray="86 226" stroke-linecap="round"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-center-label">Overall</div>
+          <div class="ring-center-score">38</div>
+          <div class="ring-center-sub">/ 100</div>
+        </div>
+      </div>
+      <div class="rings-legend">
+        <div class="rl-item">
+          <div class="rl-swatch" style="background:#f08070;"></div>
+          <div class="rl-main">
+            <div class="rl-label">Retirement</div>
+            <div class="rl-val" style="color:#f08070;">$2,874/mo</div>
+            <div class="rl-sub">50% of $5,800 target</div>
+          </div>
+        </div>
+        <div class="rl-item">
+          <div class="rl-swatch" style="background:#f5c842;"></div>
+          <div class="rl-main">
+            <div class="rl-label">Cushion</div>
+            <div class="rl-val" style="color:#f5c842;">2.6 mo</div>
+            <div class="rl-sub">of 6 month target</div>
+          </div>
+        </div>
+        <div class="rl-item">
+          <div class="rl-swatch" style="background:#c4a8f0;"></div>
+          <div class="rl-main">
+            <div class="rl-label">Down Payment</div>
+            <div class="rl-val" style="color:#c4a8f0;">38%</div>
+            <div class="rl-sub">$38K of $100K · your biggest goal</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOW YOU'RE GETTING THERE rings -->
+    <div class="rings-view" id="rings-getting">
+      <div style="width:100%;padding:0 0 16px;">
+        <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.8px;">The drivers behind your picture</div>
+        <div style="display:flex;flex-direction:column;gap:7px;">
+
+          <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.07);border-radius:10px;padding:10px 12px;">
+            <div style="width:9px;height:9px;border-radius:50%;background:#f5c842;flex-shrink:0;"></div>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:600;color:white;line-height:1.2;">Savings rate <span style="font-weight:400;color:rgba(255,255,255,0.5);">3%</span></div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.38);margin-top:2px;">Target 15% · employer match uncaptured</div>
+            </div>
+            <div style="font-size:9px;font-weight:700;color:#f5c842;background:rgba(245,200,66,0.15);border-radius:5px;padding:3px 7px;white-space:nowrap;">WATCH</div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.07);border-radius:10px;padding:10px 12px;">
+            <div style="width:9px;height:9px;border-radius:50%;background:#f5c842;flex-shrink:0;"></div>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:600;color:white;line-height:1.2;">Expense ratio <span style="font-weight:400;color:rgba(255,255,255,0.5);">70% of income</span></div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.38);margin-top:2px;">$1,520/yr redeployable across 3 findings</div>
+            </div>
+            <div style="font-size:9px;font-weight:700;color:#f5c842;background:rgba(245,200,66,0.15);border-radius:5px;padding:3px 7px;white-space:nowrap;">WATCH</div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.07);border-radius:10px;padding:10px 12px;">
+            <div style="width:9px;height:9px;border-radius:50%;background:#f08070;flex-shrink:0;"></div>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:600;color:white;line-height:1.2;">Protection <span style="font-weight:400;color:rgba(255,255,255,0.5);">None</span></div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.38);margin-top:2px;">No renters or life coverage · exposed</div>
+            </div>
+            <div style="font-size:9px;font-weight:700;color:#f08070;background:rgba(240,128,112,0.15);border-radius:5px;padding:3px 7px;white-space:nowrap;">ACT NOW</div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.07);border-radius:10px;padding:10px 12px;">
+            <div style="width:9px;height:9px;border-radius:50%;background:#a8ecc0;flex-shrink:0;"></div>
+            <div style="flex:1;">
+              <div style="font-size:12px;font-weight:600;color:white;line-height:1.2;">Debt <span style="font-weight:400;color:rgba(255,255,255,0.5);">$8,400 · 7% highest rate</span></div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.38);margin-top:2px;">Manageable · set auto-pay in full</div>
+            </div>
+            <div style="font-size:9px;font-weight:700;color:#a8ecc0;background:rgba(168,236,192,0.15);border-radius:5px;padding:3px 7px;white-space:nowrap;">OK</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map completeness -->
+  <div class="completeness-strip">
+    <div class="cs-label">Map completeness</div>
+    <div class="cs-track"><div class="cs-fill" style="width:72%"></div></div>
+    <div class="cs-pct">72%</div>
+    <div class="cs-cta">Fill gaps →</div>
+  </div>
+
+  <!-- GOALS -->
+  <div class="gap"></div>
+  <div class="section-label-row">
+    <div class="slr-label">Your goals</div>
+    <div class="slr-action">+ Add goal</div>
+  </div>
+
+  <!-- European Trip with month dots -->
+  <div class="goal-card">
+    <div class="gc-header">
+      <div class="gc-icon" style="background:var(--purple-light);">✈️</div>
+      <div class="gc-main">
+        <div class="gc-name">European Trip</div>
+        <div class="gc-meta">$5,000 target · $1,200 saved</div>
+      </div>
+      <div class="gc-right">
+        <div class="gc-pct" style="color:var(--purple);">24%</div>
+        <div class="gc-timeline">38 months at current pace</div>
+      </div>
+    </div>
+    <div class="month-timeline">
+      <div class="mt-label">
+        <span>Each dot = 1 month</span>
+        <span class="mt-label-faster">Raise cash → saves 10 months</span>
+      </div>
+      <div class="mt-dots" id="trip-dots"></div>
+      <div class="mt-note">At $100/mo you arrive in <b>38 months</b>. Free up the cell carrier saving and you're there in <b>28 months</b>.</div>
+    </div>
+  </div>
+
+  <!-- Home Down Payment -->
+  <div class="goal-card">
+    <div class="gc-header">
+      <div class="gc-icon" style="background:var(--amber-light);">🏡</div>
+      <div class="gc-main">
+        <div class="gc-name">Home Down Payment</div>
+        <div class="gc-meta">$100,000 target · $38,000 saved</div>
+      </div>
+      <div class="gc-right">
+        <div class="gc-pct" style="color:var(--amber);">38%</div>
+        <div class="gc-timeline">50 months at current pace</div>
+      </div>
+    </div>
+    <div class="month-timeline">
+      <div class="mt-label">
+        <span>Each dot = 1 month</span>
+        <span class="mt-label-faster">Raise cash → saves 8 months</span>
+      </div>
+      <div class="mt-dots" id="home-dots"></div>
+      <div class="mt-note">At $500/mo you close in <b>50 months</b>. Freeing $1,520/yr shortens this to <b>42 months</b>.</div>
+    </div>
+  </div>
+
+  <!-- Suggested goals -->
+  <div class="suggested-goals">
+    <div class="sg-chip"><span class="sg-chip-icon">💳</span> Pay off Freedom card</div>
+    <div class="sg-chip"><span class="sg-chip-icon">🎓</span> College fund</div>
+    <div class="sg-chip"><span class="sg-chip-icon">⛑️</span> Emergency fund</div>
+  </div>
+
+  <!-- ── ACTION CATEGORIES ── -->
+  <div class="gap"></div>
+  <div class="section-label">What Hence recommends</div>
+
+  <!-- 1. BUILD THE FOUNDATION -->
+  <div class="action-cat">
+    <div class="ac-head" onclick="toggleCat('foundation')">
+      <div class="ac-head-icon" style="background:#e8eef5;">📈</div>
+      <div class="ac-head-main">
+        <div class="ac-head-title">Build the Foundation</div>
+        <div class="ac-head-sub">Structural moves that compound over time</div>
+      </div>
+      <div class="ac-head-right">
+        <div class="ac-head-count">1 action</div>
+        <div class="ac-head-impact" style="color:var(--red);">High effort · highest impact</div>
+      </div>
+      <div class="ac-chev open" id="chev-foundation">›</div>
+    </div>
+    <div id="body-foundation">
+      <div class="ac-item">
+        <div class="ac-item-tag" style="background:#e8eef5;color:#1a3a5a;">RETIREMENT</div>
+        <div>
+          <div class="ac-item-label">Increase 401k to 4% — capture your employer match</div>
+          <div class="ac-item-sub">~$65/mo less take-home · $1,000/yr free match captured</div>
+        </div>
+        <div class="ac-item-val">+$570K</div>
+        <div class="ac-item-arr">›</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. GET PROTECTED -->
+  <div class="action-cat">
+    <div class="ac-head" onclick="toggleCat('protected')">
+      <div class="ac-head-icon" style="background:#e8f0e8;">🛡</div>
+      <div class="ac-head-main">
+        <div class="ac-head-title">Get Protected</div>
+        <div class="ac-head-sub">Close coverage gaps before something goes wrong</div>
+      </div>
+      <div class="ac-head-right">
+        <div class="ac-head-count">2 actions</div>
+        <div class="ac-head-impact" style="color:var(--primary);">Low effort · urgent</div>
+      </div>
+      <div class="ac-chev" id="chev-protected">›</div>
+    </div>
+    <div style="display:none;" id="body-protected">
+      <div class="ac-item">
+        <div class="ac-item-tag" style="background:#e8f0e8;color:#2a5a2a;">INSURANCE</div>
+        <div>
+          <div class="ac-item-label">Get renters insurance</div>
+          <div class="ac-item-sub">No policy — $15/mo covers $30K+ contents · ~4 min</div>
+        </div>
+        <div class="ac-item-val cost">−$180/yr</div>
+        <div class="ac-item-arr">›</div>
+      </div>
+      <div class="ac-item">
+        <div class="ac-item-tag" style="background:#fce8e8;color:#7a1a1a;">DEBT</div>
+        <div>
+          <div class="ac-item-label">Set up auto-pay in full</div>
+          <div class="ac-item-sub">Occasional carry costs 22%+ APR · ~10 min</div>
+        </div>
+        <div class="ac-item-val">+$800/yr</div>
+        <div class="ac-item-arr">›</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. RAISE CASH -->
+  <div class="action-cat">
+    <div class="ac-head" onclick="toggleCat('cash')">
+      <div class="ac-head-icon" style="background:#fff3e0;">💸</div>
+      <div class="ac-head-main">
+        <div class="ac-head-title">Raise Cash</div>
+        <div class="ac-head-sub">Free up money you're already spending</div>
+      </div>
+      <div class="ac-head-right">
+        <div class="ac-head-count">3 actions</div>
+        <div class="ac-head-impact" style="color:var(--amber);">+$1,520/yr available</div>
+      </div>
+      <div class="ac-chev" id="chev-cash">›</div>
+    </div>
+    <div style="display:none;" id="body-cash">
+      <div class="ac-item">
+        <div class="ac-item-tag" style="background:#fff3e0;color:#7a4a00;">CASH</div>
+        <div>
+          <div class="ac-item-label">Switch cell carriers</div>
+          <div class="ac-item-sub">MVNOs run $25/mo on same networks · ~20 min</div>
+        </div>
+        <div class="ac-item-val">+$300/yr</div>
+        <div class="ac-item-arr">›</div>
+      </div>
+      <div class="ac-item">
+        <div class="ac-item-tag" style="background:#fff3e0;color:#7a4a00;">CASH</div>
+        <div>
+          <div class="ac-item-label">Audit bank fees + cash yield</div>
+          <div class="ac-item-sub">ATM fees + free accounts pay ~4% · ~10 min</div>
+        </div>
+        <div class="ac-item-val">+$420/yr</div>
+        <div class="ac-item-arr">›</div>
+      </div>
+      <div class="ac-item">
+        <div class="ac-item-tag" style="background:#e8f0e8;color:#2a5a2a;">INS</div>
+        <div>
+          <div class="ac-item-label">Re-shop renters insurance</div>
+          <div class="ac-item-sub">Competitors undercut renewals 10–20% · ~15 min</div>
+        </div>
+        <div class="ac-item-val">+$240/yr</div>
+        <div class="ac-item-arr">›</div>
+      </div>
+      <div class="ac-redeploy">
+        <div class="ac-redeploy-arrow">↗</div>
+        <div class="ac-redeploy-text">Redirect to savings rate → <b>closes trip goal 10 months faster</b> · shaves <b>8 months</b> off home goal</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. COMPLETE YOUR PICTURE (Vault) -->
+  <div class="vault-cat">
+    <div class="vault-cat-head">
+      <div class="vch-icon">🔐</div>
+      <div class="vch-main">
+        <div class="vch-title">Complete Your Picture</div>
+        <div class="vch-sub">3 accounts Hence doesn't know about yet · unlocks tracking</div>
+      </div>
+    </div>
+    <div class="vault-cat-item">
+      <div class="vci-dot"></div>
+      <div class="vci-main">
+        <div class="vci-label">Fidelity 401(k)</div>
+        <div class="vci-capability">Hence will track your contribution rate and alert you if your match changes</div>
+      </div>
+      <div class="vci-arr">›</div>
+    </div>
+    <div class="vault-cat-item">
+      <div class="vci-dot"></div>
+      <div class="vci-main">
+        <div class="vci-label">Lemonade Renters Insurance</div>
+        <div class="vci-capability">Hence will alert you before renewal and flag if a cheaper option appears</div>
+      </div>
+      <div class="vci-arr">›</div>
+    </div>
+    <div class="vault-cat-item">
+      <div class="vci-dot"></div>
+      <div class="vci-main">
+        <div class="vci-label">MOHELA Student Loan</div>
+        <div class="vci-capability">Hence will monitor your payoff timeline and flag rate or plan changes</div>
+      </div>
+      <div class="vci-arr">›</div>
+    </div>
+  </div>
+
+  <!-- GUIDED ASK -->
+  <div class="gap"></div>
+  <div class="ask-prompt">
+    <div class="ap-label">✦ Questions worth exploring</div>
+    <div class="ap-questions">
+      <div class="ap-q"><div class="ap-q-text">What's a realistic retirement income for someone in my situation?</div><div class="ap-q-arr">›</div></div>
+      <div class="ap-q"><div class="ap-q-text">If I get a raise, where should the extra money go first?</div><div class="ap-q-arr">›</div></div>
+      <div class="ap-q"><div class="ap-q-text">Should I prioritize the trip or the down payment?</div><div class="ap-q-arr">›</div></div>
+      <div class="ap-q"><div class="ap-q-text">What would paying off my Freedom card do to my map?</div><div class="ap-q-arr">›</div></div>
+    </div>
+  </div>
+
+  <div class="bottom-spacer"></div>
+</div>
+
+<div class="ask-bar">
+  <div class="ask-inner">
+    <span style="font-size:16px;opacity:0.5;">💬</span>
+    <span style="flex:1;font-size:13px;color:var(--ink-3);">Ask Hence a question…</span>
+    <div class="ask-send"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <div class="bn-item"><svg class="bn-svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="#7a8a7e" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 21V12h6v9" stroke="#7a8a7e" stroke-width="1.5"/></svg><div class="bn-label">Home</div></div>
+  <div class="bn-item"><svg class="bn-svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#7a8a7e" stroke-width="1.5"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#7a8a7e" stroke-width="1.5" stroke-linecap="round"/></svg><div class="bn-label">Vault</div></div>
+  <div class="bn-item" style="position:relative;"><div style="display:inline-flex;width:44px;height:44px;border-radius:50%;background:#1a6b35;align-items:center;justify-content:center;margin-bottom:2px;box-shadow:0 2px 10px rgba(26,107,53,0.35);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="white" stroke-width="1.8" stroke-linejoin="round"/></svg></div><div class="bn-label">Ask</div></div>
+  <div class="bn-item"><svg class="bn-svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#7a8a7e" stroke-width="1.5"/><path d="M16.5 7.5l-2.5 5.5-5.5 2.5 2.5-5.5 5.5-2.5z" stroke="#7a8a7e" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="12" r="1" fill="#7a8a7e"/></svg><div class="bn-label">Marketplace</div></div>
+  <div class="bn-item"><svg class="bn-svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#7a8a7e" stroke-width="1.5"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="#7a8a7e" stroke-width="1.5" stroke-linecap="round"/></svg><div class="bn-label">You</div></div>
+</div>
+
+<script>
+// Ring toggle
+function toggleRings(view) {
+  ['stand','getting'].forEach(function(v) {
+    document.getElementById('rings-'+v).classList.toggle('active', v===view);
+    document.getElementById('btn-'+v).classList.toggle('active', v===view);
+  });
+}
+
+// Category accordion
+function toggleCat(id) {
+  var body = document.getElementById('body-'+id);
+  var chev = document.getElementById('chev-'+id);
+  var open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  chev.classList.toggle('open', !open);
+}
+
+// Month dot builder
+function buildDots(id, saved, total, fasterArrival, currentArrival) {
+  var c = document.getElementById(id);
+  for (var i = 1; i <= total; i++) {
+    var d = document.createElement('div');
+    d.className = 'mt-dot';
+    if (i <= saved) d.classList.add('saved');
+    else if (i === fasterArrival) { d.classList.add('arrival'); d.textContent = '✓'; }
+    else if (i === currentArrival) { d.classList.add('current-arrival'); d.textContent = '✓'; }
+    else if (i > saved && i < fasterArrival) d.classList.add('faster');
+    else d.classList.add('remaining');
+    c.appendChild(d);
+  }
+}
+buildDots('trip-dots', 4, 38, 28, 38);
+buildDots('home-dots', 19, 50, 42, 50);
+</script>
+</body>
+</html>

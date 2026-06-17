@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hence — Money Map (deep layer)</title>
+<style>
+  :root{
+    --canvas:#efece4; --ink:#2a2a2e; --ink-soft:#5a5a62; --ink-faint:#8d8d95;
+    --card:#ffffff; --line:rgba(0,0,0,.07);
+    --g-violet:linear-gradient(135deg,#8a7fb0,#6f6394);
+    --g-teal:linear-gradient(120deg,#2c9e7a,#3c8fae 55%,#4f6fb0);
+    --g-slate:linear-gradient(135deg,#46506b,#2f3a52);
+    --g-warm:linear-gradient(135deg,#d9763a,#c0568a);
+    --g-deep:linear-gradient(135deg,#5b4f86,#3f5a8f);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--canvas);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;padding:30px 16px 80px;line-height:1.45;}
+  .frame{max-width:430px;margin:0 auto;}
+  .stage-label{max-width:430px;margin:40px auto 14px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;}
+  .stage-label:first-child{margin-top:0;}
+  .note{max-width:430px;margin:16px auto 0;font-size:12.5px;color:var(--ink-faint);line-height:1.5;}
+
+  .topbar{display:flex;align-items:center;gap:10px;color:var(--ink-soft);font-size:13.5px;margin-bottom:14px;}
+  .topbar .back{font-size:18px;}
+  .topbar b{color:var(--ink);font-weight:600;}
+
+  .beat-h{margin:24px 4px 10px;}
+  .beat-h .bt{font-size:19px;font-weight:600;letter-spacing:-.01em;}
+  .beat-h .bs{font-size:13px;color:var(--ink-faint);margin-top:2px;}
+  .beat-h:first-of-type{margin-top:4px;}
+
+  /* ---- BEAT 1: THE FORK ---- */
+  .fork{background:var(--g-slate);border-radius:22px;padding:24px 22px 20px;color:#fff;box-shadow:0 18px 40px -26px rgba(40,50,80,.55);}
+  .fork .fk{font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.78;font-weight:600;}
+  .fork .fbignum{font-size:46px;font-weight:700;letter-spacing:-.03em;margin:10px 0 2px;}
+  .fork .fbignum span{color:#7fe0b4;}
+  .fork .fsub{font-size:14px;opacity:.9;line-height:1.5;margin-bottom:18px;max-width:340px;}
+  .chartwrap{background:rgba(255,255,255,.06);border-radius:14px;padding:14px 12px 10px;}
+  .legend{display:flex;gap:18px;margin-top:10px;padding-left:4px;}
+  .legend .lg{display:flex;align-items:center;gap:7px;font-size:12px;opacity:.92;}
+  .legend .sw{width:16px;height:3px;border-radius:2px;}
+  .legend .sw.moves{background:#7fe0b4;} .legend .sw.drift{background:#e3a87f;}
+  .fork .disc{font-size:11px;opacity:.6;margin-top:14px;line-height:1.5;}
+
+  /* ---- BEAT 2: DOMINANT MOVE ---- */
+  .dom{background:var(--card);border-radius:20px;padding:22px;border:1px solid var(--line);}
+  .dom .dmsg{font-size:14px;color:var(--ink-soft);line-height:1.55;margin-bottom:18px;}
+  .dom .dmsg b{color:var(--ink);font-weight:700;}
+  .barrow{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+  .barrow .blab{width:96px;flex-shrink:0;font-size:12.5px;color:var(--ink-soft);line-height:1.25;text-align:right;}
+  .barrow .btrack{flex:1;height:30px;background:#f4f1ea;border-radius:8px;position:relative;overflow:hidden;}
+  .barrow .bfill{position:absolute;left:0;top:0;height:100%;border-radius:8px;display:flex;align-items:center;justify-content:flex-end;padding-right:10px;font-size:13px;font-weight:700;color:#fff;}
+  .bfill.small{background:#c9b89a;} .bfill.big{background:#1d9e75;}
+  .dom .dcap{font-size:13px;color:var(--ink-faint);margin-top:8px;font-style:italic;line-height:1.5;}
+
+  /* ---- BEAT 3: DRIFT CLOCK ---- */
+  .drift{background:var(--g-warm);border-radius:20px;padding:24px 22px;color:#fff;box-shadow:0 18px 40px -26px rgba(150,90,50,.5);}
+  .drift .dk{font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.85;font-weight:600;}
+  .drift .dclock{display:flex;align-items:baseline;gap:10px;margin:12px 0 4px;}
+  .drift .dclock .n{font-size:40px;font-weight:700;letter-spacing:-.02em;}
+  .drift .dclock .u{font-size:15px;opacity:.85;font-weight:500;}
+  .drift .dline{font-size:14px;opacity:.95;line-height:1.55;margin-top:10px;}
+  .drift .dline b{font-weight:700;}
+  .drift .quote{font-size:16px;font-weight:600;line-height:1.4;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,.28);}
+
+  /* ---- DEMOTED GRID (reference) ---- */
+  .gridref{background:var(--card);border-radius:20px;padding:20px 22px;border:1px solid var(--line);}
+  .gridref .grh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
+  .gridref .grh .t{font-size:16px;font-weight:600;}
+  .gridref .grh .c{font-size:12px;color:var(--ink-faint);}
+  .matrix{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+  .cell{aspect-ratio:1;border-radius:10px;padding:8px;display:flex;flex-direction:column;justify-content:space-between;font-size:10px;}
+  .cell .cn{font-weight:600;font-size:10.5px;line-height:1.15;}
+  .cell .cc{font-size:9px;opacity:.7;}
+  .cell .ct{align-self:flex-end;background:rgba(0,0,0,.12);border-radius:10px;padding:1px 7px;font-weight:700;font-size:11px;}
+  .cell.magic{background:#e4f5ed;color:#0f6e56;} .cell.magic .ct{background:#1d9e75;color:#fff;}
+  .cell.worth{background:#eef6e2;color:#3b6d11;}
+  .cell.life{background:#efe7f8;color:#5c3a87;} .cell.life .ct{background:#7c4ba8;color:#fff;}
+  .cell.quick{background:#e9f0fb;color:#185fa5;} .cell.quick .ct{background:#3c8fae;color:#fff;}
+  .cell.solid{background:#f4f1ea;color:#5f5e5a;}
+  .cell.pivot{background:#fbe7e4;color:#993c1d;} .cell.pivot .ct{background:#cf5a4d;color:#fff;}
+  .cell.house{background:#f1efe8;color:#888780;}
+  .cell.marg{background:#f1efe8;color:#aaa;}
+  .cell.dont{background:#f1efe8;color:#bbb;opacity:.6;}
+  .axis-note{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-faint);margin-top:10px;}
+
+  /* share */
+  .share-stage{text-align:center;}
+  .sharecard{width:360px;margin:0 auto;border-radius:26px;color:#fff;padding:30px 28px 24px;box-shadow:0 22px 50px -28px rgba(60,70,110,.55);position:relative;overflow:hidden;background:var(--g-slate);}
+  .sharecard .mark{position:absolute;right:-26px;top:-34px;font-size:190px;font-weight:700;opacity:.07;font-style:italic;}
+  .sharecard .logo{font-size:20px;font-weight:600;font-style:italic;}
+  .sharecard .discovery{font-size:15px;opacity:.92;margin-top:22px;line-height:1.5;}
+  .sharecard .discovery b{font-weight:700;color:#7fe0b4;}
+  .sharecard .wisdom{font-size:20px;font-weight:600;line-height:1.4;margin-top:14px;letter-spacing:-.01em;}
+  .sharecard .quote-mark{font-size:46px;line-height:0;opacity:.4;font-family:Georgia,serif;display:block;height:24px;}
+  .sharecard .foot{margin-top:24px;padding-top:14px;border-top:1px solid rgba(255,255,255,.28);font-size:12.5px;opacity:.88;}
+  .sharecard .foot b{font-weight:600;}
+</style>
+</head>
+<body>
+
+<div class="stage-label">The deep layer · behind "this is the real story" (same 28-year-old)</div>
+<div class="frame">
+
+  <div class="topbar"><span class="back">←</span> <span>Your foundation · <b>the real story</b></span></div>
+
+  <!-- BEAT 1: THE FORK -->
+  <div class="beat-h"><div class="bt">Two futures fork from here</div><div class="bs">Same income, same job — the difference is the decisions you make next.</div></div>
+  <div class="fork">
+    <div class="fk">The gap by age 60</div>
+    <div class="fbignum"><span>$510,000</span></div>
+    <div class="fsub">That's the distance between drifting and deciding — built entirely from the housing gap and the match you're not capturing yet, compounded over the years you have.</div>
+
+    <div class="chartwrap">
+      <svg viewBox="0 0 380 200" width="100%" role="img" aria-label="Two trajectory lines from age 28 to 60: drifting reaches about $190K, deciding reaches about $700K">
+        <line x1="40" y1="180" x2="360" y2="180" stroke="rgba(255,255,255,.25)" stroke-width="1"/>
+        <path d="M40,178.9 L80,172 L120,165.8 L160,157.1 L200,145.7 L240,130.9 L280,106.9 L320,70.3 L360,20 L360,136.6 L320,143.9 L280,152.6 L240,158.3 L200,163.5 L160,168.6 L120,172.5 L80,175.9 L40,178.9 Z" fill="rgba(127,224,180,.18)"/>
+        <path d="M40,178.9 L80,175.9 L120,172.5 L160,168.6 L200,163.5 L240,158.3 L280,152.6 L320,143.9 L360,136.6" fill="none" stroke="#e3a87f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M40,178.9 L80,172 L120,165.8 L160,157.1 L200,145.7 L240,130.9 L280,106.9 L320,70.3 L360,20" fill="none" stroke="#7fe0b4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="360" cy="20" r="4.5" fill="#7fe0b4"/>
+        <circle cx="360" cy="136.6" r="4.5" fill="#e3a87f"/>
+        <text x="354" y="14" fill="#7fe0b4" font-size="12" font-weight="700" text-anchor="end" font-family="-apple-system,sans-serif">~$700K</text>
+        <text x="354" y="152" fill="#e3a87f" font-size="11" font-weight="600" text-anchor="end" font-family="-apple-system,sans-serif">~$190K</text>
+        <text x="40" y="195" fill="rgba(255,255,255,.6)" font-size="10" font-family="-apple-system,sans-serif">28</text>
+        <text x="356" y="195" fill="rgba(255,255,255,.6)" font-size="10" text-anchor="end" font-family="-apple-system,sans-serif">60</text>
+      </svg>
+      <div class="legend">
+        <div class="lg"><span class="sw moves"></span> If you decide</div>
+        <div class="lg"><span class="sw drift"></span> If you drift</div>
+      </div>
+    </div>
+    <div class="disc">Assumes the freed cash and match are invested at a conservative 6% average annual real return. Markets vary and aren't guaranteed — this is an illustration of the gap, not a prediction. Adjust the inputs anytime.</div>
+  </div>
+
+  <!-- BEAT 2: DOMINANT MOVE -->
+  <div class="beat-h"><div class="bt">One move does most of the work</div><div class="bs">Not what most people expect — and the reason structure beats tidying.</div></div>
+  <div class="dom">
+    <div class="dmsg">You'd assume your future is the sum of a hundred small good habits. It isn't. <b>Right-sizing your housing alone moves the needle more than all six quick wins combined</b> — by a wide margin.</div>
+    <div class="barrow">
+      <div class="blab">All 6 quick wins, compounded</div>
+      <div class="btrack"><div class="bfill small" style="width:26%;">~$130K</div></div>
+    </div>
+    <div class="barrow">
+      <div class="blab">Housing fix alone</div>
+      <div class="btrack"><div class="bfill big" style="width:80%;">~$400K</div></div>
+    </div>
+    <div class="dcap">The easy moves are worth doing. But the hard one is worth ~3× all of them together. That's where your attention belongs.</div>
+  </div>
+
+  <!-- BEAT 3: DRIFT CLOCK -->
+  <div class="beat-h"><div class="bt">What waiting costs</div><div class="bs">Not deciding is itself a decision — and it has a price.</div></div>
+  <div class="drift">
+    <div class="dk">The cost of drift</div>
+    <div class="dclock"><span class="n">$680</span><span class="u">gone every month you wait</span></div>
+    <div class="dline">Put off the housing decision for a year and it's <b>~$8,160 spent</b> you can't get back — plus the compounding you'll never recover, about <b>$31,000 by 60</b> for a single year's delay.</div>
+    <div class="quote">Drift is a decision. If you don't choose a direction, inertia chooses one for you.</div>
+  </div>
+
+  <!-- DEMOTED GRID -->
+  <div class="beat-h"><div class="bt">Everything, in one place</div><div class="bs">All your moves by impact and effort. The reference behind the story above.</div></div>
+  <div class="gridref">
+    <div class="grh"><div class="t">Your move map</div><div class="c">9 moves found</div></div>
+    <div class="matrix">
+      <div class="cell magic"><div class="cn">Raise 401(k) to match</div><div class="ct">★</div></div>
+      <div class="cell worth"><div class="cn">Clear $3K card</div><div class="cc">worth it</div></div>
+      <div class="cell life"><div class="cn">Housing decision</div><div class="ct">big</div></div>
+      <div class="cell quick"><div class="cn">$5K → HYSA</div><div class="cc">quick win</div></div>
+      <div class="cell solid"><div class="cn">SAVE plan check</div><div class="cc">solid</div></div>
+      <div class="cell pivot"><div class="cn">Stability Sprint</div><div class="ct">big</div></div>
+      <div class="cell house"><div class="cn">Cancel 1 sub</div><div class="cc">housekeeping</div></div>
+      <div class="cell marg"><div class="cn">Cell rate review</div></div>
+      <div class="cell dont"><div class="cn">—</div></div>
+    </div>
+    <div class="axis-note"><span>← easier</span><span>more impact ↑</span><span>harder →</span></div>
+  </div>
+
+  <div class="note">The deep layer doesn't dump the grid — it earns its own three discoveries first, then the grid sits below as reference. <b>Beat 1 (the fork)</b> is the temporal discovery the verdict couldn't show: $510K between drifting and deciding, drawn. <b>Beat 2 (dominant move)</b> is the conceptual discovery — one hard move beats all the easy ones combined, the visual proof of "structure beats optimization." <b>Beat 3 (drift clock)</b> is the behavioral push — waiting has a price tag — and it's quietly the conversion engine. Note the disclosure under the chart: any forward projection needs conservative, stated assumptions, especially heading toward RIA status. The grid (your existing 9-box) is demoted to the appendix.</div>
+</div>
+
+<!-- SHARE -->
+<div class="stage-label share-stage">What leaves the app · the deep-layer share (the bigger number)</div>
+<div class="sharecard">
+  <div class="mark">H</div>
+  <div class="logo">Hence</div>
+  <div class="discovery">Ran the math: the gap between drifting and deciding, for me, is about <b>half a million dollars</b> by the time I'm 60. From decisions I can make right now.</div>
+  <div class="wisdom"><span class="quote-mark">"</span>The expensive financial mistakes aren't the ones you make. They're the ones you keep not making.</div>
+  <div class="foot">Mapped my next 30 years on <b>Hence</b> · hence.com</div>
+</div>
+<div class="note share-stage" style="text-align:center;">The deep-layer share escalates past the verdict share: it's about a <i>lifetime</i> number, not a single ratio. "Half a million from decisions I make now" is a bigger, more provocative hook than "$1,438 in idle cash" — and the wisdom (drift as the real cost) is the most on-brand quotable in the whole flow. This is the share that travels furthest.</div>
+
+</body>
+</html>

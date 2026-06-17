@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap');
+:root {
+  --ink:#0f1a12;--ink-2:#3a4a3e;--ink-3:#7a8a7e;--rule:#dce8de;
+  --bg:#f2f6f2;--card:#fff;
+  --primary:#1a6b35;--primary-light:#eaf3ec;--primary-border:#b0d8ba;--primary-mid:#2d8a4a;
+  --amber:#b8720f;--amber-light:#fef7ec;--amber-border:#f0d8a8;
+  --red:#bf3124;--red-light:#fdf0ef;--red-border:#f0c0ba;
+  --mono:'DM Mono',monospace;
+  --dream:#1a3a5a;--dream-light:#e8f0f8;--dream-border:#b0cce0;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;}
+.app{max-width:430px;margin:0 auto;min-height:100vh;}
+
+.nav{background:var(--primary);padding:14px 20px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.nav-brand{font-family:'Libre Baskerville',serif;font-size:16px;font-weight:700;color:white;}
+.nav-back{font-size:13px;color:rgba(255,255,255,0.7);cursor:pointer;}
+.nav-skip{font-size:12px;color:rgba(255,255,255,0.5);cursor:pointer;}
+.progress-bar{background:rgba(0,0,0,0.12);height:3px;}
+.progress-fill{height:100%;background:rgba(255,255,255,0.6);transition:width 0.4s ease;border-radius:0 2px 2px 0;}
+.screen{display:none;animation:fadeIn 0.22s ease;}
+.screen.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+
+.hero{background:var(--primary);padding:6px 20px 22px;color:white;}
+.hero-eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:1.3px;color:rgba(255,255,255,0.45);margin-bottom:7px;display:flex;align-items:center;gap:6px;}
+.hero-step{background:rgba(255,255,255,0.12);border-radius:10px;padding:2px 8px;font-size:10px;color:rgba(255,255,255,0.6);white-space:nowrap;}
+.hero-title{font-family:'Libre Baskerville',serif;font-size:20px;font-weight:400;line-height:1.28;color:white;margin-bottom:6px;}
+.hero-title em{font-style:italic;color:rgba(255,255,255,0.55);}
+.hero-sub{font-size:12px;color:rgba(255,255,255,0.55);line-height:1.55;}
+.step-dots{display:flex;align-items:center;gap:5px;padding:10px 20px 0;}
+.step-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.2);transition:all 0.2s;}
+.step-dot.active{background:white;width:16px;border-radius:3px;}
+.step-dot.done{background:rgba(255,255,255,0.5);}
+
+.form-body{padding:16px 20px;display:flex;flex-direction:column;gap:12px;}
+.field-label{font-size:11px;text-transform:uppercase;letter-spacing:0.9px;color:var(--ink-3);font-weight:500;margin-bottom:6px;}
+.field-card{background:var(--card);border:1.5px solid var(--rule);border-radius:14px;padding:14px 16px;}
+.inline-field{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--rule);}
+.inline-field:last-child{border-bottom:none;padding-bottom:0;}
+.inline-field:first-child{padding-top:0;}
+.if-label{font-size:13px;color:var(--ink-2);}
+.if-sub{font-size:11px;color:var(--ink-3);margin-top:1px;}
+.if-input{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.if-prefix{font-size:13px;color:var(--ink-3);}
+.if-suffix{font-size:13px;color:var(--ink-3);}
+.if-text{border:none;outline:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;color:var(--ink);text-align:right;background:transparent;}
+.if-text.w-100{width:100px;}.if-text.w-55{width:55px;}.if-text.w-40{width:40px;}
+.if-text::placeholder{color:var(--ink-3);font-weight:400;}
+.option-grid{display:grid;gap:7px;}
+.option-grid.cols-3{grid-template-columns:1fr 1fr 1fr;}
+.option-grid.cols-2{grid-template-columns:1fr 1fr;}
+.option-tile{background:var(--card);border:1.5px solid var(--rule);border-radius:12px;padding:11px 8px;text-align:center;cursor:pointer;transition:all 0.15s;}
+.option-tile.selected{background:var(--primary-light);border-color:var(--primary);border-width:2px;}
+.option-tile.selected .ot-label{color:var(--primary);font-weight:600;}
+.ot-icon{font-size:20px;margin-bottom:4px;display:block;}
+.ot-label{font-size:12px;color:var(--ink-2);line-height:1.3;font-weight:500;}
+.ot-sub{font-size:10px;color:var(--ink-3);margin-top:2px;line-height:1.3;}
+.option-tile.dream{background:var(--dream-light);border-color:var(--dream-border);}
+.option-tile.dream.selected{background:var(--dream);border-color:var(--dream);}
+.option-tile.dream.selected .ot-label{color:white;}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--rule);}
+.toggle-row:last-child{border-bottom:none;padding-bottom:0;}
+.toggle-row:first-child{padding-top:0;}
+.tr-info{flex:1;}
+.tr-label{font-size:13px;color:var(--ink);}
+.tr-sub{font-size:11px;color:var(--ink-3);margin-top:1px;}
+.toggle{width:40px;height:24px;border-radius:12px;background:var(--rule);cursor:pointer;position:relative;transition:background 0.2s;flex-shrink:0;margin-left:12px;}
+.toggle.on{background:var(--primary);}
+.toggle-knob{width:18px;height:18px;border-radius:50%;background:white;position:absolute;top:3px;left:3px;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.15);}
+.toggle.on .toggle-knob{left:19px;}
+.hint{background:var(--primary-light);border:1px solid var(--primary-border);border-radius:9px;padding:9px 12px;font-size:11px;color:var(--ink-2);line-height:1.5;display:flex;align-items:flex-start;gap:8px;}
+.hint-icon{font-size:13px;flex-shrink:0;margin-top:1px;}
+.dream-callout{background:var(--dream);border-radius:14px;padding:14px 16px;color:white;}
+.dc-eyebrow{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.4);margin-bottom:5px;}
+.dc-text{font-size:13px;color:rgba(255,255,255,0.8);line-height:1.5;}
+.dc-text em{font-style:italic;color:rgba(255,255,255,0.55);}
+.freq-row{display:flex;align-items:center;gap:10px;}
+.freq-slider{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--rule);outline:none;}
+.freq-slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--primary);cursor:pointer;}
+.assumed{font-size:10px;background:var(--amber-light);color:var(--amber);border-radius:10px;padding:2px 7px;border:1px solid var(--amber-border);white-space:nowrap;}
+
+/* ══════════════════════════════
+   RESULT SCREEN
+══════════════════════════════ */
+.result-hero{background:var(--primary);padding:8px 20px 20px;color:white;}
+.rh-eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,0.45);margin-bottom:10px;}
+
+.proj-income{margin-bottom:14px;}
+.pi-label{font-size:11px;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;}
+.pi-val{font-family:'Libre Baskerville',serif;font-size:38px;font-weight:700;color:white;letter-spacing:-1.5px;line-height:1;}
+.pi-context{font-size:12px;color:rgba(255,255,255,0.5);margin-top:5px;line-height:1.5;}
+.pi-context strong{color:rgba(255,255,255,0.8);}
+
+.income-bars{margin-bottom:8px;}
+.ib-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.ib-row:last-child{margin-bottom:0;}
+.ib-label{font-size:10px;color:rgba(255,255,255,0.4);width:68px;flex-shrink:0;line-height:1.3;}
+.ib-track{flex:1;height:24px;background:rgba(255,255,255,0.08);border-radius:6px;overflow:hidden;}
+.ib-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding:0 9px;transition:width 0.5s ease;}
+.ib-fill.earn{background:rgba(255,255,255,0.18);}
+.ib-fill.projected{background:var(--primary-mid);}
+.ib-fill.dream-bar{background:rgba(255,255,255,0.07);border:1px dashed rgba(255,255,255,0.2);}
+.ib-val{font-size:11px;font-weight:700;color:white;white-space:nowrap;}
+.ib-pct{font-size:10px;color:rgba(255,255,255,0.35);width:28px;text-align:right;flex-shrink:0;}
+
+.dollar-toggle{display:flex;background:rgba(255,255,255,0.1);border-radius:20px;padding:2px;gap:2px;width:fit-content;}
+.dt-btn{border-radius:16px;padding:5px 14px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;cursor:pointer;border:none;color:rgba(255,255,255,0.5);background:transparent;transition:all 0.18s;white-space:nowrap;}
+.dt-btn.active{background:rgba(255,255,255,0.18);color:white;font-weight:600;}
+.future-note{display:none;font-size:11px;color:rgba(255,255,255,0.4);margin-top:8px;line-height:1.5;}
+.future-note.active{display:block;}
+
+/* ── UNIFIED LEVERS ── */
+.levers-section{padding:16px 20px 0;}
+.levers-head{margin-bottom:12px;}
+.lh-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:3px;}
+.lh-sub{font-size:12px;color:var(--ink-3);line-height:1.5;}
+
+/* running total pill */
+.running-total{display:inline-flex;align-items:center;gap:6px;background:var(--primary-light);border:1.5px solid var(--primary-border);border-radius:20px;padding:6px 14px;margin-bottom:12px;}
+.rt-label{font-size:11px;color:var(--ink-3);}
+.rt-val{font-size:14px;font-weight:700;color:var(--primary);letter-spacing:-0.3px;}
+.rt-arrow{font-size:11px;color:var(--primary);}
+
+.lever-card{background:var(--card);border:1.5px solid var(--rule);border-radius:12px;margin-bottom:8px;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;gap:6px;transition:all 0.18s;}
+.lever-card:hover{border-color:var(--primary-border);}
+.lever-card.applied{border-color:var(--primary);background:var(--primary-light);}
+.lever-card.applied .lc-label{color:var(--primary);}
+.lc-top{display:flex;align-items:center;gap:8px;}
+
+.lc-type{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;border-radius:4px;padding:2px 6px;flex-shrink:0;white-space:nowrap;}
+.lc-type.savings{background:var(--primary-light);color:var(--primary);}
+.lc-type.dream{background:var(--dream-light);color:var(--dream);}
+.lever-card.applied .lc-type.savings{background:rgba(26,107,53,0.15);color:var(--primary);}
+.lever-card.applied .lc-type.dream{background:rgba(26,58,90,0.12);color:var(--dream);}
+
+.lc-body{flex:1;min-width:0;}
+.lc-label{font-size:12px;font-weight:600;color:var(--ink);line-height:1.3;}
+.lc-sub{font-size:11px;color:var(--ink-3);line-height:1.3;}
+
+.lc-right{text-align:right;flex-shrink:0;}
+.lc-gain{font-size:13px;font-weight:700;color:var(--primary);}
+.lc-gain.cost{color:var(--red);}
+.lc-pct{font-size:10px;color:var(--ink-3);margin-top:1px;}
+
+/* gap bar + plan button on one row */
+.lc-bottom{display:flex;align-items:center;gap:8px;}
+.lc-gap-track{flex:1;height:4px;background:rgba(0,0,0,0.07);border-radius:2px;overflow:hidden;}
+.lc-gap-fill{height:100%;border-radius:2px;transition:width 0.3s ease;}
+.lc-gap-label{font-size:10px;font-weight:600;flex-shrink:0;min-width:52px;text-align:right;}
+.lc-plan-btn{flex-shrink:0;border-radius:6px;padding:3px 9px;font-family:'DM Sans',sans-serif;font-size:10px;font-weight:600;cursor:pointer;border:1.5px solid var(--primary-border);background:transparent;color:var(--primary);transition:all 0.15s;white-space:nowrap;}
+.lc-plan-btn:hover{background:var(--primary);color:white;}
+.lever-card.applied .lc-plan-btn{background:var(--primary);color:white;border-color:var(--primary);}
+
+.lc-check{width:16px;height:16px;border-radius:50%;background:var(--primary);display:none;align-items:center;justify-content:center;font-size:9px;color:white;flex-shrink:0;}
+.lever-card.applied .lc-check{display:flex;}
+
+.see-more-btn{width:100%;background:transparent;border:1.5px solid var(--rule);border-radius:10px;padding:10px;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--ink-3);cursor:pointer;text-align:center;margin-bottom:4px;transition:all 0.15s;}
+.see-more-btn:hover{border-color:var(--primary-border);color:var(--primary);}
+
+.extra-levers{display:none;}
+.extra-levers.open{display:block;}
+
+/* ── MILESTONES — 3 checkpoints, dream-anchored ── */
+.milestone-track{padding:0 20px;margin-top:20px;}
+.mt-head{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.mt-head-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--ink-3);font-weight:500;}
+.mt-head-line{flex:1;height:1px;background:var(--rule);}
+.mt-sub{font-size:11px;color:var(--ink-3);line-height:1.5;margin-bottom:16px;}
+
+.mi-age-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px;}
+
+/* chart interaction */
+.chart-point circle:last-of-type{transition:r 0.15s ease;}
+
+/* detail cards */
+.mi-detail-card{border:1.5px solid var(--rule);border-radius:14px;padding:14px;background:var(--card);animation:fadeIn 0.2s ease;transition:background 0.3s,border-color 0.3s;}
+.mi-detail-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;}
+.mi-detail-tagline{font-size:11px;color:var(--ink-3);margin-top:2px;}
+.mi-detail-status{font-size:10px;font-weight:700;border-radius:6px;padding:3px 9px;white-space:nowrap;flex-shrink:0;background:var(--amber-light);color:var(--amber);border:1px solid var(--amber-border);transition:all 0.3s;}
+.gap-status{background:var(--amber-light);color:var(--amber);border-color:var(--amber-border);}
+.mi-detail-card.state-on-track{border-color:var(--primary) !important;background:var(--primary-light) !important;}
+.mi-detail-card.state-on-track .mi-detail-status{background:var(--primary-light);color:var(--primary);border-color:var(--primary-border);}
+.mi-detail-card.state-on-track .mi-progress-fill{background:var(--primary) !important;}
+.mi-detail-card.state-close{border-color:var(--amber) !important;background:var(--amber-light) !important;}
+.mi-detail-card.state-close .mi-detail-status{background:var(--amber-light);color:var(--amber);border-color:var(--amber-border);}
+.mc-actions{display:flex;gap:7px;margin-top:12px;padding-top:11px;border-top:1px solid rgba(0,0,0,0.07);}
+.mc-action-btn{flex:1;border-radius:9px;padding:8px 10px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:600;cursor:pointer;text-align:center;transition:all 0.15s;}
+.mc-action-btn.savings{background:var(--primary-light);color:var(--primary);border:1.5px solid var(--primary-border);}
+.mc-action-btn.savings:hover{background:var(--primary);color:white;}
+.mc-action-btn.dream-btn{background:var(--dream-light);color:var(--dream);border:1.5px solid var(--dream-border);}
+.mc-action-btn.dream-btn:hover{background:var(--dream);color:white;}
+/* view details */
+.view-details-btn{background:transparent;border:none;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--primary);cursor:pointer;padding:4px 8px;text-decoration:underline;text-underline-offset:3px;opacity:0.7;}
+.view-details-btn:hover{opacity:1;}
+
+/* what-if lever rows */
+.wi-lever-row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--card);border:1.5px solid var(--rule);border-radius:12px;padding:11px 14px;cursor:pointer;transition:all 0.18s;}
+.wi-lever-row:hover{border-color:var(--primary-border);}
+.wi-lever-row.wi-on{border-color:var(--primary);background:var(--primary-light);}
+.wi-lever-row.wi-on .wil-label{color:var(--primary);}
+.wi-lever-row.wi-on .wil-toggle-pill{background:var(--primary);color:white;}
+.wil-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0;}
+.wil-icon{font-size:18px;flex-shrink:0;}
+.wil-body{flex:1;min-width:0;}
+.wil-label{font-size:13px;font-weight:600;color:var(--ink);}
+.wil-sub{font-size:11px;color:var(--ink-3);margin-top:1px;}
+.wil-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.wil-impact{font-size:12px;font-weight:700;color:var(--primary);}
+.wil-impact.wil-cost{color:var(--red);}
+.wil-toggle-pill{font-size:11px;font-weight:600;color:var(--primary);background:var(--primary-light);border-radius:20px;padding:4px 10px;border:1px solid var(--primary-border);white-space:nowrap;transition:all 0.15s;}
+.assump-head{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--ink-3);font-weight:500;margin-bottom:10px;}
+.assump-key-card{background:var(--card);border:1.5px solid var(--rule);border-radius:12px;padding:12px 14px;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start;}
+.assump-key-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.assump-key-body{flex:1;}
+.assump-key-label{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:4px;}
+.assump-key-sub{font-size:11px;color:var(--ink-3);line-height:1.6;}
+.assump-table{background:var(--card);border:1.5px solid var(--rule);border-radius:12px;overflow:hidden;}
+.assump-row{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid var(--rule);}
+.assump-row:last-child{border-bottom:none;}
+.assump-key-col{font-size:12px;color:var(--ink-2);}
+.assump-val{font-size:12px;font-weight:600;color:var(--ink);text-align:right;}
+
+/* projected vs dream — stacked, clear hierarchy */
+.mi-figures{display:flex;gap:0;margin-bottom:10px;}
+.mi-fig{flex:1;}
+.mi-fig-label{font-size:10px;color:var(--ink-3);margin-bottom:2px;}
+.mi-card.current .mi-fig-label{color:rgba(26,107,53,0.6);}
+.mi-card.destination .mi-fig-label{color:rgba(26,58,90,0.55);}
+.mi-fig-val{font-size:20px;font-weight:700;letter-spacing:-0.8px;line-height:1;}
+.mi-fig.proj .mi-fig-val{color:var(--ink);}
+.mi-card.current .mi-fig.proj .mi-fig-val{color:var(--primary);}
+.mi-card.destination .mi-fig.proj .mi-fig-val{color:var(--dream);}
+.mi-fig.target .mi-fig-val{color:var(--ink-3);font-size:14px;font-weight:600;margin-top:2px;}
+.mi-fig-divider{width:1px;background:var(--rule);margin:0 14px;flex-shrink:0;}
+
+/* progress toward dream */
+.mi-progress-wrap{margin-bottom:7px;}
+.mi-progress-track{height:7px;background:rgba(0,0,0,0.07);border-radius:4px;overflow:hidden;}
+.mi-progress-fill{height:100%;border-radius:4px;transition:width 0.5s ease;}
+.mi-card.current .mi-progress-fill{background:var(--primary);}
+.mi-card.mid .mi-progress-fill{background:var(--ink-3);}
+.mi-card.destination .mi-progress-fill{background:var(--dream);}
+.mi-progress-label{font-size:10px;color:var(--ink-3);margin-top:4px;}
+.mi-card.current .mi-progress-label{color:var(--primary-mid);}
+.mi-card.destination .mi-progress-label{color:var(--dream);}
+
+.mi-explain{font-size:11px;line-height:1.45;color:var(--ink-3);padding-top:7px;border-top:1px solid rgba(0,0,0,0.06);}
+.mi-card.current .mi-explain{color:var(--ink-2);}
+.mi-card.destination .mi-explain{color:var(--dream);}
+
+/* expand milestones */
+
+
+.cta-row{padding:16px 20px 0;}
+.btn-primary{width:100%;background:var(--primary);color:white;border:none;border-radius:12px;padding:14px 16px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;text-align:center;}
+.btn-secondary{width:100%;background:transparent;color:var(--primary);border:1.5px solid var(--primary-border);border-radius:12px;padding:12px 16px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;text-align:center;margin-top:8px;}
+.btn-text{width:100%;background:transparent;color:var(--ink-3);border:none;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;padding:10px;text-align:center;}
+
+.gap{height:14px;}
+.bottom-spacer{height:90px;}
+.bottom-nav{background:rgba(255,255,255,0.94);backdrop-filter:blur(12px);border-top:1px solid var(--rule);display:flex;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:100;}
+.bn-item{flex:1;padding:10px 4px 11px;text-align:center;cursor:pointer;}
+.bn-svg{display:block;margin:0 auto 3px;}
+.bn-label{font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--ink-3);}
+.bn-item.active .bn-label{color:var(--primary);font-weight:600;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ═══ ENTRY ═══ -->
+<div class="screen active" id="screen-entry">
+  <div class="nav"><div class="nav-back">‹ Map</div><div class="nav-brand">Hence</div><div></div></div>
+  <div class="hero">
+    <div class="hero-eyebrow">Retirement Planning</div>
+    <div class="hero-title">What does your<br>retirement actually <em>look like?</em></div>
+    <div class="hero-sub">Most tools ask for a percentage of income. That hides all the real decisions. We start from your specific life and work backwards.</div>
+  </div>
+  <div class="form-body">
+    <div class="dream-callout">
+      <div class="dc-eyebrow">How this works</div>
+      <div class="dc-text">You describe where you are today and the life you imagine retiring into. <em>Hence builds a balance sheet from those specific choices</em> and shows what you're on track for — and what changes if you want more.</div>
+    </div>
+    <div class="field-card" style="display:flex;align-items:center;gap:12px;padding:12px 16px;"><span style="font-size:22px;">⏱</span><div><div style="font-size:13px;font-weight:600;">About 5 minutes</div><div style="font-size:11px;color:var(--ink-3);margin-top:2px;">12 questions · all skippable · every assumption shown</div></div></div>
+    <div class="cta-row" style="padding:0;"><button class="btn-primary" onclick="goto('screen-today')">Start with today's picture →</button></div>
+  </div>
+  <div class="bottom-spacer"></div>
+</div>
+
+<!-- ═══ TODAY 1A: INCOME + SAVINGS ═══ -->
+<div class="screen" id="screen-today">
+  <div class="nav"><div class="nav-back" onclick="goto('screen-entry')">‹ Back</div><div class="nav-brand">Hence</div><div class="nav-skip" onclick="goto('screen-today-b')">Skip</div></div>
+  <div class="progress-bar"><div class="progress-fill" style="width:9%"></div></div>
+  <div class="hero">
+    <div class="step-dots"><div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div></div>
+    <div style="height:10px"></div>
+    <div class="hero-eyebrow">Step 1 of 5 <div class="hero-step">Income &amp; savings</div></div>
+    <div class="hero-title">Let's anchor to<br><em>your current life.</em></div>
+    <div class="hero-sub">Income and retirement savings first — this is what everything compounds from.</div>
+  </div>
+  <div class="form-body">
+    <div>
+      <div class="field-label">Income &amp; age</div>
+      <div class="field-card">
+        <div class="inline-field"><div><div class="if-label">Annual income</div><div class="if-sub">Household, before tax</div></div><div class="if-input"><div class="if-prefix">$</div><input class="if-text w-100" type="text" value="100,000"></div></div>
+        <div class="inline-field"><div><div class="if-label">Current age</div></div><div class="if-input"><input class="if-text w-55" type="text" value="27"></div></div>
+        <div class="inline-field"><div><div class="if-label">Target retirement age</div></div><div class="if-input"><input class="if-text w-55" type="text" value="65"></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="field-label">Retirement savings &amp; contributions</div>
+      <div class="field-card">
+        <div class="inline-field"><div><div class="if-label">401(k) / 403(b)</div><div class="if-sub">All employer plans</div></div><div class="if-input"><div class="if-prefix">$</div><input class="if-text w-100" type="text" value="12,126"></div></div>
+        <div class="inline-field"><div><div class="if-label">IRA (Roth + Traditional)</div></div><div class="if-input"><div class="if-prefix">$</div><input class="if-text w-100" type="text" placeholder="0"></div></div>
+        <div class="inline-field"><div><div class="if-label">Other invested assets</div><div class="if-sub">Brokerage, not cash</div></div><div class="if-input"><div class="if-prefix">$</div><input class="if-text w-100" type="text" placeholder="0"></div></div>
+        <div class="toggle-row"><div class="tr-info"><div class="tr-label">Currently contributing</div><div class="tr-sub">To any retirement account</div></div><div class="toggle on" id="tog-contrib" onclick="toggleContrib(this)"><div class="toggle-knob"></div></div></div>
+        <div id="contrib-fields">
+          <div class="inline-field"><div><div class="if-label">Your contribution rate</div><div class="if-sub">% of gross income</div></div><div class="if-input"><input class="if-text w-40" type="text" value="3"><div class="if-suffix">%</div></div></div>
+          <div class="inline-field"><div><div class="if-label">Employer match</div><div class="if-sub">Match up to what %?</div></div><div class="if-input"><input class="if-text w-40" type="text" placeholder="4"><div class="if-suffix">%</div></div></div>
+          <div class="inline-field" style="padding-bottom:0;border-bottom:none;"><div><div class="if-label">Capturing the full match?</div></div><div style="display:flex;gap:6px;flex-shrink:0;"><div class="option-tile" id="match-yes" onclick="selectMatch('yes')" style="padding:5px 12px;border-radius:8px;font-size:11px;">Yes</div><div class="option-tile selected" id="match-no" onclick="selectMatch('no')" style="padding:5px 12px;border-radius:8px;font-size:11px;">No</div></div></div>
+        </div>
+      </div>
+      <div class="hint" style="margin-top:7px;"><span class="hint-icon">🔐</span><span>Hence can pull balances from your Vault — <strong style="color:var(--primary);cursor:pointer;">sync from Fidelity</strong></span></div>
+    </div>
+    <div>
+      <div class="field-label">Do you have a partner?</div>
+      <div class="option-grid cols-2">
+        <div class="option-tile selected" id="partner-no" onclick="selectPartner('no')"><span class="ot-icon">🧍</span><div class="ot-label">No partner</div><div class="ot-sub">Just me</div></div>
+        <div class="option-tile" id="partner-yes" onclick="selectPartner('yes')"><span class="ot-icon">💑</span><div class="ot-label">Yes, I have a partner</div><div class="ot-sub">We'll include their picture too</div></div>
+      </div>
+    </div>
+    <div class="cta-row" style="padding:0;"><button class="btn-primary" id="today-continue-btn" onclick="goto('screen-today-b')">Continue →</button></div>
+  </div>
+  <div class="bottom-spacer"></div>
+</div>
+
+<!-- ═══ TODAY 1B-PARTNER: PARTNER INCOME + SAVINGS ═══ -->
+<div class="screen" id="screen-today-partner">
+  <div class="nav"><div class="nav-back" onclick="goto('screen-today')">‹ Back</div><div class="nav-brand">Hence</div><div class="nav-skip" onclick="goto('screen-today-b')">Skip</div></div>
+  <div class="progress-bar"><div class="progress-fill" style="width:14%"></div></div>
+  <div class="hero">
+    <div class="step-dots"><div class="step-dot done"></div><div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div></div>
+    <div style="height:10px"></div>
+    <div class="hero-eyebrow">Step 1b of 5 <div class="hero-step">Partner's picture</div></div>
+    <div class="hero-title">Now the same for<br><em>your partner.</em></div>
+    <div class="hero-sub">Their income and savings are additive to the household picture — both affect what you can build together.</div>
+  </div>
+  <div class="form-body">
+    <div>
+      <div class="field-label">Partner's income &amp; age</div>
+      <div class="field-card">
+        <div class="inline-field"><div><div class="if-label">Annual income</div><div class="if-sub">Before tax</div></div><div class="if-input"><div class="if-prefix">$</div><input class="if-text w-100" type="text" placeholder="0"></div></div>
+        <div class="inline-field"><div><div class="if-label">Their age</div></div><div class="if-input"><input class="if-text w-55" type="text" placeholder="—"></div></div>
+        <div class="inline-field"><div><div class="if-label">Their target retirement age</div></div><div class="if-input"><input class="if-text w-55" type="text" placeholder="65"></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="field-label">Partner's retirement savings &amp; contributions</div>
+      <div class="field-card">
+        <div class="inline-field"><div><div class="if-label">401(k) / 403(b)</div><div class="if-sub">All their employer plans</div></div><div class="if-input"><div class="if-prefix">$</div><input class="if-text w-100" type="text" placeholder="0"></div></div>
+        <div class="inline-field"><div><div class="if-label">IRA (Roth + Traditional)</div></div><div class="if-input"><div class="if-prefix">$</div><input class="if-text w-100" type="text" placeholder="0"></div></div>
+        <div class="inline-field"><div><div class="if-label">Other invested assets</div><div class="if-sub">Brokerage, not cash</div></div><div class="if-input"><div class="if-prefix">$</div><input class="if-text w-100" type="text" placeholder="0"></div></div>
+        <div class="toggle-row"><div class="tr-info"><div class="tr-label">Currently contributing</div><div class="tr-sub">To any retirement account</div></div><div class="toggle on" id="tog-partner-contrib" onclick="togglePartnerContrib(this)"><div class="toggle-knob"></div></div></div>
+        <div id="partner-contrib-fields">
+          <div class="inline-field"><div><div class="if-label">Their contribution rate</div><div class="if-sub">% of their gross income</div></div><div class="if-input"><input class="if-text w-40" type="text" placeholder="5"><div class="if-suffix">%</div></div></div>
+          <div class="inline-field"><div><div class="if-label">Their employer match</div><div class="if-sub">Match up to what %?</div></div><div class="if-input"><input class="if-text w-40" type="text" placeholder="4"><div class="if-suffix">%</div></div></div>
+          <div class="inline-field" style="padding-bottom:0;border-bottom:none;"><div><div class="if-label">Capturing the full match?</div></div><div style="display:flex;gap:6px;flex-shrink:0;"><div class="option-tile selected" id="pmatch-yes" onclick="selectPartnerMatch('yes')" style="padding:5px 12px;border-radius:8px;font-size:11px;">Yes</div><div class="option-tile" id="pmatch-no" onclick="selectPartnerMatch('no')" style="padding:5px 12px;border-radius:8px;font-size:11px;">No</div></div></div>
+        </div>
+      </div>
+      <div class="hint" style="margin-top:7px;"><span class="hint-icon">💡</span><span>Hence combines both pictures into one household plan — you can always separate them later.</span></div>
+    </div>
+    <div class="cta-row" style="padding:0;"><button class="btn-primary" onclick="goto('screen-today-b')">Continue →</button></div>
+  </div>
+  <div class="bottom-spacer"></div>
+</div>
+
+<!-- ═══ TODAY 1C: HOUSING + CAR + FAMILY + DEBT ═══ -->
+<div class="screen" id="screen-today-b">
+  <div class="nav"><div class="nav-back" onclick="gotoTodayBack()">‹ Back</div><div class="nav-brand">Hence</div><div class="nav-skip" onclick="goto('screen-dream-home')">Skip</div></div>
+  <div class="progress-bar"><div class="progress-fill" style="width:22%"></div></div>
+  <div class="hero">
+    <div class="step-dots"><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div></div>
+    <div style="height:10px"></div>
+    <div class="hero-eyebrow">Step 2 of 5 <div class="hero-step">Life &amp; obligations</div></div>
+    <div class="hero-title">Housing, family,<br><em>and what you owe.</em></div>
+    <div class="hero-sub">These shape how much runway you have — and what your retirement baseline actually costs.</div>
+  </div>
+  <div class="form-body">
+    <div>
+      <div class="field-label">Housing today</div>
+      <div class="option-grid cols-3">
+        <div class="option-tile selected" onclick="selectTile(this,'housing-now');showHousingField('rent')"><span class="ot-icon">🏠</span><div class="ot-label">Renting</div></div>
+        <div class="option-tile" onclick="selectTile(this,'housing-now');showHousingField('own')"><span class="ot-icon">🏡</span><div class="ot-label">Own a home</div></div>
+        <div class="option-tile" onclick="selectTile(this,'housing-now');showHousingField('other')"><span class="ot-icon">🏢</span><div class="ot-label">Other</div></div>
+      </div>
+      <div id="housing-val-field" class="field-card" style="margin-top:7px;"><div class="inline-field" style="padding:0;"><div><div class="if-label" id="housing-val-label">Monthly rent</div><div class="if-sub">What you pay today</div></div><div class="if-input"><div class="if-prefix">$</div><input class="if-text w-100" id="housing-val-input" type="text" placeholder="2,800"></div></div></div>
+    </div>
+    <div>
+      <div class="field-label">Car today</div>
+      <div class="option-grid cols-3">
+        <div class="option-tile" onclick="selectTile(this,'car-now');document.getElementById('car-val-field').style.display='none'"><span class="ot-icon">🚌</span><div class="ot-label">No car</div></div>
+        <div class="option-tile selected" onclick="selectTile(this,'car-now');document.getElementById('car-val-field').style.display='block'"><span class="ot-icon">🚗</span><div class="ot-label">Own one</div></div>
+        <div class="option-tile" onclick="selectTile(this,'car-now');document.getElementById('car-val-field').style.display='block'"><span class="ot-icon">🚗🚗</span><div class="ot-label">Own two+</div></div>
+      </div>
+      <div id="car-val-field" class="field-card" style="margin-top:7px;"><div class="inline-field" style="padding:0;"><div><div class="if-label">Monthly payment</div><div class="if-sub">$0 if paid off</div></div><div class="if-input"><div class="if-prefix">$</div><input class="if-text w-100" type="text" placeholder="0"></div></div></div>
+    </div>
+    <div>
+      <div class="field-label">Family &amp; obligations today</div>
+      <div class="field-card">
+        <div class="toggle-row"><div class="tr-info"><div class="tr-label">Have or planning children</div></div><div class="toggle" id="tog-kids" onclick="toggleKids(this)"><div class="toggle-knob"></div></div></div>
+        <div class="toggle-row"><div class="tr-info"><div class="tr-label">Supporting a parent or family member</div></div><div class="toggle" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="field-label">Current debt</div>
+      <div class="field-card">
+        <div class="inline-field"><div><div class="if-label">Student loans</div></div><div class="if-input"><div class="if-prefix">$</div><input class="if-text w-100" type="text" value="22,000"></div></div>
+        <div class="inline-field"><div><div class="if-label">Credit card</div></div><div class="if-input"><div class="if-prefix">$</div><input class="if-text w-100" type="text" placeholder="0"></div></div>
+        <div class="inline-field"><div><div class="if-label">Other</div></div><div class="if-input"><div class="if-prefix">$</div><input class="if-text w-100" type="text" placeholder="0"></div></div>
+      </div>
+    </div>
+    <div class="cta-row" style="padding:0;"><button class="btn-primary" onclick="goto('screen-dream-home')">Now let's dream a little →</button></div>
+  </div>
+  <div class="bottom-spacer"></div>
+</div>
+
+<!-- ═══ DREAM: HOME ═══ -->
+<div class="screen" id="screen-dream-home">
+  <div class="nav"><div class="nav-back" onclick="goto('screen-today-b')">‹ Back</div><div class="nav-brand">Hence</div><div class="nav-skip" onclick="goto('screen-dream-life')">Skip</div></div>
+  <div class="progress-bar"><div class="progress-fill" style="width:36%"></div></div>
+  <div class="hero">
+    <div class="step-dots"><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div></div>
+    <div style="height:10px"></div>
+    <div class="hero-eyebrow">Step 3 of 5 <div class="hero-step">Home &amp; Place</div></div>
+    <div class="hero-title">Picture where you'd<br><em>want to wake up.</em></div>
+    <div class="hero-sub">No judgment — the dream is the data.</div>
+  </div>
+  <div class="form-body">
+    <div><div class="field-label">Compared to where you live now…</div><div class="option-grid cols-3"><div class="option-tile dream" onclick="selectTile(this,'ret-home-tier')"><span class="ot-icon">🏙</span><div class="ot-label">Upgrade</div><div class="ot-sub">More or nicer</div></div><div class="option-tile dream selected" onclick="selectTile(this,'ret-home-tier')"><span class="ot-icon">🏡</span><div class="ot-label">About the same</div></div><div class="option-tile dream" onclick="selectTile(this,'ret-home-tier')"><span class="ot-icon">🌿</span><div class="ot-label">Downsize</div><div class="ot-sub">Simpler, cheaper</div></div></div></div>
+    <div><div class="field-label">What kind of city?</div><div class="option-grid cols-3"><div class="option-tile dream" onclick="selectTile(this,'ret-city')"><span class="ot-icon">🗽</span><div class="ot-label">Major metro</div><div class="ot-sub">NYC / SF / LA</div></div><div class="option-tile dream selected" onclick="selectTile(this,'ret-city')"><span class="ot-icon">🌆</span><div class="ot-label">Mid-size city</div><div class="ot-sub">Austin / Denver</div></div><div class="option-tile dream" onclick="selectTile(this,'ret-city')"><span class="ot-icon">🌄</span><div class="ot-label">Smaller / rural</div><div class="ot-sub">Lower cost</div></div></div></div>
+    <div><div class="field-label">Own or rent in retirement?</div><div class="option-grid cols-2"><div class="option-tile dream selected" onclick="selectTile(this,'ret-own')"><span class="ot-icon">🏡</span><div class="ot-label">Own</div></div><div class="option-tile dream" onclick="selectTile(this,'ret-own')"><span class="ot-icon">🏠</span><div class="ot-label">Rent</div></div></div><div class="hint" style="margin-top:7px;"><span class="hint-icon">💡</span><span>Hence uses your current housing cost as the baseline and adjusts for city tier and upgrade/downsize.</span></div></div>
+    <div class="cta-row" style="padding:0;"><button class="btn-primary" onclick="goto('screen-dream-life')">Continue →</button></div>
+  </div>
+  <div class="bottom-spacer"></div>
+</div>
+
+<!-- ═══ DREAM: DAILY LIFE ═══ -->
+<div class="screen" id="screen-dream-life">
+  <div class="nav"><div class="nav-back" onclick="goto('screen-dream-home')">‹ Back</div><div class="nav-brand">Hence</div><div class="nav-skip" onclick="goto('screen-dream-income')">Skip</div></div>
+  <div class="progress-bar"><div class="progress-fill" style="width:55%"></div></div>
+  <div class="hero">
+    <div class="step-dots"><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot active"></div><div class="step-dot"></div></div>
+    <div style="height:10px"></div>
+    <div class="hero-eyebrow">Step 4 of 5 <div class="hero-step">Daily Life</div></div>
+    <div class="hero-title">The car, the trips,<br><em>the dinner table.</em></div>
+  </div>
+  <div class="form-body">
+    <div><div class="field-label">Car in retirement</div><div class="option-grid cols-2"><div class="option-tile dream" onclick="selectTile(this,'ret-car')"><span class="ot-icon">🚫</span><div class="ot-label">No car</div></div><div class="option-tile dream selected" onclick="selectTile(this,'ret-car')"><span class="ot-icon">🚗</span><div class="ot-label">Similar to now</div></div><div class="option-tile dream" onclick="selectTile(this,'ret-car')"><span class="ot-icon">🏎</span><div class="ot-label">Nicer car</div></div><div class="option-tile dream" onclick="selectTile(this,'ret-car')"><span class="ot-icon">🚗🚗</span><div class="ot-label">Two cars</div></div></div><div class="hint" style="margin-top:7px;"><span class="hint-icon">💡</span><span>Estimated relative to your current car — no price needed. Modeled as replacement every 8 years.</span></div></div>
+    <div><div class="field-label">Travel in retirement</div><div class="option-grid cols-3"><div class="option-tile dream" onclick="selectTile(this,'ret-travel')"><span class="ot-icon">🏠</span><div class="ot-label">Mostly local</div></div><div class="option-tile dream selected" onclick="selectTile(this,'ret-travel')"><span class="ot-icon">✈️</span><div class="ot-label">1–2 big trips / yr</div></div><div class="option-tile dream" onclick="selectTile(this,'ret-travel')"><span class="ot-icon">🌍</span><div class="ot-label">Frequent traveler</div><div class="ot-sub">3+ trips / yr</div></div></div></div>
+    <div><div class="field-label">Dining out</div><div class="field-card" style="padding:12px 16px;"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;"><div style="font-size:13px;color:var(--ink-2);">How often?</div><div style="font-size:13px;font-weight:700;color:var(--primary);" id="dining-label">3× / week</div></div><div class="freq-row"><span style="font-size:10px;color:var(--ink-3);">Rarely</span><input class="freq-slider" type="range" min="0" max="4" value="2" oninput="updateDining(this.value)"><span style="font-size:10px;color:var(--ink-3);">Daily</span></div><div style="font-size:11px;color:var(--ink-3);margin-top:8px;" id="dining-est">~$8,400/yr in today's dollars</div></div></div>
+    <div>
+      <div class="field-label" id="hobbies-label">Hobbies &amp; personal interests</div>
+      <div class="option-grid cols-3">
+        <div class="option-tile dream" onclick="selectTile(this,'ret-hobbies')"><span class="ot-icon">📉</span><div class="ot-label">Less than today</div><div class="ot-sub" id="hobbies-sub-less">Simpler pace</div></div>
+        <div class="option-tile dream selected" onclick="selectTile(this,'ret-hobbies')"><span class="ot-icon">⚖️</span><div class="ot-label">About the same</div><div class="ot-sub">Same spend</div></div>
+        <div class="option-tile dream" onclick="selectTile(this,'ret-hobbies')"><span class="ot-icon">📈</span><div class="ot-label">More than today</div><div class="ot-sub" id="hobbies-sub-more">More time, more spend</div></div>
+      </div>
+      <div class="hint" style="margin-top:7px;"><span class="hint-icon">💡</span><span id="hobbies-hint-text">You'll have more free time — hobbies tend to fill it. More means more spend.</span></div>
+    </div>
+    <div class="cta-row" style="padding:0;"><button class="btn-primary" onclick="goto('screen-dream-income')">Continue →</button></div>
+  </div>
+  <div class="bottom-spacer"></div>
+</div>
+
+<!-- ═══ INCOME + FAMILY ═══ -->
+<div class="screen" id="screen-dream-income">
+  <div class="nav"><div class="nav-back" onclick="goto('screen-dream-life')">‹ Back</div><div class="nav-brand">Hence</div><div class="nav-skip" onclick="goto('screen-result')">Skip</div></div>
+  <div class="progress-bar"><div class="progress-fill" style="width:82%"></div></div>
+  <div class="hero">
+    <div class="step-dots"><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot done"></div><div class="step-dot active"></div></div>
+    <div style="height:10px"></div>
+    <div class="hero-eyebrow">Step 5 of 5 <div class="hero-step">Income &amp; Family</div></div>
+    <div class="hero-title">What comes in,<br><em>and who's there with you?</em></div>
+  </div>
+  <div class="form-body">
+    <div><div class="field-label">Income in retirement</div><div class="field-card">
+      <div class="toggle-row"><div class="tr-info"><div class="tr-label">Social Security</div><div class="tr-sub">Est. $2,300/mo &nbsp;<span class="assumed">assumed</span></div></div><div class="toggle on" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div></div>
+      <div class="toggle-row"><div class="tr-info"><div class="tr-label">Pension</div></div><div class="toggle" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div></div>
+      <div class="toggle-row"><div class="tr-info"><div class="tr-label">Part-time work</div><div class="tr-sub">Consulting, freelance, passion income</div></div><div class="toggle" onclick="toggleField2('parttime-field',this)"><div class="toggle-knob"></div></div></div>
+      <div id="parttime-field" style="display:none;" class="inline-field"><div><div class="if-label">Estimated annual</div></div><div class="if-input"><div class="if-prefix">$</div><input class="if-text w-100" type="text" placeholder="20,000"></div></div>
+      <div class="toggle-row"><div class="tr-info"><div class="tr-label">Expecting an inheritance</div></div><div class="toggle" onclick="toggleField2('inherit-field',this)"><div class="toggle-knob"></div></div></div>
+      <div id="inherit-field" style="display:none;" class="inline-field"><div><div class="if-label">Rough estimate</div></div><div class="if-input"><div class="if-prefix">$</div><input class="if-text w-100" type="text" placeholder="100,000"></div></div>
+    </div></div>
+    <div><div class="field-label">Family in retirement</div><div class="field-card">
+      <div class="toggle-row"><div class="tr-info"><div class="tr-label">Married / partnered</div><div class="tr-sub">Affects shared expenses and income offsets</div></div><div class="toggle" onclick="toggleField2('partner-rows',this)"><div class="toggle-knob"></div></div></div>
+      <div id="partner-rows" style="display:none;">
+        <div class="toggle-row"><div class="tr-info"><div class="tr-label">Partner has their own retirement income</div></div><div class="toggle" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div></div>
+        <div class="toggle-row"><div class="tr-info"><div class="tr-label">Partner has their own car</div></div><div class="toggle" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div></div>
+      </div>
+      <div class="toggle-row"><div class="tr-info"><div class="tr-label">Financially supporting kids</div></div><div class="toggle" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div></div>
+      <div class="toggle-row"><div class="tr-info"><div class="tr-label">Supporting a parent or family member</div></div><div class="toggle" onclick="toggleSwitch(this)"><div class="toggle-knob"></div></div></div>
+    </div></div>
+    <div class="cta-row" style="padding:0;"><button class="btn-primary" onclick="goto('screen-result')">Build my retirement picture →</button></div>
+  </div>
+  <div class="bottom-spacer"></div>
+</div>
+
+
+<!-- ═══ WHAT IF SCREEN ═══ -->
+<div class="screen" id="screen-whatif">
+  <div class="nav"><div class="nav-back" onclick="goto('screen-result')">‹ Back</div><div class="nav-brand">Hence</div><div></div></div>
+  <div class="hero" style="padding-bottom:16px;">
+    <div class="hero-eyebrow">What if…</div>
+    <div class="hero-title">Move any lever and see<br><em>your picture update.</em></div>
+    <div class="hero-sub">Chart updates live as you adjust. No commitment — this is just exploration.</div>
+  </div>
+
+  <!-- LIVE MINI CHART -->
+  <div style="padding:0 20px;margin-top:16px;">
+    <div style="background:var(--card);border:1.5px solid var(--rule);border-radius:14px;padding:14px 14px 8px;">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;">
+        <div style="font-size:11px;color:var(--ink-3);">Monthly income in retirement</div>
+        <div style="font-size:11px;color:var(--ink-3);">Dream: <strong style="color:var(--dream);" id="wi-need-val">$6,180</strong></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <div style="font-size:24px;font-weight:700;font-family:'Libre Baskerville',serif;color:var(--primary);letter-spacing:-1px;" id="wi-proj-val">$4,950</div>
+        <div style="font-size:12px;color:var(--ink-3);line-height:1.4;" id="wi-gap-label">$1,230/mo short of dream</div>
+      </div>
+      <!-- simple bar comparison -->
+      <div style="height:10px;background:rgba(0,0,0,0.06);border-radius:5px;overflow:hidden;margin-bottom:4px;position:relative;">
+        <div id="wi-proj-bar" style="height:100%;background:var(--primary);border-radius:5px;width:59%;transition:width 0.4s ease;"></div>
+        <div id="wi-dream-bar-marker" style="position:absolute;top:0;bottom:0;width:2px;background:var(--dream);left:74%;opacity:0.5;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink-3);">
+        <span>$0</span><span>$8,333 (current income)</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:16px 20px 0;">
+
+    <!-- SAVINGS LEVERS -->
+    <div class="field-label" style="margin-bottom:8px;">Savings rate</div>
+    <div class="field-card" style="padding:14px 16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:13px;color:var(--ink-2);">Contribution rate</div>
+        <div style="font-size:14px;font-weight:700;color:var(--primary);" id="wi-contrib-label">3%</div>
+      </div>
+      <input type="range" min="0" max="20" value="3" id="wi-contrib-slider" oninput="wiUpdateContrib(this.value)"
+        style="-webkit-appearance:none;width:100%;height:4px;border-radius:2px;background:var(--rule);outline:none;">
+      <style>#wi-contrib-slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--primary);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.15);}</style>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--ink-3);margin-top:6px;"><span>0%</span><span>10%</span><span>20%</span></div>
+      <div style="font-size:11px;color:var(--ink-3);margin-top:8px;padding-top:8px;border-top:1px solid var(--rule);" id="wi-contrib-note">At 3% you're not capturing your employer match. Raising to 4% adds ~$1K/yr in free money.</div>
+    </div>
+
+    <!-- DREAM LEVERS -->
+    <div class="field-label" style="margin-bottom:8px;margin-top:14px;">Dream adjustments</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+
+      <div class="wi-lever-row" id="wil-city" onclick="wiToggleLever(this, 520)" data-active="false" data-gain="520">
+        <div class="wil-left">
+          <div class="wil-icon">🌄</div>
+          <div class="wil-body"><div class="wil-label">Smaller city</div><div class="wil-sub">Mid-size → smaller / rural</div></div>
+        </div>
+        <div class="wil-right">
+          <div class="wil-impact" id="wil-city-val">−$520 need</div>
+          <div class="wil-toggle-pill">Apply</div>
+        </div>
+      </div>
+
+      <div class="wi-lever-row" id="wil-car" onclick="wiToggleLever(this, 260)" data-active="false" data-gain="260">
+        <div class="wil-left">
+          <div class="wil-icon">🚫</div>
+          <div class="wil-body"><div class="wil-label">No car in retirement</div><div class="wil-sub">Transit and rideshare</div></div>
+        </div>
+        <div class="wil-right">
+          <div class="wil-impact" id="wil-car-val">−$260 need</div>
+          <div class="wil-toggle-pill">Apply</div>
+        </div>
+      </div>
+
+      <div class="wi-lever-row" id="wil-dining" onclick="wiToggleLever(this, 280)" data-active="false" data-gain="280">
+        <div class="wil-left">
+          <div class="wil-icon">🍽</div>
+          <div class="wil-body"><div class="wil-label">Dine out less</div><div class="wil-sub">1× / week instead of 3×</div></div>
+        </div>
+        <div class="wil-right">
+          <div class="wil-impact" id="wil-dining-val">−$280 need</div>
+          <div class="wil-toggle-pill">Apply</div>
+        </div>
+      </div>
+
+      <div class="wi-lever-row" id="wil-partner" onclick="wiToggleLever(this, 1070)" data-active="false" data-gain="1070">
+        <div class="wil-left">
+          <div class="wil-icon">💑</div>
+          <div class="wil-body"><div class="wil-label">Partner with own income</div><div class="wil-sub">Shared expenses + their SS</div></div>
+        </div>
+        <div class="wil-right">
+          <div class="wil-impact" id="wil-partner-val">−$1,070 need</div>
+          <div class="wil-toggle-pill">Apply</div>
+        </div>
+      </div>
+
+      <div class="wi-lever-row" id="wil-travel" onclick="wiToggleLever(this, -440)" data-active="false" data-gain="-440">
+        <div class="wil-left">
+          <div class="wil-icon">🌍</div>
+          <div class="wil-body"><div class="wil-label">Travel more</div><div class="wil-sub">3+ trips / yr — raises need</div></div>
+        </div>
+        <div class="wil-right">
+          <div class="wil-impact wil-cost" id="wil-travel-val">+$440 need</div>
+          <div class="wil-toggle-pill">Apply</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top:16px;padding:12px 14px;background:var(--primary-light);border:1.5px solid var(--primary-border);border-radius:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;" id="wi-summary">
+      <div>
+        <div style="font-size:11px;color:var(--ink-3);">With these changes</div>
+        <div style="font-size:16px;font-weight:700;color:var(--primary);letter-spacing:-0.5px;" id="wi-summary-val">$4,950 / mo</div>
+        <div style="font-size:11px;color:var(--ink-3);margin-top:1px;" id="wi-summary-sub">No changes applied yet</div>
+      </div>
+      <button class="btn-primary" style="width:auto;padding:10px 18px;font-size:13px;white-space:nowrap;" onclick="goto('screen-result')">Save &amp; view plan</button>
+    </div>
+
+  </div>
+  <div class="bottom-spacer"></div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     RESULT SCREEN
+══════════════════════════════════════════ -->
+<div class="screen" id="screen-result">
+  <div class="nav"><div class="nav-back" onclick="goto('screen-dream-income')">‹ Back</div><div class="nav-brand">Hence</div><div></div></div>
+
+  <!-- HERO -->
+  <div class="result-hero">
+    <div class="rh-eyebrow">Your retirement picture · at current pace</div>
+    <div class="proj-income">
+      <div class="pi-label">You're on track for</div>
+      <div class="pi-val">$4,950 / mo</div>
+      <div class="pi-context">in today's dollars · starting at 65. That's <strong>59% of what you earn now</strong> — a real retirement, $1,230/mo short of your dream.</div>
+    </div>
+    <div class="income-bars">
+      <div class="ib-row"><div class="ib-label">Earn now</div><div class="ib-track"><div class="ib-fill earn" style="width:100%"><span class="ib-val">$8,333 / mo</span></div></div><div class="ib-pct">100%</div></div>
+      <div class="ib-row"><div class="ib-label">On track for</div><div class="ib-track"><div class="ib-fill projected" style="width:59%"><span class="ib-val">$4,950 / mo</span></div></div><div class="ib-pct">59%</div></div>
+      <div class="ib-row"><div class="ib-label">Your dream</div><div class="ib-track"><div class="ib-fill dream-bar" style="width:74%"><span class="ib-val" style="color:rgba(255,255,255,0.45);">$6,180 / mo</span></div></div><div class="ib-pct">74%</div></div>
+    </div>
+    <div class="dollar-toggle">
+      <button class="dt-btn active" id="btn-today" onclick="setDollarView('today')">Today's dollars</button>
+      <button class="dt-btn" id="btn-future" onclick="setDollarView('future')">2063 dollars</button>
+    </div>
+    <div class="future-note" id="future-note">In 2063: earning ~$17,900/mo · on track for ~$10,650/mo · dream costs ~$13,280/mo.</div>
+  </div>
+
+  <!-- UNIFIED LEVERS -->
+  <div class="levers-section">
+    <div class="levers-head">
+      <div class="lh-title">Close the $1,230 gap your way.</div>
+      <div class="lh-sub">Savings levers raise what you'll have. Dream levers lower what you'll need. Tap to apply — any combination works.</div>
+    </div>
+
+    <!-- running total — shows projected income and adjusted need side by side -->
+    <div class="running-total" id="running-total" style="display:none;flex-wrap:wrap;gap:4px 12px;">
+      <span class="rt-label">Projected:</span>
+      <span class="rt-val" id="rt-proj">$4,950 / mo</span>
+      <span style="font-size:11px;color:var(--ink-3);">·</span>
+      <span class="rt-label">Need:</span>
+      <span class="rt-val" style="color:var(--dream);" id="rt-need">$6,180 / mo</span>
+    </div>
+
+    <!-- VISIBLE: 2 savings + 2 dream -->
+    <div class="lever-card" onclick="toggleLever(this, 690, 'savings')" data-gain="690" data-type="savings">
+      <div class="lc-top">
+        <div class="lc-type savings">Savings</div>
+        <div class="lc-body"><div class="lc-label">Raise to 4% · capture full match</div><div class="lc-sub">~$65/mo less take-home · $1K/yr free match</div></div>
+        <div class="lc-right"><div class="lc-gain">→ $5,640</div><div class="lc-pct">projected/mo</div></div>
+        <div class="lc-check">✓</div>
+      </div>
+      <div class="lc-bottom">
+        <div class="lc-gap-track"><div class="lc-gap-fill" style="width:56%;background:var(--amber);"></div></div>
+        <div class="lc-gap-label" style="color:var(--amber);">56% of gap</div>
+        <button class="lc-plan-btn">+ Plan</button>
+      </div>
+    </div>
+
+    <div class="lever-card" onclick="toggleLever(this, 520, 'dream')" data-gain="520" data-type="dream">
+      <div class="lc-top">
+        <div class="lc-type dream">Dream</div>
+        <div class="lc-body"><div class="lc-label">Retire to a smaller city</div><div class="lc-sub">Mid-size → smaller / rural</div></div>
+        <div class="lc-right"><div class="lc-gain">−$520 need</div><div class="lc-pct">→ $5,660</div></div>
+        <div class="lc-check">✓</div>
+      </div>
+      <div class="lc-bottom">
+        <div class="lc-gap-track"><div class="lc-gap-fill" style="width:42%;background:var(--amber);"></div></div>
+        <div class="lc-gap-label" style="color:var(--amber);">42% of gap</div>
+        <button class="lc-plan-btn">+ Plan</button>
+      </div>
+    </div>
+
+    <div class="lever-card" onclick="toggleLever(this, 370, 'savings')" data-gain="370" data-type="savings">
+      <div class="lc-top">
+        <div class="lc-type savings">Savings</div>
+        <div class="lc-body"><div class="lc-label">Raise to 8% contribution</div><div class="lc-sub">~$270/mo less take-home</div></div>
+        <div class="lc-right"><div class="lc-gain">→ $5,320</div><div class="lc-pct">projected/mo</div></div>
+        <div class="lc-check">✓</div>
+      </div>
+      <div class="lc-bottom">
+        <div class="lc-gap-track"><div class="lc-gap-fill" style="width:30%;background:var(--ink-3);opacity:0.5;"></div></div>
+        <div class="lc-gap-label" style="color:var(--ink-3);">30% of gap</div>
+        <button class="lc-plan-btn">+ Plan</button>
+      </div>
+    </div>
+
+    <div class="lever-card" onclick="toggleLever(this, 260, 'dream')" data-gain="260" data-type="dream">
+      <div class="lc-top">
+        <div class="lc-type dream">Dream</div>
+        <div class="lc-body"><div class="lc-label">Skip the car in retirement</div><div class="lc-sub">Transit and rideshare instead</div></div>
+        <div class="lc-right"><div class="lc-gain">−$260 need</div><div class="lc-pct">→ $5,920</div></div>
+        <div class="lc-check">✓</div>
+      </div>
+      <div class="lc-bottom">
+        <div class="lc-gap-track"><div class="lc-gap-fill" style="width:21%;background:var(--ink-3);opacity:0.5;"></div></div>
+        <div class="lc-gap-label" style="color:var(--ink-3);">21% of gap</div>
+        <button class="lc-plan-btn">+ Plan</button>
+      </div>
+    </div>
+
+    <!-- SEE MORE -->
+    <button class="see-more-btn" id="see-more-btn" onclick="toggleSeeMore()">See 3 more levers ↓</button>
+
+    <div class="extra-levers" id="extra-levers">
+      <div class="lever-card" onclick="toggleLever(this, 280, 'dream')" data-gain="280" data-type="dream">
+        <div class="lc-top">
+          <div class="lc-type dream">Dream</div>
+          <div class="lc-body"><div class="lc-label">Dine out 1× / week instead of 3×</div><div class="lc-sub">Same quality, simpler rhythm</div></div>
+          <div class="lc-right"><div class="lc-gain">−$280 need</div><div class="lc-pct">→ $5,900</div></div>
+          <div class="lc-check">✓</div>
+        </div>
+        <div class="lc-bottom">
+          <div class="lc-gap-track"><div class="lc-gap-fill" style="width:23%;background:var(--ink-3);opacity:0.5;"></div></div>
+          <div class="lc-gap-label" style="color:var(--ink-3);">23% of gap</div>
+          <button class="lc-plan-btn">+ Plan</button>
+        </div>
+      </div>
+      <div class="lever-card" onclick="toggleLever(this, 1070, 'dream')" data-gain="1070" data-type="dream">
+        <div class="lc-top">
+          <div class="lc-type dream">Dream</div>
+          <div class="lc-body"><div class="lc-label">Partner with their own income</div><div class="lc-sub">Shared expenses + their SS</div></div>
+          <div class="lc-right"><div class="lc-gain">−$1,070 need</div><div class="lc-pct">→ $5,110</div></div>
+          <div class="lc-check">✓</div>
+        </div>
+        <div class="lc-bottom">
+          <div class="lc-gap-track"><div class="lc-gap-fill" style="width:87%;background:var(--primary);"></div></div>
+          <div class="lc-gap-label" style="color:var(--primary);">87% of gap</div>
+          <button class="lc-plan-btn">+ Plan</button>
+        </div>
+      </div>
+      <div class="lever-card" onclick="toggleLever(this, -440, 'dream')" data-gain="-440" data-type="dream">
+        <div class="lc-top">
+          <div class="lc-type dream">Dream</div>
+          <div class="lc-body"><div class="lc-label">Travel more — 3+ trips / yr</div><div class="lc-sub">Your dream costs more</div></div>
+          <div class="lc-right"><div class="lc-gain cost">+$440 need</div><div class="lc-pct">→ $6,620</div></div>
+          <div class="lc-check">✓</div>
+        </div>
+        <div class="lc-bottom">
+          <div class="lc-gap-track"><div class="lc-gap-fill" style="width:36%;background:var(--red);"></div></div>
+          <div class="lc-gap-label" style="color:var(--red);">widens gap</div>
+          <button class="lc-plan-btn" style="border-color:var(--red-border);color:var(--red);">+ Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MILESTONES — SVG trajectory chart + 3 clickable detail cards -->
+  <div class="milestone-track">
+    <div class="mt-head">
+      <div class="mt-head-label">Your path to the dream</div>
+      <div class="mt-head-line"></div>
+    </div>
+    <div class="mt-sub">Tap any point on the chart for details. Dashed line is your dream target — solid is where you're headed.</div>
+
+    <!-- SVG CHART -->
+    <div style="background:var(--card);border:1.5px solid var(--rule);border-radius:14px;padding:16px 14px 10px;margin-bottom:12px;">
+      <svg id="trajectory-chart" viewBox="0 0 360 180" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible;">
+        <defs>
+          <linearGradient id="projGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1a6b35" stop-opacity="0.18"/>
+            <stop offset="100%" stop-color="#1a6b35" stop-opacity="0"/>
+          </linearGradient>
+          <linearGradient id="dreamGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1a3a5a" stop-opacity="0.08"/>
+            <stop offset="100%" stop-color="#1a3a5a" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Y-axis grid lines + labels -->
+        <!-- $2.1M top, $0 bottom. Chart area: x 44–348, y 10–155 -->
+        <line x1="44" y1="10" x2="348" y2="10" stroke="#dce8de" stroke-width="1"/>
+        <line x1="44" y1="47" x2="348" y2="47" stroke="#dce8de" stroke-width="1"/>
+        <line x1="44" y1="84" x2="348" y2="84" stroke="#dce8de" stroke-width="1"/>
+        <line x1="44" y1="121" x2="348" y2="121" stroke="#dce8de" stroke-width="1"/>
+        <line x1="44" y1="155" x2="348" y2="155" stroke="#dce8de" stroke-width="1"/>
+        <text x="40" y="14" text-anchor="end" font-family="DM Sans,sans-serif" font-size="9" fill="#7a8a7e">$2.1M</text>
+        <text x="40" y="51" text-anchor="end" font-family="DM Sans,sans-serif" font-size="9" fill="#7a8a7e">$1.6M</text>
+        <text x="40" y="88" text-anchor="end" font-family="DM Sans,sans-serif" font-size="9" fill="#7a8a7e">$1.0M</text>
+        <text x="40" y="125" text-anchor="end" font-family="DM Sans,sans-serif" font-size="9" fill="#7a8a7e">$500K</text>
+        <text x="40" y="159" text-anchor="end" font-family="DM Sans,sans-serif" font-size="9" fill="#7a8a7e">$0</text>
+
+        <!-- X-axis age labels -->
+        <text x="44"  y="170" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#7a8a7e">27</text>
+        <text x="108" y="170" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#7a8a7e">35</text>
+        <text x="172" y="170" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#7a8a7e">43</text>
+        <text x="236" y="170" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#7a8a7e">51</text>
+        <text x="300" y="170" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#7a8a7e">59</text>
+        <text x="348" y="170" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#7a8a7e">65</text>
+
+        <!-- DREAM TARGET area fill (dashed line path) -->
+        <!-- Ages 27→65 mapped to x 44→348. Dream curve: exponential from $21K→$2.1M -->
+        <!-- Key dream points: 27=$21K, 35=$105K, 43=$370K, 51=$840K, 59=$1.55M, 65=$2.1M -->
+        <!-- Y mapping: val/2100000 * 145, inverted. y = 155 - (val/2100000)*145 -->
+        <!-- 21K→154, 105K→148, 370K→130, 840K→97, 1550K→48, 2100K→10 -->
+        <path d="M44,154 C80,153 108,147 172,128 S260,60 348,10"
+              fill="url(#dreamGrad)" stroke="none"/>
+        <path d="M44,154 C80,153 108,147 172,128 S260,60 348,10"
+              fill="none" stroke="#1a3a5a" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.4"/>
+
+        <!-- PROJECTED area fill -->
+        <!-- Proj points: 27=$12K, 35=$73K, 43=$210K, 51=$500K, 59=$780K, 65=$990K -->
+        <!-- y: 12K→154, 73K→150, 210K→141, 500K→121, 780K→101, 990K→87 -->
+        <path d="M44,154 C80,153 108,150 172,141 S260,108 348,87 L348,155 L44,155 Z"
+              fill="url(#projGrad)" stroke="none"/>
+        <path d="M44,154 C80,153 108,150 172,141 S260,108 348,87"
+              fill="none" stroke="#1a6b35" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+
+        <!-- LEGEND -->
+        <line x1="44" y1="180" x2="60" y2="180" stroke="#1a6b35" stroke-width="2.5" stroke-linecap="round"/>
+        <text x="63" y="183" font-family="DM Sans,sans-serif" font-size="9" fill="#3a4a3e">Your pace</text>
+        <line x1="116" y1="180" x2="132" y2="180" stroke="#1a3a5a" stroke-width="1.5" stroke-dasharray="4,2" opacity="0.5"/>
+        <text x="135" y="183" font-family="DM Sans,sans-serif" font-size="9" fill="#3a4a3e">Dream target</text>
+
+        <!-- ── CLICKABLE DATA POINTS ── -->
+
+        <!-- TODAY: age 27, proj x=44, proj y=154, dream y=154 -->
+        <g class="chart-point" onclick="selectMilestone(0)" style="cursor:pointer;">
+          <circle cx="44" cy="154" r="14" fill="transparent"/>
+          <circle id="pt0-dream" cx="44" cy="154" r="4" fill="none" stroke="#1a3a5a" stroke-width="1.5" opacity="0.4"/>
+          <circle id="pt0-proj" cx="44" cy="154" r="5.5" fill="white" stroke="#1a6b35" stroke-width="2.5"/>
+          <circle id="pt0-pulse" cx="44" cy="154" r="9" fill="none" stroke="#1a6b35" stroke-width="1.5" opacity="0" id="pulse0"/>
+        </g>
+
+        <!-- MIDPOINT: age 46 → x≈172+(46-43)/(51-43)*(236-172) = 172+24=196, proj≈$290K→y=135, dream≈$530K→y=119 -->
+        <g class="chart-point" onclick="selectMilestone(1)" style="cursor:pointer;">
+          <circle cx="196" cy="135" r="14" fill="transparent"/>
+          <circle id="pt1-dream" cx="196" cy="119" r="4" fill="none" stroke="#1a3a5a" stroke-width="1.5" opacity="0.4"/>
+          <circle id="pt1-proj" cx="196" cy="135" r="5.5" fill="white" stroke="#1a6b35" stroke-width="2.5"/>
+        </g>
+
+        <!-- RETIREMENT: age 65, x=348, proj y=87, dream y=10 -->
+        <g class="chart-point" onclick="selectMilestone(2)" style="cursor:pointer;">
+          <circle cx="348" cy="87" r="14" fill="transparent"/>
+          <circle id="pt2-dream" cx="348" cy="10" r="4" fill="none" stroke="#1a3a5a" stroke-width="1.5" opacity="0.4"/>
+          <circle id="pt2-proj" cx="348" cy="87" r="5.5" fill="white" stroke="#1a6b35" stroke-width="2.5"/>
+        </g>
+
+        <!-- Active point highlight rings (hidden until selected) -->
+        <circle id="ring0" cx="44"  cy="154" r="10" fill="none" stroke="#1a6b35" stroke-width="2" opacity="0" pointer-events="none"/>
+        <circle id="ring1" cx="196" cy="135" r="10" fill="none" stroke="#1a6b35" stroke-width="2" opacity="0" pointer-events="none"/>
+        <circle id="ring2" cx="348" cy="87"  r="10" fill="none" stroke="#1a6b35" stroke-width="2" opacity="0" pointer-events="none"/>
+
+      </svg>
+    </div>
+
+    <!-- DETAIL CARDS — one shown at a time based on selected point -->
+    <div id="milestone-detail">
+
+      <div class="mi-detail-card current" id="mc-0">
+        <div class="mi-detail-header">
+          <div>
+            <div class="mi-age-label" style="color:var(--primary);">Today · Age 27</div>
+            <div class="mi-detail-tagline" id="mc0-tagline">Your starting position</div>
+          </div>
+          <div class="mi-detail-status" id="mc0-status">Behind pace</div>
+        </div>
+        <div class="mi-figures">
+          <div class="mi-fig proj">
+            <div class="mi-fig-label">You have</div>
+            <div class="mi-fig-val" style="color:var(--primary);">$12,126</div>
+          </div>
+          <div class="mi-fig-divider"></div>
+          <div class="mi-fig target">
+            <div class="mi-fig-label">Dream target</div>
+            <div class="mi-fig-val">$21,000</div>
+          </div>
+        </div>
+        <div class="mi-progress-wrap">
+          <div class="mi-progress-track"><div class="mi-progress-fill" id="mc0-bar" style="width:58%;background:var(--primary);"></div></div>
+          <div class="mi-progress-label" id="mc0-pct-label" style="color:var(--ink-3);">58% of dream target · $8,874 to go</div>
+        </div>
+        <div class="mi-explain" style="color:var(--ink-2);">Gap opened because your 3% rate is below dream pace. Capturing your employer match closes this by age 29 with no lifestyle change.</div>
+        <div class="mc-actions" id="mc0-actions">
+          <button class="mc-action-btn savings" onclick="goto('screen-whatif')">↑ Save more</button>
+          <button class="mc-action-btn dream-btn" onclick="goto('screen-whatif')">✦ Adjust dream</button>
+        </div>
+      </div>
+
+      <div class="mi-detail-card" id="mc-1" style="display:none;">
+        <div class="mi-detail-header">
+          <div>
+            <div class="mi-age-label" style="color:var(--ink-3);">Midpoint · Age 46</div>
+            <div class="mi-detail-tagline" id="mc1-tagline">Compounding does more work</div>
+          </div>
+          <div class="mi-detail-status" id="mc1-status">55% there</div>
+        </div>
+        <div class="mi-figures">
+          <div class="mi-fig proj">
+            <div class="mi-fig-label">Projected</div>
+            <div class="mi-fig-val">$290,000</div>
+          </div>
+          <div class="mi-fig-divider"></div>
+          <div class="mi-fig target">
+            <div class="mi-fig-label">Dream target</div>
+            <div class="mi-fig-val">$530,000</div>
+          </div>
+        </div>
+        <div class="mi-progress-wrap">
+          <div class="mi-progress-track"><div class="mi-progress-fill" id="mc1-bar" style="width:55%;background:var(--ink-3);opacity:0.5;"></div></div>
+          <div class="mi-progress-label" id="mc1-pct-label">55% of dream target at midpoint</div>
+        </div>
+        <div class="mi-explain">Raising to 4% now puts this milestone at $480K — 90% of dream target. You're closer than the numbers suggest.</div>
+        <div class="mc-actions" id="mc1-actions">
+          <button class="mc-action-btn savings" onclick="goto('screen-whatif')">↑ Save more</button>
+          <button class="mc-action-btn dream-btn" onclick="goto('screen-whatif')">✦ Adjust dream</button>
+        </div>
+      </div>
+
+      <div class="mi-detail-card" id="mc-2" style="display:none;">
+        <div class="mi-detail-header">
+          <div>
+            <div class="mi-age-label" style="color:var(--dream);">Retirement · Age 65</div>
+            <div class="mi-detail-tagline" id="mc2-tagline">Where you land at current pace</div>
+          </div>
+          <div class="mi-detail-status" id="mc2-status" style="background:var(--dream-light);color:var(--dream);border-color:var(--dream-border);">47% of dream</div>
+        </div>
+        <div class="mi-figures">
+          <div class="mi-fig proj">
+            <div class="mi-fig-label">Projected</div>
+            <div class="mi-fig-val" style="color:var(--dream);">$990,000</div>
+          </div>
+          <div class="mi-fig-divider"></div>
+          <div class="mi-fig target">
+            <div class="mi-fig-label">Dream needs</div>
+            <div class="mi-fig-val">$2,100,000</div>
+          </div>
+        </div>
+        <div class="mi-progress-wrap">
+          <div class="mi-progress-track"><div class="mi-progress-fill" id="mc2-bar" style="width:47%;background:var(--dream);"></div></div>
+          <div class="mi-progress-label" id="mc2-pct-label" style="color:var(--dream);">Funds $4,950/mo · dream needs $6,180/mo</div>
+        </div>
+        <div class="mi-explain" style="color:var(--dream);opacity:0.7;">Your $990K funds a real retirement. The levers above close most of the remaining distance. Capturing your match alone adds ~$400K here.</div>
+        <div class="mc-actions" id="mc2-actions">
+          <button class="mc-action-btn savings" onclick="goto('screen-whatif')">↑ Save more</button>
+          <button class="mc-action-btn dream-btn" onclick="goto('screen-whatif')">✦ Adjust dream</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="cta-row">
+    <button class="btn-primary">Add this to my Hence plan →</button>
+    <button class="btn-text" onclick="goto('screen-today')">Recalculate with different choices</button>
+  </div>
+
+  <div style="padding:10px 20px 0;text-align:center;">
+    <button class="view-details-btn" id="view-details-btn" onclick="toggleAssumptions()">View full details &amp; assumptions ↓</button>
+  </div>
+
+  <div id="assumptions-panel" style="display:none;padding:16px 20px 0;">
+    <div class="assump-head">Key assumptions</div>
+    <div class="assump-key-card">
+      <div class="assump-key-icon">📈</div>
+      <div class="assump-key-body">
+        <div class="assump-key-label">All costs inflate at 2.5% / year</div>
+        <div class="assump-key-sub">Your dream home, car, travel, and dining costs are expressed in today's dollars. Hence inflates every line item forward to your retirement date. A $500 flight today costs ~$830 in 2063 at 2.5%/yr. The math works in both directions — your savings also grow.</div>
+      </div>
+    </div>
+    <div class="assump-key-card">
+      <div class="assump-key-icon">🏛</div>
+      <div class="assump-key-body">
+        <div class="assump-key-label">Social Security includes a 20% benefit haircut</div>
+        <div class="assump-key-sub">Current projections suggest the SS trust fund faces pressure around 2033. Hence conservatively assumes benefits come in at ~80% of the current schedule. Your estimated $2,300/mo therefore reflects $1,840/mo in the plan. Toggle SS off to see the worst case.</div>
+      </div>
+    </div>
+    <div class="assump-head" style="margin-top:14px;">All assumptions</div>
+    <div class="assump-table">
+      <div class="assump-row"><div class="assump-key-col">Investment return</div><div class="assump-val">7.0% / yr nominal</div></div>
+      <div class="assump-row"><div class="assump-key-col">Inflation rate</div><div class="assump-val">2.5% / yr</div></div>
+      <div class="assump-row"><div class="assump-key-col">Retirement duration</div><div class="assump-val">30 years (to age 95)</div></div>
+      <div class="assump-row"><div class="assump-key-col">SS benefit level</div><div class="assump-val">80% of current schedule</div></div>
+      <div class="assump-row"><div class="assump-key-col">SS start age</div><div class="assump-val">65 (full benefit)</div></div>
+      <div class="assump-row"><div class="assump-key-col">Vehicle replacement</div><div class="assump-val">Every 8 years</div></div>
+      <div class="assump-row"><div class="assump-key-col">Housing cost basis</div><div class="assump-val">Your current rent / home value</div></div>
+      <div class="assump-row"><div class="assump-key-col">Portfolio withdrawal rate</div><div class="assump-val">4% / yr (safe withdrawal)</div></div>
+      <div class="assump-row"><div class="assump-key-col">Tax treatment</div><div class="assump-val">Pre-tax accounts assumed</div></div>
+      <div class="assump-row"><div class="assump-key-col">Income growth</div><div class="assump-val">2.0% / yr real</div></div>
+    </div>
+    <div style="font-size:11px;color:var(--ink-3);line-height:1.6;margin-top:10px;">All figures are projections based on your inputs and the assumptions above, not guarantees of future performance. Hence Advisory LLC · Registered Investment Adviser.</div>
+  </div>
+
+  <div class="gap"></div>
+  <div class="bottom-spacer"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bn-item"><svg class="bn-svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z" stroke="#7a8a7e" stroke-width="1.5" stroke-linejoin="round"/><path d="M9 21V12h6v9" stroke="#7a8a7e" stroke-width="1.5"/></svg><div class="bn-label">Home</div></div>
+  <div class="bn-item"><svg class="bn-svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#7a8a7e" stroke-width="1.5"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#7a8a7e" stroke-width="1.5" stroke-linecap="round"/></svg><div class="bn-label">Vault</div></div>
+  <div class="bn-item" style="position:relative;"><div style="display:inline-flex;width:44px;height:44px;border-radius:50%;background:#1a6b35;align-items:center;justify-content:center;margin-bottom:2px;box-shadow:0 2px 10px rgba(26,107,53,0.35);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2v10z" stroke="white" stroke-width="1.8" stroke-linejoin="round"/></svg></div><div class="bn-label">Ask</div></div>
+  <div class="bn-item active"><svg class="bn-svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#1a6b35" stroke-width="1.5"/><path d="M16.5 7.5l-2.5 5.5-5.5 2.5 2.5-5.5 5.5-2.5z" stroke="#1a6b35" stroke-width="1.5" stroke-linejoin="round"/><circle cx="12" cy="12" r="1" fill="#1a6b35"/></svg><div class="bn-label">Map</div></div>
+  <div class="bn-item"><svg class="bn-svg" width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#7a8a7e" stroke-width="1.5"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="#7a8a7e" stroke-width="1.5" stroke-linecap="round"/></svg><div class="bn-label">You</div></div>
+</div>
+</div>
+
+<script>
+function goto(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));var t=document.getElementById(id);if(t){t.classList.add('active');window.scrollTo(0,0);}}
+function selectTile(el,group){el.closest('.option-grid').querySelectorAll('.option-tile').forEach(t=>t.classList.remove('selected'));el.classList.add('selected');}
+function showHousingField(mode){var f=document.getElementById('housing-val-field');if(mode==='other'){f.style.display='none';return;}f.style.display='block';document.getElementById('housing-val-label').textContent=mode==='own'?'Estimated home value':'Monthly rent';document.getElementById('housing-val-input').placeholder=mode==='own'?'450,000':'2,800';}
+function toggleSwitch(el){el.classList.toggle('on');}
+function toggleContrib(el){el.classList.toggle('on');document.getElementById('contrib-fields').style.display=el.classList.contains('on')?'block':'none';}
+function toggleField2(fieldId,el){el.classList.toggle('on');document.getElementById(fieldId).style.display=el.classList.contains('on')?'block':'none';}
+function selectMatch(mode){document.getElementById('match-yes').classList.toggle('selected',mode==='yes');document.getElementById('match-no').classList.toggle('selected',mode==='no');}
+
+// ── WHAT IF SCREEN ──
+var wiContrib = 3;
+function wiUpdateContrib(val){
+  wiContrib = parseInt(val);
+  document.getElementById('wi-contrib-label').textContent = val + '%';
+  var note = document.getElementById('wi-contrib-note');
+  if(wiContrib < 4) note.textContent = "At "+wiContrib+"% you're not capturing your employer match. Raising to 4% adds ~$1K/yr in free money.";
+  else if(wiContrib < 10) note.textContent = "At "+wiContrib+"% you're capturing your match. Every point above this compounds significantly over 38 years.";
+  else note.textContent = "At "+wiContrib+"% you're saving aggressively — well ahead of most savers your age.";
+  wiRefreshChart();
+}
+function wiToggleLever(row, gain){
+  var isOn = row.getAttribute('data-active') === 'true';
+  row.setAttribute('data-active', String(!isOn));
+  row.classList.toggle('wi-on', !isOn);
+  row.querySelector('.wil-toggle-pill').textContent = isOn ? 'Apply' : 'Applied ✓';
+  wiRefreshChart();
+}
+function wiRefreshChart(){
+  var savingsMultiplier = Math.min(wiContrib / 3, 5);
+  var projIncome = Math.round(4950 * savingsMultiplier);
+  var dreamNeed = 6180;
+  document.querySelectorAll('.wi-lever-row[data-active="true"]').forEach(function(r){
+    dreamNeed -= parseInt(r.getAttribute('data-gain'));
+  });
+  dreamNeed = Math.max(1000, dreamNeed);
+  projIncome = Math.max(0, projIncome);
+  document.getElementById('wi-proj-val').textContent = '$' + projIncome.toLocaleString();
+  document.getElementById('wi-need-val').textContent = '$' + dreamNeed.toLocaleString();
+  var maxIncome = 8333;
+  document.getElementById('wi-proj-bar').style.width = Math.min(100, Math.round(projIncome/maxIncome*100)) + '%';
+  document.getElementById('wi-dream-bar-marker').style.left = Math.min(100, Math.round(dreamNeed/maxIncome*100)) + '%';
+  var gap = dreamNeed - projIncome;
+  var projEl = document.getElementById('wi-proj-val');
+  document.getElementById('wi-gap-label').textContent = gap <= 0 ? 'Meets or exceeds your dream ✓' : '$' + Math.abs(gap).toLocaleString() + '/mo short of dream';
+  projEl.style.color = gap <= 0 ? 'var(--primary-mid)' : 'var(--primary)';
+  var summaryVal = document.getElementById('wi-summary-val');
+  var summarySub = document.getElementById('wi-summary-sub');
+  summaryVal.textContent = '$' + projIncome.toLocaleString() + ' / mo';
+  summaryVal.style.color = gap <= 0 ? 'var(--primary-mid)' : 'var(--primary)';
+  var changed = document.querySelectorAll('.wi-lever-row[data-active="true"]').length > 0 || wiContrib !== 3;
+  summarySub.textContent = gap <= 0 ? 'Dream fully funded with these changes' : (changed ? '$' + Math.abs(gap).toLocaleString() + '/mo still to close' : 'No changes applied yet');
+}
+
+function updateCardState(cardIdx, projIncome, dreamNeed){
+  var incomeRatio = projIncome / 4950;
+  var needRatio = dreamNeed / 6180;
+  var proj = [12126, 290000, 990000][cardIdx] * incomeRatio;
+  var dream = [21000, 530000, 2100000][cardIdx] * needRatio;
+  var pct = Math.min(100, Math.round(proj/dream*100));
+  var card = document.getElementById('mc-'+cardIdx);
+  if(!card) return;
+  // preserve display:none so selectMilestone still controls visibility
+  var currentDisplay = card.style.display;
+  var actions = document.getElementById('mc'+cardIdx+'-actions');
+  if(pct >= 95){
+    card.className = 'mi-detail-card state-on-track';
+    if(actions) actions.style.display = 'none';
+  } else if(pct >= 80){
+    card.className = 'mi-detail-card state-close';
+    if(actions) actions.style.display = 'flex';
+  } else {
+    card.className = 'mi-detail-card';
+    if(actions) actions.style.display = 'flex';
+  }
+  card.style.display = currentDisplay;
+  var bar = document.getElementById('mc'+cardIdx+'-bar');
+  if(bar){
+    bar.style.width = pct+'%';
+    bar.style.opacity = '1';
+    if(pct >= 95) bar.style.background = 'var(--primary)';
+    else if(pct >= 80) bar.style.background = 'var(--amber)';
+    else bar.style.background = 'var(--ink-3)';
+  }
+  var statusEl = document.getElementById('mc'+cardIdx+'-status');
+  if(statusEl){
+    if(pct >= 95){ statusEl.textContent = 'On track \u2713'; statusEl.style.cssText = 'background:var(--primary-light);color:var(--primary);border-color:var(--primary-border);'; }
+    else if(pct >= 80){ statusEl.textContent = pct+'% — almost there'; statusEl.style.cssText = 'background:var(--amber-light);color:var(--amber);border-color:var(--amber-border);'; }
+    else { statusEl.textContent = pct+'% of dream'; statusEl.style.cssText = ''; }
+  }
+  var pctLabel = document.getElementById('mc'+cardIdx+'-pct-label');
+  if(pctLabel) pctLabel.textContent = pct+'% of dream target';
+}
+var diningLabels=['Rarely','1× / week','3× / week','5× / week','Daily'];
+var diningAmounts=['~$1,200/yr','~$3,600/yr','~$8,400/yr','~$14,000/yr','~$18,200/yr'];
+function updateDining(val){document.getElementById('dining-label').textContent=diningLabels[val];document.getElementById('dining-est').textContent=diningAmounts[val]+' in today\'s dollars';}
+function setDollarView(mode){document.getElementById('btn-today').classList.toggle('active',mode==='today');document.getElementById('btn-future').classList.toggle('active',mode==='future');document.getElementById('future-note').classList.toggle('active',mode==='future');}
+
+// lever interaction with running total
+var baseIncome = 4950;
+var baseDreamNeed = 6180;
+function toggleLever(card, gain, type){
+  card.classList.toggle('applied');
+  var btn = card.querySelector('.lc-plan-btn');
+  if(btn){
+    var isNegative = gain < 0; // widens gap
+    btn.textContent = card.classList.contains('applied')
+      ? '✓ In plan'
+      : (isNegative ? '+ Add' : '+ Plan');
+  }
+  updateRunningTotal();
+}
+function updateRunningTotal(){
+  var projIncome = baseIncome;
+  var dreamNeed = baseDreamNeed;
+  document.querySelectorAll('.lever-card.applied').forEach(function(c){
+    var g = parseInt(c.getAttribute('data-gain'));
+    var t = c.getAttribute('data-type');
+    if(t === 'savings') projIncome += g;
+    else dreamNeed -= g; // dream lever: positive gain = need goes down
+  });
+  var rt = document.getElementById('running-total');
+  var rtProj = document.getElementById('rt-proj');
+  var rtNeed = document.getElementById('rt-need');
+  var count = document.querySelectorAll('.lever-card.applied').length;
+  if(count > 0){
+    rt.style.display = 'inline-flex';
+    rtProj.textContent = '$' + projIncome.toLocaleString() + ' / mo';
+    rtNeed.textContent = '$' + dreamNeed.toLocaleString() + ' / mo';
+    // color shift when projected meets or beats need
+    var met = projIncome >= dreamNeed;
+    rtProj.style.color = met ? 'var(--primary-mid)' : 'var(--primary)';
+    rt.style.borderColor = met ? 'var(--primary)' : 'var(--primary-border)';
+    rt.style.background = met ? 'var(--primary-light)' : 'var(--primary-light)';
+  } else {
+    rt.style.display = 'none';
+  }
+  [0,1,2].forEach(function(i){ updateCardState(i, projIncome, dreamNeed); });
+}
+
+function toggleSeeMore(){
+  var el = document.getElementById('extra-levers');
+  var btn = document.getElementById('see-more-btn');
+  var open = el.classList.contains('open');
+  el.classList.toggle('open', !open);
+  btn.textContent = open ? 'See 3 more levers ↓' : 'Show fewer ↑';
+}
+
+// partner routing
+var hasPartner = false;
+function selectPartner(choice){
+  hasPartner = (choice === 'yes');
+  document.getElementById('partner-no').classList.toggle('selected', !hasPartner);
+  document.getElementById('partner-yes').classList.toggle('selected', hasPartner);
+  var btn = document.getElementById('today-continue-btn');
+  btn.textContent = hasPartner ? "Add partner's picture →" : "Continue →";
+  btn.onclick = hasPartner ? function(){ goto('screen-today-partner'); } : function(){ goto('screen-today-b'); };
+}
+function gotoTodayBack(){
+  goto(hasPartner ? 'screen-today-partner' : 'screen-today');
+}
+function togglePartnerContrib(el){
+  el.classList.toggle('on');
+  document.getElementById('partner-contrib-fields').style.display = el.classList.contains('on') ? 'block' : 'none';
+}
+function selectPartnerMatch(mode){
+  document.getElementById('pmatch-yes').classList.toggle('selected', mode==='yes');
+  document.getElementById('pmatch-no').classList.toggle('selected', mode==='no');
+}
+
+function toggleKids(el){
+  el.classList.toggle('on');
+  var hasKids = el.classList.contains('on');
+  var hintText = document.getElementById('hobbies-hint-text');
+  var subMore = document.getElementById('hobbies-sub-more');
+  if(hintText) hintText.textContent = hasKids
+    ? "When kids leave home, their activity budget often becomes yours — more hobbies may be cost-neutral or a wash."
+    : "You'll have more free time — hobbies tend to fill it. More means more spend.";
+  if(subMore) subMore.textContent = hasKids ? 'Often cost-neutral' : 'More time, more spend';
+}
+
+function toggleAssumptions(){
+  var panel = document.getElementById('assumptions-panel');
+  var btn = document.getElementById('view-details-btn');
+  var open = panel.style.display !== 'none';
+  panel.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? 'View full details & assumptions \u2193' : 'Hide details \u2191';
+}
+function selectMilestone(idx){
+  // hide all cards
+  [0,1,2].forEach(function(i){
+    document.getElementById('mc-'+i).style.display = i===idx ? 'block' : 'none';
+    // ring highlight
+    var ring = document.getElementById('ring'+i);
+    if(ring) ring.setAttribute('opacity', i===idx ? '0.6' : '0');
+    // proj dot fill
+    var pt = document.getElementById('pt'+i+'-proj');
+    if(pt) {
+      pt.setAttribute('fill', i===idx ? '#1a6b35' : 'white');
+      pt.setAttribute('r', i===idx ? '7' : '5.5');
+    }
+  });
+}
+// init — point 0 selected
+selectMilestone(0);
+// init
+document.getElementById('housing-val-field').style.display='block';
+</script>
+</body>
+</html>

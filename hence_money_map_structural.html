@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hence — Money Map (momentum + structural)</title>
+<style>
+  :root{
+    --canvas:#efece4; --ink:#2a2a2e; --ink-soft:#5a5a62; --ink-faint:#8d8d95;
+    --card:#ffffff; --line:rgba(0,0,0,.07);
+    --g-violet:linear-gradient(135deg,#8a7fb0,#6f6394);
+    --g-magenta:linear-gradient(120deg,#c0306f,#9a52c0 60%,#8f74d6);
+    --g-teal:linear-gradient(120deg,#2c9e7a,#3c8fae 55%,#4f6fb0);
+    --g-slate:linear-gradient(135deg,#46506b,#2f3a52);
+    --g-warm:linear-gradient(135deg,#d9763a,#c0568a);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--canvas);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;padding:30px 16px 80px;line-height:1.45;}
+  .frame{max-width:430px;margin:0 auto;}
+  .stage-label{max-width:430px;margin:40px auto 14px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);font-weight:600;}
+  .stage-label:first-child{margin-top:0;}
+  .note{max-width:430px;margin:16px auto 0;font-size:12.5px;color:var(--ink-faint);line-height:1.5;}
+
+  .brandbar{background:var(--g-violet);border-radius:20px;padding:16px 20px;color:#fff;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+  .brandbar .logo{font-size:22px;font-weight:600;font-style:italic;}
+  .brandbar .meta{font-size:12px;opacity:.82;text-align:right;}
+
+  /* score hero */
+  .score-block{background:var(--g-magenta);border-radius:24px;padding:26px 28px 22px;color:#fff;box-shadow:0 18px 40px -24px rgba(120,40,90,.5);}
+  .kicker{font-size:12px;letter-spacing:.14em;text-transform:uppercase;opacity:.82;font-weight:600;}
+  .hero-num{display:flex;align-items:flex-end;gap:12px;margin:12px 0 4px;}
+  .hero-num .big{font-size:80px;line-height:.85;font-weight:700;letter-spacing:-.035em;}
+  .hero-num .of{font-size:15px;opacity:.6;font-weight:500;padding-bottom:11px;}
+  .say{font-size:16px;font-weight:600;line-height:1.3;margin-bottom:20px;max-width:330px;}
+  .say span{display:block;font-size:13.5px;font-weight:400;opacity:.85;margin-top:5px;}
+  .scale{position:relative;}
+  .scale .track{display:flex;gap:2px;height:8px;border-radius:6px;overflow:hidden;}
+  .scale .zone{flex:1;background:rgba(255,255,255,.18);}
+  .scale .zone.filled{background:rgba(255,255,255,.42);}
+  .scale .marker{position:absolute;top:-7px;transform:translateX(-50%);}
+  .scale .marker .dot{width:20px;height:20px;border-radius:50%;background:#fff;border:4px solid #c0306f;box-shadow:0 2px 8px rgba(0,0,0,.25);}
+  .scale .labels{display:flex;margin-top:12px;}
+  .scale .labels .lab{flex:1;text-align:center;font-size:12.5px;font-weight:600;opacity:.5;}
+  .scale .labels .lab.here{opacity:1;}
+
+  /* section header (shared) */
+  .sec-h{margin:22px 4px 10px;}
+  .sec-h .st{font-size:18px;font-weight:600;letter-spacing:-.01em;}
+  .sec-h .ss{font-size:13px;color:var(--ink-faint);margin-top:2px;}
+
+  /* MOMENTUM — optimizations */
+  .opt{background:var(--card);border-radius:20px;padding:18px 22px 12px;border:1px solid var(--line);}
+  .opt .recap{display:flex;gap:12px;margin-bottom:8px;padding-bottom:16px;border-bottom:1px solid var(--line);}
+  .opt .recap .c{flex:1;text-align:center;background:#f4f1ea;border-radius:13px;padding:13px 6px;}
+  .opt .recap .c .n{font-size:21px;font-weight:700;letter-spacing:-.02em;line-height:1;}
+  .opt .recap .c .n.green{color:#1d9e75;}
+  .opt .recap .c .l{font-size:10.5px;color:var(--ink-faint);margin-top:5px;line-height:1.25;}
+  .row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);}
+  .row:last-child{border-bottom:none;}
+  .row .ic{width:32px;height:32px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;}
+  .ic.cash{background:#e4f5ed;color:#1d9e75;} .ic.ret{background:#efe7f8;color:#7c4ba8;}
+  .ic.debt{background:#fdeceb;color:#cf5a4d;} .ic.ins{background:#e9f0fb;color:#3c8fae;}
+  .row .mid{flex:1;min-width:0;}
+  .row .mid .t{font-size:14px;font-weight:600;line-height:1.25;}
+  .row .mid .s{font-size:11.5px;color:var(--ink-faint);margin-top:2px;}
+  .row .rt{text-align:right;flex-shrink:0;}
+  .row .rt .dol{font-size:14px;font-weight:700;letter-spacing:-.01em;}
+  .row .rt .dol.green{color:#1d9e75;} .row .rt .dol.deep{color:#7c4ba8;} .row .rt .dol.neut{color:var(--ink-soft);} .row .rt .dol.risk{color:#3c8fae;font-size:12.5px;font-weight:600;}
+  .row .rt .pt{font-size:10.5px;color:var(--ink-faint);margin-top:2px;}
+  .seeall{display:block;width:100%;text-align:center;margin-top:12px;padding:11px;border:1px solid var(--line);border-radius:12px;background:none;font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;font-family:inherit;}
+
+  /* climb */
+  .climb{background:var(--g-teal);border-radius:18px;padding:18px 22px;margin-top:14px;color:#fff;}
+  .climb .ch{font-size:12px;opacity:.85;letter-spacing:.04em;text-transform:uppercase;font-weight:600;margin-bottom:12px;}
+  .climb .cbar{position:relative;height:9px;border-radius:6px;background:rgba(255,255,255,.22);margin-bottom:4px;}
+  .climb .cbar .have{position:absolute;left:0;top:0;height:100%;border-radius:6px;background:rgba(255,255,255,.5);}
+  .climb .cbar .add{position:absolute;top:0;height:100%;border-radius:6px;background:#fff;}
+  .climb .cbar .endpin{position:absolute;top:-5px;width:19px;height:19px;border-radius:50%;background:#fff;transform:translateX(-50%);box-shadow:0 2px 8px rgba(0,0,0,.25);}
+  .climb .ccap{font-size:13.5px;margin-top:12px;line-height:1.45;opacity:.95;}
+  .climb .ccap b{font-weight:700;}
+
+  /* STRUCTURAL — the foundation diagnosis */
+  .struct{background:var(--g-slate);border-radius:22px;padding:24px 24px 20px;margin-top:14px;color:#fff;box-shadow:0 18px 40px -26px rgba(40,50,80,.55);}
+  .struct .skick{font-size:12px;letter-spacing:.12em;text-transform:uppercase;opacity:.78;font-weight:600;}
+  .struct .sverdict{font-size:23px;font-weight:700;letter-spacing:-.01em;margin:12px 0 6px;line-height:1.2;}
+  .struct .sverdict em{font-style:normal;color:#f0b86e;}
+  .struct .sub{font-size:14px;opacity:.9;line-height:1.5;margin-bottom:18px;}
+
+  .ratio{background:rgba(255,255,255,.09);border-radius:16px;padding:16px 18px;margin-top:12px;}
+  .ratio .rtop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;}
+  .ratio .rtop .rname{font-size:14.5px;font-weight:600;}
+  .ratio .rtop .rstat{font-size:12px;font-weight:600;padding:2px 9px;border-radius:20px;}
+  .rstat.over{background:rgba(240,140,90,.25);color:#f3c08a;}
+  .rstat.edge{background:rgba(240,200,110,.2);color:#f0d39a;}
+  .ratio .rmsg{font-size:13px;opacity:.88;line-height:1.45;margin-bottom:12px;}
+  .ratio .rmsg b{color:#fff;font-weight:700;}
+  /* the balance bar: your % vs balanced band */
+  .balbar{position:relative;height:26px;border-radius:8px;background:rgba(255,255,255,.12);overflow:hidden;margin-bottom:6px;}
+  .balbar .band{position:absolute;top:0;height:100%;background:rgba(120,200,160,.28);}
+  .balbar .bandline{position:absolute;top:0;height:100%;width:2px;background:rgba(150,230,190,.8);}
+  .balbar .you{position:absolute;top:0;height:100%;border-radius:8px 0 0 8px;background:rgba(240,140,90,.55);}
+  .balbar .youlab{position:absolute;top:50%;transform:translateY(-50%);font-size:11.5px;font-weight:700;color:#fff;}
+  .balbar .bandlab{position:absolute;top:50%;transform:translate(-50%,-50%);font-size:10px;color:#cfeede;font-weight:600;}
+  .ratio .plan{margin-top:12px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+  .ratio .plan .pt{font-size:13.5px;font-weight:600;}
+  .ratio .plan .ps{font-size:11.5px;opacity:.72;margin-top:1px;}
+  .ratio .plan .pa{font-size:18px;opacity:.8;}
+
+  .struct .footline{font-size:12.5px;opacity:.7;margin-top:18px;line-height:1.5;}
+
+  /* hand-down */
+  .handdown{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;margin-top:14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;}
+  .handdown .t{font-size:15px;font-weight:600;}
+  .handdown .s{font-size:12px;color:var(--ink-faint);margin-top:2px;}
+  .handdown .arrow{font-size:22px;color:var(--ink-faint);}
+
+  /* share */
+  .share-stage{text-align:center;}
+  .sharecard{width:360px;margin:0 auto;border-radius:26px;color:#fff;padding:30px 28px 24px;box-shadow:0 22px 50px -28px rgba(60,70,110,.55);position:relative;overflow:hidden;background:var(--g-slate);}
+  .sharecard .mark{position:absolute;right:-26px;top:-34px;font-size:190px;font-weight:700;opacity:.07;font-style:italic;}
+  .sharecard .logo{font-size:20px;font-weight:600;font-style:italic;}
+  .sharecard .discovery{font-size:15px;opacity:.92;margin-top:22px;line-height:1.5;}
+  .sharecard .discovery b{font-weight:700;color:#f0b86e;}
+  .sharecard .wisdom{font-size:21px;font-weight:600;line-height:1.36;margin-top:14px;letter-spacing:-.01em;}
+  .sharecard .quote-mark{font-size:46px;line-height:0;opacity:.4;font-family:Georgia,serif;display:block;height:24px;}
+  .sharecard .foot{margin-top:24px;padding-top:14px;border-top:1px solid rgba(255,255,255,.28);font-size:12.5px;opacity:.88;}
+  .sharecard .foot b{font-weight:600;}
+</style>
+</head>
+<body>
+
+<div class="stage-label">The complete Money Map · momentum first, then structure</div>
+<div class="frame">
+
+  <div class="brandbar">
+    <div class="logo">Hence</div>
+    <div class="meta">Money Map<br>run today</div>
+  </div>
+
+  <!-- SCORE -->
+  <div class="score-block">
+    <div class="kicker">Your Money Map score</div>
+    <div class="hero-num"><div class="big">72</div><div class="of">/ 100</div></div>
+    <div class="say">Solid on the surface — strained underneath.<span>Easy wins are sitting right here. The bigger story is in your foundation.</span></div>
+    <div class="scale">
+      <div class="track"><div class="zone filled"></div><div class="zone filled"></div><div class="zone filled"></div><div class="zone"></div></div>
+      <div class="marker" style="left:72%;"><div class="dot"></div></div>
+      <div class="labels"><div class="lab">D</div><div class="lab">C</div><div class="lab here">B</div><div class="lab">A</div></div>
+    </div>
+  </div>
+
+  <!-- MOMENTUM: OPTIMIZATIONS -->
+  <div class="sec-h"><div class="st">Start here — quick wins</div><div class="ss">Fast, low-risk, do them today. Real money and points on the board.</div></div>
+  <div class="opt">
+    <div class="recap">
+      <div class="c"><div class="n green">$3,960</div><div class="l">a year to recover now</div></div>
+      <div class="c"><div class="n">+24</div><div class="l">points available here</div></div>
+      <div class="c"><div class="n">6</div><div class="l">moves you can do today</div></div>
+    </div>
+    <div class="row">
+      <div class="ic cash">$</div>
+      <div class="mid"><div class="t">Move $32K out of idle cash</div><div class="s">~5 min · high-yield savings</div></div>
+      <div class="rt"><div class="dol green">+$1,438/yr</div><div class="pt">+9 pts</div></div>
+    </div>
+    <div class="row">
+      <div class="ic ret">★</div>
+      <div class="mid"><div class="t">Capture your full 401(k) match</div><div class="s">~20 min · free employer money</div></div>
+      <div class="rt"><div class="dol deep">+$3,200/yr</div><div class="pt">+11 pts</div></div>
+    </div>
+    <div class="row">
+      <div class="ic cash">$</div>
+      <div class="mid"><div class="t">Cancel 3 unused subscriptions</div><div class="s">~10 min · $105/mo you forgot</div></div>
+      <div class="rt"><div class="dol green">+$1,260/yr</div><div class="pt">+3 pts</div></div>
+    </div>
+    <div class="row">
+      <div class="ic ins">⟳</div>
+      <div class="mid"><div class="t">Reset your 401(k) to your risk level</div><div class="s">drifted higher-risk than you chose</div></div>
+      <div class="rt"><div class="dol risk">Risk realigned</div><div class="pt">+6 pts</div></div>
+    </div>
+    <button class="seeall">See all 6 quick wins →</button>
+  </div>
+
+  <div class="climb">
+    <div class="ch">Your quick wins, on the score</div>
+    <div class="cbar">
+      <div class="have" style="width:72%;"></div>
+      <div class="add" style="left:72%;width:24%;"></div>
+      <div class="endpin" style="left:96%;"></div>
+    </div>
+    <div class="ccap">Clear these and you go <b>72 → 96</b>, a B to an A. The top three do most of it.</div>
+  </div>
+
+  <!-- STRUCTURAL: THE FOUNDATION DIAGNOSIS -->
+  <div class="sec-h"><div class="st">Your foundation</div><div class="ss">The big picture under the score. Harder to change — and where the real leverage is.</div></div>
+  <div class="struct">
+    <div class="skick">Structural read</div>
+    <div class="sverdict">Your foundation is <em>strained</em>.</div>
+    <div class="sub">Two parts of your life are taking more than they should — and they're the quiet reason the quick wins above won't be enough on their own. These aren't five-minute fixes. They're decisions worth planning.</div>
+
+    <div class="ratio">
+      <div class="rtop"><div class="rname">Housing</div><div class="rstat over">9 pts over</div></div>
+      <div class="rmsg"><b>41% of your take-home</b> goes to housing. Balanced is closer to <b>28%</b>. That gap is ~$900/month you can't put anywhere else.</div>
+      <div class="balbar">
+        <div class="band" style="left:20%;width:18%;"></div>
+        <div class="bandline" style="left:28%;"></div>
+        <div class="you" style="width:41%;"></div>
+        <div class="youlab" style="left:8px;">41%</div>
+        <div class="bandlab" style="left:28%;top:75%;">balanced ~28%</div>
+      </div>
+      <div class="plan">
+        <div><div class="pt">Plan a housing move</div><div class="ps">Roommate, renegotiation, or relocation — mapped to your life</div></div>
+        <div class="pa">→</div>
+      </div>
+    </div>
+
+    <div class="ratio">
+      <div class="rtop"><div class="rname">Transportation</div><div class="rstat edge">at the edge</div></div>
+      <div class="rmsg"><b>17% of your take-home</b> goes to your car. Balanced tops out around <b>15%</b>. Close, but it's tightening everything else.</div>
+      <div class="balbar">
+        <div class="band" style="left:4%;width:11%;"></div>
+        <div class="bandline" style="left:15%;"></div>
+        <div class="you" style="width:17%;"></div>
+        <div class="youlab" style="left:8px;">17%</div>
+        <div class="bandlab" style="left:15%;top:75%;">balanced ~15%</div>
+      </div>
+      <div class="plan">
+        <div><div class="pt">Right-size the car</div><div class="ps">Refinance, or sell and match it to your income</div></div>
+        <div class="pa">→</div>
+      </div>
+    </div>
+
+    <div class="footline">A strained foundation isn't a failure — it's the highest-leverage thing you can fix. But it takes a plan, not a button. When you're ready, Hence builds the plan with you.</div>
+  </div>
+
+  <div class="handdown">
+    <div><div class="t">Open your full Map</div><div class="s">Every move, quick wins and structural, in one place</div></div>
+    <div class="arrow">→</div>
+  </div>
+
+  <div class="note">Two distinct sections, two mechanics. <b>Quick wins</b> lead (momentum, dollars, points, magic-button steps) because they're actionable today — nobody leaves empty-handed. <b>Foundation</b> follows: its value is the <i>discovery</i> ("you're strained, here's exactly where") shown via your real ratio vs. a balanced band — rendered for everyone regardless of readiness. The fix is explicitly a plan, not a button. The rebalance moved into quick wins as "risk realigned" (no dollar promise). Structural items carry point weight but no dollar figure, because their impact is deferred and conditional.</div>
+</div>
+
+<!-- SHARE -->
+<div class="stage-label share-stage">What leaves the app · structural wisdom</div>
+<div class="sharecard">
+  <div class="mark">H</div>
+  <div class="logo">Hence</div>
+  <div class="discovery">Found out <b>41% of my take-home</b> goes to rent. I'd been blaming everything except the actual problem.</div>
+  <div class="wisdom"><span class="quote-mark">"</span>You can optimize the small stuff forever. If the big scaffolding of your life is in the wrong place, none of it adds up.</div>
+  <div class="foot">Got my <b>Money Map</b> on Hence · hence.com</div>
+</div>
+<div class="note share-stage" style="text-align:center;">The share now carries the <i>structural</i> insight — the on-brand one. The discovery is a foundation truth (a ratio, not a leak), and the wisdom is the Fintentional thesis itself: get the scaffolding right first. Grade-agnostic, and it makes the sharer sound like they understand money at a level their friends don't.</div>
+
+</body>
+</html>

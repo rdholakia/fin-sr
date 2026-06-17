@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
+:root{
+  --ink:#0f1a12; --ink-2:#3a4a3e; --ink-3:#7a8a7e;
+  --primary:#1a6b35; --primary-light:#eaf3ec; --primary-border:#b0d8ba;
+  --amber:#b8720f; --red:#bf3124;
+  --morning-bg:#1a1a2e; --morning-mid:#16213e; --morning-accent:#e8c96a;
+  --day-bg:#f5efe6; --day-accent:#c17f3a;
+  --eve-bg:#1e1428; --eve-accent:#a78bcc;
+  --card:#fff; --bg:#f2f6f2; --rule:#dce8de;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'DM Sans',sans-serif;background:#0f1a12;color:white;-webkit-font-smoothing:antialiased;}
+.app{width:100%;max-width:430px;margin:0 auto;height:100vh;overflow:hidden;position:relative;}
+
+/* ══ SCREENS ══ */
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;transition:opacity 0.35s ease,transform 0.35s ease;opacity:0;pointer-events:none;transform:translateY(12px);}
+.screen.active{opacity:1;pointer-events:all;transform:translateY(0);}
+.screen.exit{opacity:0;transform:translateY(-12px);}
+
+/* ══ ANCHOR SCREEN ══ */
+.anchor-wrap{min-height:100vh;background:linear-gradient(165deg,#0f1a12 0%,#1a2e1a 50%,#0f230f 100%);display:flex;flex-direction:column;padding:60px 32px 40px;}
+.anchor-hence{font-family:'Libre Baskerville',serif;font-size:13px;color:rgba(255,255,255,0.35);letter-spacing:3px;text-transform:uppercase;margin-bottom:48px;}
+.anchor-headline{font-family:'Libre Baskerville',serif;font-size:32px;font-weight:400;line-height:1.2;color:white;margin-bottom:12px;}
+.anchor-headline em{font-style:italic;color:rgba(255,255,255,0.4);}
+.anchor-body{font-size:13px;color:rgba(255,255,255,0.45);line-height:1.7;margin-bottom:48px;max-width:280px;}
+
+.anchor-fields{display:flex;flex-direction:column;gap:0;margin-bottom:40px;}
+.af-item{display:flex;align-items:baseline;justify-content:space-between;padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.08);}
+.af-item:last-child{border-bottom:none;}
+.af-key{font-size:12px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px;}
+.af-val{display:flex;align-items:baseline;gap:3px;}
+.af-prefix{font-size:14px;color:rgba(255,255,255,0.3);}
+.af-input{background:transparent;border:none;outline:none;font-family:'Libre Baskerville',serif;font-size:22px;font-weight:400;color:white;text-align:right;width:140px;}
+.af-input::placeholder{color:rgba(255,255,255,0.15);}
+.af-input.narrow{width:60px;}
+
+.anchor-btn{background:white;color:#0f1a12;border:none;border-radius:50px;padding:16px 32px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.2s;width:100%;}
+.anchor-btn:hover{background:rgba(255,255,255,0.9);transform:translateY(-1px);}
+.anchor-btn-ghost{background:transparent;border:none;font-family:'DM Sans',sans-serif;font-size:12px;color:rgba(255,255,255,0.25);cursor:pointer;margin-top:14px;width:100%;text-align:center;padding:8px;}
+
+/* ══ DAY BUILDER ══ */
+.builder-wrap{min-height:100vh;background:#0c0c0c;}
+
+/* floating cost ticker */
+.cost-ticker{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:200;padding:0 20px 20px;}
+.ct-inner{background:rgba(15,15,15,0.92);backdrop-filter:blur(20px);border-radius:20px;padding:14px 20px;border:1px solid rgba(255,255,255,0.08);}
+.ct-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.ct-life{font-family:'Libre Baskerville',serif;font-size:26px;font-weight:400;color:white;letter-spacing:-0.5px;}
+.ct-life span{font-size:13px;color:rgba(255,255,255,0.3);font-family:'DM Sans',sans-serif;letter-spacing:0;margin-left:4px;}
+.ct-done{background:#1a6b35;color:white;border:none;border-radius:25px;padding:9px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.ct-track{height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:visible;position:relative;}
+.ct-fill{height:100%;background:#1a6b35;border-radius:2px;transition:width 0.4s ease;}
+.ct-marker{position:absolute;top:-3px;bottom:-3px;width:2px;background:rgba(255,255,255,0.3);border-radius:1px;transition:left 0.4s ease;}
+.ct-labels{display:flex;justify-content:space-between;margin-top:5px;}
+.ct-label-item{font-size:10px;color:rgba(255,255,255,0.2);}
+.ct-label-item.active{color:rgba(255,255,255,0.5);}
+
+/* scene sections */
+.scene{position:relative;overflow:hidden;}
+
+/* MORNING scene */
+.scene-morning{background:linear-gradient(180deg,#0a0a1a 0%,#111428 60%,#1c1a0a 100%);padding:40px 28px 20px;}
+.scene-time{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:rgba(255,255,255,0.2);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.scene-time::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.07);}
+.scene-headline{font-family:'Libre Baskerville',serif;font-size:28px;line-height:1.2;color:rgba(255,255,255,0.9);margin-bottom:6px;}
+.scene-headline em{font-style:italic;color:rgba(255,255,255,0.35);}
+.scene-sub{font-size:12px;color:rgba(255,255,255,0.3);margin-bottom:28px;line-height:1.6;}
+
+/* choice rows */
+.choice-row{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.choice-label{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,0.2);margin-bottom:4px;}
+
+.choice-strip{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.choice-strip::-webkit-scrollbar{display:none;}
+
+.cs-pill{flex-shrink:0;border-radius:50px;padding:10px 18px;cursor:pointer;transition:all 0.18s;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);display:flex;align-items:center;gap:8px;}
+.cs-pill:hover{background:rgba(255,255,255,0.08);}
+.cs-pill.chosen{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.3);}
+.cs-pill-icon{font-size:16px;}
+.cs-pill-text{white-space:nowrap;}
+.cs-pill-name{font-size:13px;font-weight:500;color:rgba(255,255,255,0.8);}
+.cs-pill-cost{font-size:11px;color:rgba(255,255,255,0.3);margin-top:1px;}
+.cs-pill.chosen .cs-pill-name{color:white;}
+.cs-pill.chosen .cs-pill-cost{color:rgba(255,255,255,0.5);}
+
+/* morning accent color overrides */
+.scene-morning .cs-pill.chosen{border-color:var(--morning-accent);background:rgba(232,201,106,0.08);}
+.scene-morning .cs-pill.chosen .cs-pill-name{color:var(--morning-accent);}
+
+/* DAY scene */
+.scene-day{background:linear-gradient(180deg,#f5efe6 0%,#ede5d8 100%);padding:40px 28px 20px;}
+.scene-day .scene-time{color:rgba(80,50,20,0.3);}
+.scene-day .scene-time::after{background:rgba(80,50,20,0.1);}
+.scene-day .scene-headline{color:rgba(40,25,10,0.85);}
+.scene-day .scene-headline em{color:rgba(40,25,10,0.3);}
+.scene-day .scene-sub{color:rgba(40,25,10,0.4);}
+.scene-day .choice-label{color:rgba(40,25,10,0.25);}
+.scene-day .cs-pill{border-color:rgba(80,50,20,0.12);background:rgba(80,50,20,0.04);}
+.scene-day .cs-pill:hover{background:rgba(80,50,20,0.08);}
+.scene-day .cs-pill-name{color:rgba(40,25,10,0.75);}
+.scene-day .cs-pill-cost{color:rgba(80,50,20,0.35);}
+.scene-day .cs-pill.chosen{border-color:var(--day-accent);background:rgba(193,127,58,0.1);}
+.scene-day .cs-pill.chosen .cs-pill-name{color:var(--day-accent);}
+.scene-day .cs-pill.chosen .cs-pill-cost{color:rgba(193,127,58,0.6);}
+
+/* EVENING scene */
+.scene-eve{background:linear-gradient(180deg,#150e20 0%,#1e1428 100%);padding:40px 28px 140px;}
+.scene-eve .scene-time{color:rgba(167,139,204,0.3);}
+.scene-eve .scene-time::after{background:rgba(167,139,204,0.1);}
+.scene-eve .scene-headline{color:rgba(240,230,255,0.85);}
+.scene-eve .scene-headline em{color:rgba(167,139,204,0.4);}
+.scene-eve .scene-sub{color:rgba(167,139,204,0.4);}
+.scene-eve .choice-label{color:rgba(167,139,204,0.3);}
+.scene-eve .cs-pill{border-color:rgba(167,139,204,0.1);background:rgba(167,139,204,0.04);}
+.scene-eve .cs-pill:hover{background:rgba(167,139,204,0.08);}
+.scene-eve .cs-pill-name{color:rgba(230,220,255,0.7);}
+.scene-eve .cs-pill-cost{color:rgba(167,139,204,0.35);}
+.scene-eve .cs-pill.chosen{border-color:var(--eve-accent);background:rgba(167,139,204,0.12);}
+.scene-eve .cs-pill.chosen .cs-pill-name{color:var(--eve-accent);}
+.scene-eve .cs-pill.chosen .cs-pill-cost{color:rgba(167,139,204,0.6);}
+
+/* ══ RESULT SCREEN ══ */
+.result-wrap{min-height:100vh;background:var(--bg);}
+
+/* result hero — editorial not dashboard */
+.result-hero{background:linear-gradient(165deg,#0f1a12 0%,#1a2e1a 100%);padding:48px 28px 36px;color:white;}
+.rh-hence{font-size:10px;text-transform:uppercase;letter-spacing:2.5px;color:rgba(255,255,255,0.2);margin-bottom:32px;}
+.rh-verdict{font-family:'Libre Baskerville',serif;font-size:13px;color:rgba(255,255,255,0.4);margin-bottom:6px;}
+.rh-cost{font-family:'Libre Baskerville',serif;font-size:48px;font-weight:400;color:white;letter-spacing:-2px;line-height:1;margin-bottom:4px;}
+.rh-unit{font-size:13px;color:rgba(255,255,255,0.3);letter-spacing:0;}
+.rh-afford-row{display:flex;align-items:center;gap:12px;margin-top:24px;}
+.rh-afford-label{font-size:11px;color:rgba(255,255,255,0.3);}
+.rh-afford-val{font-family:'Libre Baskerville',serif;font-size:20px;color:rgba(255,255,255,0.6);letter-spacing:-0.5px;}
+.rh-divider{width:1px;height:28px;background:rgba(255,255,255,0.12);}
+.rh-gap-label{font-size:11px;color:rgba(255,255,255,0.3);line-height:1.4;}
+.rh-gap-val{font-size:15px;font-weight:600;color:rgba(255,255,255,0.7);}
+
+/* scene receipt */
+.scene-receipt{padding:24px 28px 0;}
+.sr-title{font-family:'Libre Baskerville',serif;font-size:14px;color:var(--ink-2);margin-bottom:16px;font-style:italic;}
+
+.receipt-band{margin-bottom:1px;}
+.rb-time{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--ink-3);padding:10px 0 6px;}
+.receipt-item{display:flex;align-items:baseline;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--rule);}
+.receipt-item:last-child{border-bottom:none;}
+.ri-left{display:flex;align-items:center;gap:8px;}
+.ri-icon{font-size:14px;}
+.ri-label{font-size:13px;color:var(--ink-2);}
+.ri-cost{font-size:12px;font-weight:600;color:var(--ink-3);font-variant-numeric:tabular-nums;}
+
+/* milestones — horizontal scroll */
+.result-milestones{padding:28px 28px 0;}
+.rm-title{font-family:'Libre Baskerville',serif;font-size:14px;color:var(--ink-2);margin-bottom:14px;font-style:italic;}
+.ms-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:8px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.ms-scroll::-webkit-scrollbar{display:none;}
+
+.ms-node{flex-shrink:0;width:130px;padding:14px;}
+.ms-node-age{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--ink-3);margin-bottom:8px;}
+.ms-node-val{font-family:'Libre Baskerville',serif;font-size:22px;font-weight:400;color:var(--ink);letter-spacing:-0.5px;line-height:1;margin-bottom:6px;}
+.ms-node-bar{height:2px;background:var(--rule);border-radius:1px;overflow:hidden;margin-bottom:6px;}
+.ms-node-fill{height:100%;border-radius:1px;background:var(--primary);}
+.ms-node-note{font-size:10px;color:var(--ink-3);line-height:1.4;}
+.ms-node.current{background:var(--primary-light);border-radius:12px;}
+.ms-node.current .ms-node-age{color:var(--primary);}
+.ms-node.current .ms-node-val{color:var(--primary);}
+.ms-node-sep{flex-shrink:0;width:1px;background:var(--rule);align-self:stretch;margin:14px 0;}
+
+/* result CTAs */
+.result-actions{padding:28px 28px 16px;display:flex;flex-direction:column;gap:10px;}
+.ra-primary{background:var(--primary);color:white;border:none;border-radius:50px;padding:16px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;width:100%;}
+.ra-secondary{background:transparent;border:1.5px solid var(--rule);border-radius:50px;padding:14px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--ink-3);cursor:pointer;width:100%;}
+.ra-tiny{background:transparent;border:none;font-family:'DM Sans',sans-serif;font-size:11px;color:var(--ink-3);cursor:pointer;text-decoration:underline;text-align:center;padding:4px;}
+
+.result-spacer{height:40px;}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ══════════ ANCHOR ══════════ -->
+<div class="screen active" id="s-anchor">
+  <div class="anchor-wrap">
+    <div class="anchor-hence">Hence</div>
+    <div class="anchor-headline">What does your<br>retirement<br><em>actually look like?</em></div>
+    <div class="anchor-body">You're not answering questions. You're building a day. Tell us where you're starting and we'll show you what the life costs.</div>
+    <div class="anchor-fields">
+      <div class="af-item">
+        <div class="af-key">Income today</div>
+        <div class="af-val"><div class="af-prefix">$</div><input class="af-input" type="text" value="100,000" id="f-income"></div>
+      </div>
+      <div class="af-item">
+        <div class="af-key">Your age</div>
+        <div class="af-val"><input class="af-input narrow" type="text" value="27" id="f-age"></div>
+      </div>
+      <div class="af-item">
+        <div class="af-key">Saved so far</div>
+        <div class="af-val"><div class="af-prefix">$</div><input class="af-input" type="text" value="12,126" id="f-savings"></div>
+      </div>
+    </div>
+    <button class="anchor-btn" onclick="goto('s-build')">Build your retirement day →</button>
+    <button class="anchor-btn-ghost" onclick="goto('s-build')">Skip for now</button>
+  </div>
+</div>
+
+
+<!-- ══════════ DAY BUILDER ══════════ -->
+<div class="screen" id="s-build">
+  <div class="builder-wrap">
+
+    <!-- MORNING SCENE -->
+    <div class="scene scene-morning">
+      <div class="scene-time">Morning</div>
+      <div class="scene-headline">You wake up.<br><em>Where are you?</em></div>
+      <div class="scene-sub">The city shapes everything that follows — cost of living, pace, what's possible.</div>
+
+      <div class="choice-row">
+        <div class="choice-label">Where you live</div>
+        <div class="choice-strip" id="strip-home">
+          <div class="cs-pill" onclick="pick('home',this,{icon:'🌍',name:'Abroad',cost:700,snap:'Abroad — overseas'})" data-cost="700">
+            <div class="cs-pill-icon">🌍</div><div class="cs-pill-text"><div class="cs-pill-name">Abroad</div><div class="cs-pill-cost">$700/mo</div></div>
+          </div>
+          <div class="cs-pill" onclick="pick('home',this,{icon:'🌿',name:'Smaller city',cost:900,snap:'Smaller city'})" data-cost="900">
+            <div class="cs-pill-icon">🌿</div><div class="cs-pill-text"><div class="cs-pill-name">Smaller city</div><div class="cs-pill-cost">$900/mo</div></div>
+          </div>
+          <div class="cs-pill chosen" onclick="pick('home',this,{icon:'🏡',name:'Mid-size city',cost:1400,snap:'Mid-size city'})" data-cost="1400">
+            <div class="cs-pill-icon">🏡</div><div class="cs-pill-text"><div class="cs-pill-name">Mid-size city</div><div class="cs-pill-cost">$1,400/mo</div></div>
+          </div>
+          <div class="cs-pill" onclick="pick('home',this,{icon:'🏙',name:'Major metro',cost:1800,snap:'Major metro'})" data-cost="1800">
+            <div class="cs-pill-icon">🏙</div><div class="cs-pill-text"><div class="cs-pill-name">Major metro</div><div class="cs-pill-cost">$1,800/mo</div></div>
+          </div>
+          <div class="cs-pill" onclick="pick('home',this,{icon:'✨',name:'Metro, upgraded',cost:2200,snap:'Major metro, upgraded'})" data-cost="2200">
+            <div class="cs-pill-icon">✨</div><div class="cs-pill-text"><div class="cs-pill-name">Metro, upgraded</div><div class="cs-pill-cost">$2,200/mo</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="choice-row">
+        <div class="choice-label">How you get around</div>
+        <div class="choice-strip" id="strip-car">
+          <div class="cs-pill" onclick="pick('car',this,{icon:'🚌',name:'No car',cost:120,snap:'No car'})" data-cost="120">
+            <div class="cs-pill-icon">🚌</div><div class="cs-pill-text"><div class="cs-pill-name">No car</div><div class="cs-pill-cost">$120/mo</div></div>
+          </div>
+          <div class="cs-pill chosen" onclick="pick('car',this,{icon:'🚗',name:'One car',cost:440,snap:'One car'})" data-cost="440">
+            <div class="cs-pill-icon">🚗</div><div class="cs-pill-text"><div class="cs-pill-name">One car</div><div class="cs-pill-cost">$440/mo</div></div>
+          </div>
+          <div class="cs-pill" onclick="pick('car',this,{icon:'🏎',name:'Nicer car',cost:680,snap:'Nicer car'})" data-cost="680">
+            <div class="cs-pill-icon">🏎</div><div class="cs-pill-text"><div class="cs-pill-name">Nicer car</div><div class="cs-pill-cost">$680/mo</div></div>
+          </div>
+          <div class="cs-pill" onclick="pick('car',this,{icon:'🚗🚗',name:'Two cars',cost:780,snap:'Two cars'})" data-cost="780">
+            <div class="cs-pill-icon">🚗🚗</div><div class="cs-pill-text"><div class="cs-pill-name">Two cars</div><div class="cs-pill-cost">$780/mo</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAY SCENE -->
+    <div class="scene scene-day">
+      <div class="scene-time">Afternoon</div>
+      <div class="scene-headline">The hours<br><em>are yours now.</em></div>
+      <div class="scene-sub">No commute. No meetings. What does a Tuesday look like?</div>
+
+      <div class="choice-row">
+        <div class="choice-label">How you spend your time</div>
+        <div class="choice-strip" id="strip-activity">
+          <div class="cs-pill" onclick="pick('activity',this,{icon:'🌿',name:'Quiet life',cost:150,snap:'Quiet life'})" data-cost="150">
+            <div class="cs-pill-icon">🌿</div><div class="cs-pill-text"><div class="cs-pill-name">Quiet life</div><div class="cs-pill-cost">$150/mo</div></div>
+          </div>
+          <div class="cs-pill chosen" onclick="pick('activity',this,{icon:'🎨',name:'Active hobbies',cost:400,snap:'Active hobbies'})" data-cost="400">
+            <div class="cs-pill-icon">🎨</div><div class="cs-pill-text"><div class="cs-pill-name">Active hobbies</div><div class="cs-pill-cost">$400/mo</div></div>
+          </div>
+          <div class="cs-pill" onclick="pick('activity',this,{icon:'🎭',name:'Many interests',cost:800,snap:'Many interests'})" data-cost="800">
+            <div class="cs-pill-icon">🎭</div><div class="cs-pill-text"><div class="cs-pill-name">Many interests</div><div class="cs-pill-cost">$800/mo</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="choice-row">
+        <div class="choice-label">Travel</div>
+        <div class="choice-strip" id="strip-travel">
+          <div class="cs-pill" onclick="pick('travel',this,{icon:'🏠',name:'Stay local',cost:80,snap:'Stay local'})" data-cost="80">
+            <div class="cs-pill-icon">🏠</div><div class="cs-pill-text"><div class="cs-pill-name">Stay local</div><div class="cs-pill-cost">$80/mo</div></div>
+          </div>
+          <div class="cs-pill chosen" onclick="pick('travel',this,{icon:'✈️',name:'1–2 trips/yr',cost:420,snap:'1–2 trips/yr'})" data-cost="420">
+            <div class="cs-pill-icon">✈️</div><div class="cs-pill-text"><div class="cs-pill-name">1–2 trips/yr</div><div class="cs-pill-cost">$420/mo</div></div>
+          </div>
+          <div class="cs-pill" onclick="pick('travel',this,{icon:'🌍',name:'Frequent traveler',cost:900,snap:'Frequent traveler'})" data-cost="900">
+            <div class="cs-pill-icon">🌍</div><div class="cs-pill-text"><div class="cs-pill-name">Frequent traveler</div><div class="cs-pill-cost">$900/mo</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="choice-row">
+        <div class="choice-label">Who's with you</div>
+        <div class="choice-strip" id="strip-family">
+          <div class="cs-pill chosen" onclick="pick('family',this,{icon:'🧍',name:'Solo',cost:0,snap:'Solo'})" data-cost="0">
+            <div class="cs-pill-icon">🧍</div><div class="cs-pill-text"><div class="cs-pill-name">Solo</div><div class="cs-pill-cost">—</div></div>
+          </div>
+          <div class="cs-pill" onclick="pick('family',this,{icon:'💑',name:'Partner, own income',cost:-600,snap:'Partner (own income)'})" data-cost="-600">
+            <div class="cs-pill-icon">💑</div><div class="cs-pill-text"><div class="cs-pill-name">Partner w/ income</div><div class="cs-pill-cost">−$600/mo</div></div>
+          </div>
+          <div class="cs-pill" onclick="pick('family',this,{icon:'💑',name:'Partner, you support',cost:800,snap:'Supporting partner'})" data-cost="800">
+            <div class="cs-pill-icon">💑</div><div class="cs-pill-text"><div class="cs-pill-name">Supporting partner</div><div class="cs-pill-cost">+$800/mo</div></div>
+          </div>
+          <div class="cs-pill" onclick="pick('family',this,{icon:'👨‍👩‍👧',name:'Supporting kids',cost:400,snap:'Supporting kids'})" data-cost="400">
+            <div class="cs-pill-icon">👨‍👩‍👧</div><div class="cs-pill-text"><div class="cs-pill-name">Supporting kids</div><div class="cs-pill-cost">+$400/mo</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EVENING SCENE -->
+    <div class="scene scene-eve">
+      <div class="scene-time">Evening</div>
+      <div class="scene-headline">The table's set.<br><em>What does it look like?</em></div>
+      <div class="scene-sub">How you end the day matters more than people think. And healthcare is the quiet budget line that surprises everyone.</div>
+
+      <div class="choice-row">
+        <div class="choice-label">Dining</div>
+        <div class="choice-strip" id="strip-dining">
+          <div class="cs-pill" onclick="pick('dining',this,{icon:'🥘',name:'Mostly home',cost:200,snap:'Mostly home cooking'})" data-cost="200">
+            <div class="cs-pill-icon">🥘</div><div class="cs-pill-text"><div class="cs-pill-name">Mostly home</div><div class="cs-pill-cost">$200/mo</div></div>
+          </div>
+          <div class="cs-pill" onclick="pick('dining',this,{icon:'🍜',name:'Out once a week',cost:400,snap:'Eat out 1×/wk'})" data-cost="400">
+            <div class="cs-pill-icon">🍜</div><div class="cs-pill-text"><div class="cs-pill-name">Out once a week</div><div class="cs-pill-cost">$400/mo</div></div>
+          </div>
+          <div class="cs-pill chosen" onclick="pick('dining',this,{icon:'🍽',name:'Out 3× a week',cost:700,snap:'Eat out 3×/wk'})" data-cost="700">
+            <div class="cs-pill-icon">🍽</div><div class="cs-pill-text"><div class="cs-pill-name">Out 3× a week</div><div class="cs-pill-cost">$700/mo</div></div>
+          </div>
+          <div class="cs-pill" onclick="pick('dining',this,{icon:'🍷',name:'Most nights out',cost:1400,snap:'Most nights out'})" data-cost="1400">
+            <div class="cs-pill-icon">🍷</div><div class="cs-pill-text"><div class="cs-pill-name">Most nights out</div><div class="cs-pill-cost">$1,400/mo</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="choice-row">
+        <div class="choice-label">Healthcare</div>
+        <div class="choice-strip" id="strip-health">
+          <div class="cs-pill" onclick="pick('health',this,{icon:'🏥',name:'Medicare only',cost:180,snap:'Medicare only'})" data-cost="180">
+            <div class="cs-pill-icon">🏥</div><div class="cs-pill-text"><div class="cs-pill-name">Medicare only</div><div class="cs-pill-cost">$180/mo</div></div>
+          </div>
+          <div class="cs-pill chosen" onclick="pick('health',this,{icon:'💊',name:'Medicare + supplement',cost:480,snap:'Medicare + supplement'})" data-cost="480">
+            <div class="cs-pill-icon">💊</div><div class="cs-pill-text"><div class="cs-pill-name">Medicare + supplement</div><div class="cs-pill-cost">$480/mo</div></div>
+          </div>
+          <div class="cs-pill" onclick="pick('health',this,{icon:'⭐',name:'Premium coverage',cost:900,snap:'Premium coverage'})" data-cost="900">
+            <div class="cs-pill-icon">⭐</div><div class="cs-pill-text"><div class="cs-pill-name">Premium coverage</div><div class="cs-pill-cost">$900/mo</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FLOATING COST TICKER -->
+  <div class="cost-ticker">
+    <div class="ct-inner">
+      <div class="ct-top">
+        <div>
+          <div class="ct-life" id="ct-cost">$5,840 <span>/ mo</span></div>
+        </div>
+        <button class="ct-done" onclick="goto('s-result')">See the picture →</button>
+      </div>
+      <div class="ct-track">
+        <div class="ct-fill" id="ct-fill" style="width:59%;"></div>
+        <div class="ct-marker" id="ct-marker" style="left:70%;"></div>
+      </div>
+      <div class="ct-labels">
+        <div class="ct-label-item">$0</div>
+        <div class="ct-label-item active" id="ct-afford-label">Can afford: $4,950</div>
+        <div class="ct-label-item">$8,333 (income)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════ RESULT ══════════ -->
+<div class="screen" id="s-result">
+  <div class="result-wrap">
+    <div class="result-hero">
+      <div class="rh-hence">Hence · Retirement Picture</div>
+      <div class="rh-verdict">This life costs</div>
+      <div><span class="rh-cost" id="r-total-cost">$5,840</span> <span class="rh-unit">/ mo in today's dollars</span></div>
+      <div class="rh-afford-row">
+        <div>
+          <div class="rh-afford-label">You can afford</div>
+          <div class="rh-afford-val" id="r-afford-val">$4,950 / mo</div>
+        </div>
+        <div class="rh-divider"></div>
+        <div>
+          <div class="rh-gap-label" id="r-gap-label">Gap to close</div>
+          <div class="rh-gap-val" id="r-gap-val">$890 / mo</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- day receipt -->
+    <div class="scene-receipt">
+      <div class="sr-title">The day you built</div>
+      <div class="receipt-band">
+        <div class="rb-time">Morning</div>
+        <div class="receipt-item"><div class="ri-left"><span class="ri-icon" id="rr-home-icon">🏡</span><span class="ri-label" id="rr-home-label">Mid-size city</span></div><span class="ri-cost" id="rr-home-cost">$1,400</span></div>
+        <div class="receipt-item"><div class="ri-left"><span class="ri-icon" id="rr-car-icon">🚗</span><span class="ri-label" id="rr-car-label">One car</span></div><span class="ri-cost" id="rr-car-cost">$440</span></div>
+      </div>
+      <div class="receipt-band">
+        <div class="rb-time">Afternoon</div>
+        <div class="receipt-item"><div class="ri-left"><span class="ri-icon" id="rr-activity-icon">🎨</span><span class="ri-label" id="rr-activity-label">Active hobbies</span></div><span class="ri-cost" id="rr-activity-cost">$400</span></div>
+        <div class="receipt-item"><div class="ri-left"><span class="ri-icon" id="rr-travel-icon">✈️</span><span class="ri-label" id="rr-travel-label">1–2 trips/yr</span></div><span class="ri-cost" id="rr-travel-cost">$420</span></div>
+        <div class="receipt-item"><div class="ri-left"><span class="ri-icon" id="rr-family-icon">🧍</span><span class="ri-label" id="rr-family-label">Solo</span></div><span class="ri-cost" id="rr-family-cost">—</span></div>
+      </div>
+      <div class="receipt-band">
+        <div class="rb-time">Evening</div>
+        <div class="receipt-item"><div class="ri-left"><span class="ri-icon" id="rr-dining-icon">🍽</span><span class="ri-label" id="rr-dining-label">Out 3×/wk</span></div><span class="ri-cost" id="rr-dining-cost">$700</span></div>
+        <div class="receipt-item"><div class="ri-left"><span class="ri-icon" id="rr-health-icon">💊</span><span class="ri-label" id="rr-health-label">Medicare + supplement</span></div><span class="ri-cost" id="rr-health-cost">$480</span></div>
+      </div>
+    </div>
+
+    <!-- milestones — horizontal -->
+    <div class="result-milestones">
+      <div class="rm-title">Your savings milestones</div>
+      <div class="ms-scroll">
+        <div class="ms-node current">
+          <div class="ms-node-age">Today · 27</div>
+          <div class="ms-node-val">$12K</div>
+          <div class="ms-node-bar"><div class="ms-node-fill" style="width:58%;"></div></div>
+          <div class="ms-node-note">58% of target</div>
+        </div>
+        <div class="ms-node-sep"></div>
+        <div class="ms-node">
+          <div class="ms-node-age">Age 35</div>
+          <div class="ms-node-val">$73K</div>
+          <div class="ms-node-bar"><div class="ms-node-fill" style="width:70%;opacity:0.5;"></div></div>
+          <div class="ms-node-note">70% of milestone</div>
+        </div>
+        <div class="ms-node-sep"></div>
+        <div class="ms-node">
+          <div class="ms-node-age">Age 46</div>
+          <div class="ms-node-val">$290K</div>
+          <div class="ms-node-bar"><div class="ms-node-fill" style="width:55%;opacity:0.4;"></div></div>
+          <div class="ms-node-note">55% of milestone</div>
+        </div>
+        <div class="ms-node-sep"></div>
+        <div class="ms-node">
+          <div class="ms-node-age">Retire · 65</div>
+          <div class="ms-node-val">$990K</div>
+          <div class="ms-node-bar"><div class="ms-node-fill" style="width:47%;opacity:0.35;"></div></div>
+          <div class="ms-node-note">Funds $4,950/mo</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="result-actions">
+      <button class="ra-primary">Add this to my Hence plan →</button>
+      <button class="ra-secondary" onclick="goto('s-build')">✏️ Change your retirement day</button>
+      <button class="ra-tiny">View all assumptions</button>
+    </div>
+    <div class="result-spacer"></div>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<script>
+var state = { home:{icon:'🏡',name:'Mid-size city',cost:1400,snap:'Mid-size city'}, car:{icon:'🚗',name:'One car',cost:440,snap:'One car'}, activity:{icon:'🎨',name:'Active hobbies',cost:400,snap:'Active hobbies'}, travel:{icon:'✈️',name:'1–2 trips/yr',cost:420,snap:'1–2 trips/yr'}, family:{icon:'🧍',name:'Solo',cost:0,snap:'Solo'}, dining:{icon:'🍽',name:'Out 3× a week',cost:700,snap:'Eat out 3×/wk'}, health:{icon:'💊',name:'Medicare + supplement',cost:480,snap:'Medicare + supplement'} };
+var affordable = 4950;
+var maxIncome = 8333;
+
+function totalCost(){ return Object.values(state).reduce(function(a,v){ return a + v.cost; }, 0); }
+
+function goto(id){
+  var screens = document.querySelectorAll('.screen');
+  screens.forEach(function(s){
+    if(s.classList.contains('active')){ s.classList.add('exit'); s.classList.remove('active'); setTimeout(function(){ s.classList.remove('exit'); }, 400); }
+  });
+  var t = document.getElementById(id);
+  if(t){ setTimeout(function(){ t.classList.add('active'); t.scrollTop = 0; }, 60); }
+  if(id === 's-result') refreshResult();
+}
+
+function pick(slot, el, data){
+  state[slot] = data;
+  var strip = el.closest('.choice-strip');
+  strip.querySelectorAll('.cs-pill').forEach(function(p){ p.classList.remove('chosen'); });
+  el.classList.add('chosen');
+  refreshTicker();
+}
+
+function refreshTicker(){
+  var total = totalCost();
+  document.getElementById('ct-cost').innerHTML = '$' + total.toLocaleString() + ' <span>/ mo</span>';
+  var affordPct = Math.min(97, Math.round(affordable / maxIncome * 100));
+  var needPct = Math.min(97, Math.round(total / maxIncome * 100));
+  document.getElementById('ct-fill').style.width = affordPct + '%';
+  document.getElementById('ct-marker').style.left = needPct + '%';
+  var gap = total - affordable;
+  var lbl = document.getElementById('ct-afford-label');
+  if(gap <= 0){ lbl.textContent = 'Fully affordable ✓'; lbl.style.color = '#6ecf8a'; }
+  else { lbl.textContent = 'Can afford: $' + affordable.toLocaleString(); lbl.style.color = ''; }
+}
+
+function refreshResult(){
+  var total = totalCost();
+  document.getElementById('r-total-cost').textContent = '$' + total.toLocaleString();
+  document.getElementById('r-afford-val').textContent = '$' + affordable.toLocaleString() + ' / mo';
+  var gap = total - affordable;
+  if(gap <= 0){
+    document.getElementById('r-gap-label').textContent = 'Status';
+    document.getElementById('r-gap-val').textContent = 'Fully funded ✓';
+    document.getElementById('r-gap-val').style.color = '#6ecf8a';
+  } else {
+    document.getElementById('r-gap-label').textContent = 'Gap to close';
+    document.getElementById('r-gap-val').textContent = '$' + gap.toLocaleString() + ' / mo';
+    document.getElementById('r-gap-val').style.color = 'rgba(255,255,255,0.7)';
+  }
+  ['home','car','activity','travel','family','dining','health'].forEach(function(slot){
+    var s = state[slot];
+    var i = document.getElementById('rr-'+slot+'-icon'); if(i) i.textContent = s.icon;
+    var l = document.getElementById('rr-'+slot+'-label'); if(l) l.textContent = s.snap;
+    var c = document.getElementById('rr-'+slot+'-cost'); if(c) c.textContent = s.cost === 0 ? '—' : (s.cost < 0 ? '−$'+Math.abs(s.cost) : '$'+s.cost);
+  });
+}
+
+refreshTicker();
+</script>
+</body>
+</html>
