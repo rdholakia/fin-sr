@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hence — Persona Comparison Matrix</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --plum:     #2d1b2e;
+    --primary:  #7b3f7f;
+    --lavender: #c4a8f0;
+    --cream:    #f7f3ea;
+    --ink:      #1a1118;
+    --ink-2:    #4a3a4d;
+    --ink-3:    #8a7a8d;
+    --rule:     #e2d8e6;
+    --green:    #2c6e49;
+    --green-lt: #e8f5ee;
+    --green-mid:#4a9e72;
+    --red:      #8b2c2c;
+    --red-lt:   #fdf0f0;
+    --amber:    #8a5c00;
+    --amber-lt: #fdf6e3;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    padding: 48px 32px 64px;
+  }
+
+  .page-header {
+    max-width: 1080px;
+    margin: 0 auto 40px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    border-bottom: 1.5px solid var(--rule);
+    padding-bottom: 18px;
+  }
+  .brand {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 12px;
+    color: var(--primary);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .page-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 26px;
+    font-weight: 400;
+  }
+  .page-meta {
+    font-size: 12px;
+    color: var(--ink-3);
+    text-align: right;
+    line-height: 1.7;
+  }
+
+  /* ── TABLE WRAPPER ── */
+  .matrix-wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    table-layout: fixed;
+  }
+
+  /* Column widths */
+  col.dim   { width: 170px; }
+  col.p1,
+  col.p2,
+  col.p3    { width: 140px; }
+  col.divider { width: 12px; }
+  col.n1,
+  col.n2,
+  col.n3    { width: 140px; }
+
+  /* ── HEADER ROW ── */
+  thead tr.group-header th {
+    padding: 10px 12px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    border-bottom: none;
+  }
+  thead tr.group-header th.target-group {
+    background: var(--green-lt);
+    color: var(--green);
+    border-radius: 8px 8px 0 0;
+  }
+  thead tr.group-header th.non-group {
+    background: var(--red-lt);
+    color: var(--red);
+    border-radius: 8px 8px 0 0;
+  }
+  thead tr.group-header th.dim-header {
+    background: transparent;
+  }
+  thead tr.group-header th.div-cell {
+    background: transparent;
+  }
+
+  thead tr.persona-header th {
+    padding: 10px 12px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.3;
+    vertical-align: bottom;
+  }
+  thead tr.persona-header th.target-col {
+    background: var(--green-lt);
+    border-bottom: 2px solid var(--green-mid);
+  }
+  thead tr.persona-header th.non-col {
+    background: var(--red-lt);
+    border-bottom: 2px solid #c97070;
+  }
+  thead tr.persona-header th.dim-col {
+    background: transparent;
+    border-bottom: 2px solid var(--rule);
+  }
+  thead tr.persona-header th .persona-name {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 2px;
+  }
+  thead tr.persona-header th .persona-arch {
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    opacity: 0.65;
+  }
+  thead tr.persona-header th.target-col .persona-arch { color: var(--green); }
+  thead tr.persona-header th.non-col   .persona-arch { color: var(--red); }
+
+  /* ── SECTION DIVIDER ROW ── */
+  tr.section-row td {
+    padding: 18px 12px 6px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-3);
+    border-bottom: 1px solid var(--rule);
+    background: var(--cream);
+  }
+  tr.section-row td.target-col { background: #f4fbf7; }
+  tr.section-row td.non-col    { background: #fdf7f7; }
+  tr.section-row td.dim-col    { background: var(--cream); }
+
+  /* ── DATA ROW ── */
+  tr.data-row td {
+    padding: 11px 12px;
+    vertical-align: top;
+    border-bottom: 1px solid var(--rule);
+    line-height: 1.5;
+  }
+  tr.data-row td.dim-col {
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--ink-2);
+    background: white;
+  }
+  tr.data-row td.target-col { background: #f9fdf9; color: var(--ink-2); }
+  tr.data-row td.non-col    { background: #fefafa; color: var(--ink-2); }
+
+  /* alternating rows */
+  tr.data-row:nth-child(even) td.target-col { background: #f4faf6; }
+  tr.data-row:nth-child(even) td.non-col    { background: #fdf5f5; }
+  tr.data-row:nth-child(even) td.dim-col    { background: #f8f8f8; }
+
+  td.div-cell { background: var(--cream); border: none; }
+
+  /* ── RATING DOTS ── */
+  .dots {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+  }
+  .dot.filled-t { background: var(--green-mid); }
+  .dot.filled-n { background: #c97070; }
+  .dot.empty    { background: var(--rule); }
+
+  /* ── VERDICT ROW ── */
+  tr.verdict-row td {
+    padding: 14px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.5;
+    border-top: 2px solid var(--rule);
+  }
+  tr.verdict-row td.dim-col {
+    font-weight: 700;
+    font-size: 12px;
+    color: var(--ink);
+    background: white;
+  }
+  tr.verdict-row td.target-col {
+    background: var(--green-lt);
+    color: var(--green);
+    font-style: italic;
+  }
+  tr.verdict-row td.non-col {
+    background: var(--red-lt);
+    color: var(--red);
+    font-style: italic;
+  }
+
+  .footnote {
+    max-width: 1080px;
+    margin: 28px auto 0;
+    font-size: 12px;
+    color: var(--ink-3);
+    border-top: 1px solid var(--rule);
+    padding-top: 16px;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <div>
+    <div class="brand">Hence · Design Reference</div>
+    <h1 class="page-title">Persona Comparison Matrix</h1>
+  </div>
+  <div class="page-meta">
+    Psychographic &amp; behavioral dimensions<br>
+    6 characters · what differs and why it matters
+  </div>
+</header>
+
+<div class="matrix-wrap">
+<table>
+  <colgroup>
+    <col class="dim">
+    <col class="p1"><col class="p2"><col class="p3">
+    <col class="divider">
+    <col class="n1"><col class="n2"><col class="n3">
+  </colgroup>
+
+  <thead>
+    <tr class="group-header">
+      <th class="dim-header"></th>
+      <th class="target-group" colspan="3">Design For</th>
+      <th class="div-cell"></th>
+      <th class="non-group" colspan="3">Design Around</th>
+    </tr>
+    <tr class="persona-header">
+      <th class="dim-col"></th>
+      <th class="target-col">
+        <span class="persona-name">Priya</span>
+        <span class="persona-arch">Anxious Achiever</span>
+      </th>
+      <th class="target-col">
+        <span class="persona-name">Marcus</span>
+        <span class="persona-arch">Reluctant Coaster</span>
+      </th>
+      <th class="target-col">
+        <span class="persona-name">Dani</span>
+        <span class="persona-arch">Trend Trier</span>
+      </th>
+      <th class="div-cell"></th>
+      <th class="non-col">
+        <span class="persona-name">Sandra</span>
+        <span class="persona-arch">Fully Avoidant</span>
+      </th>
+      <th class="non-col">
+        <span class="persona-name">Trevor</span>
+        <span class="persona-arch">Hyper-Wonk</span>
+      </th>
+      <th class="non-col">
+        <span class="persona-name">Jordan</span>
+        <span class="persona-arch">Active Speculator</span>
+      </th>
+    </tr>
+  </thead>
+
+  <tbody>
+
+    <!-- SECTION: MOTIVATION -->
+    <tr class="section-row">
+      <td class="dim-col">Motivation</td>
+      <td class="target-col" colspan="3"></td>
+      <td class="div-cell"></td>
+      <td class="non-col" colspan="3"></td>
+    </tr>
+
+    <tr class="data-row">
+      <td class="dim-col">Drive to engage</td>
+      <td class="target-col">Anxious about falling behind; wants relief through clarity — has tried tools and is tired of more data without answers</td>
+      <td class="target-col">Wants control and to stop being sold to</td>
+      <td class="target-col">Novelty-driven; tries things when they feel fresh, drops them when they feel like homework; life event is the real trigger</td>
+      <td class="div-cell"></td>
+      <td class="non-col">Knows she should but can't bring herself to look</td>
+      <td class="non-col">Intrinsically motivated; already doing it</td>
+      <td class="non-col">Motivated by upside capture, not structural health</td>
+    </tr>
+
+    <tr class="data-row">
+      <td class="dim-col">Engagement style</td>
+      <td class="target-col">Active but unfocused — tracks a lot, oscillates between engagement and abandonment</td>
+      <td class="target-col">Deliberate; researches before committing</td>
+      <td class="target-col">Episodic bursts around novelty; high early engagement, rapid drop-off without a sticky hook</td>
+      <td class="div-cell"></td>
+      <td class="non-col">Avoidant; loops of intent without action</td>
+      <td class="non-col">Deep and continuous; builds own systems</td>
+      <td class="non-col">Active but event-driven; watches markets daily</td>
+    </tr>
+
+    <tr class="data-row">
+      <td class="dim-col">Primary fear</td>
+      <td class="target-col">Quietly falling behind while appearing to have it together</td>
+      <td class="target-col">Being manipulated by hidden incentives</td>
+      <td class="target-col">Being unprepared when a big decision lands — and not having enough time to fix it</td>
+      <td class="div-cell"></td>
+      <td class="non-col">Seeing the full picture and feeling worse</td>
+      <td class="non-col">Leaving optimization on the table</td>
+      <td class="non-col">Missing a move; underperforming the market</td>
+    </tr>
+
+    <!-- SECTION: FINANCIAL ORIENTATION -->
+    <tr class="section-row">
+      <td class="dim-col">Financial orientation</td>
+      <td class="target-col" colspan="3"></td>
+      <td class="div-cell"></td>
+      <td class="non-col" colspan="3"></td>
+    </tr>
+
+    <tr class="data-row">
+      <td class="dim-col">Financial literacy</td>
+      <td class="target-col">
+        Medium-high — understands concepts, not confident in application
+        <div class="dots">
+          <div class="dot filled-t"></div><div class="dot filled-t"></div><div class="dot filled-t"></div><div class="dot empty"></div><div class="dot empty"></div>
+        </div>
+      </td>
+      <td class="target-col">
+        Medium-high — understands enough to be skeptical
+        <div class="dots">
+          <div class="dot filled-t"></div><div class="dot filled-t"></div><div class="dot filled-t"></div><div class="dot empty"></div><div class="dot empty"></div>
+        </div>
+      </td>
+      <td class="target-col">
+        Medium — knows the basics, hasn't gone deeper
+        <div class="dots">
+          <div class="dot filled-t"></div><div class="dot filled-t"></div><div class="dot empty"></div><div class="dot empty"></div><div class="dot empty"></div>
+        </div>
+      </td>
+      <td class="div-cell"></td>
+      <td class="non-col">
+        Low-medium — knows enough to feel shame, not enough to act
+        <div class="dots">
+          <div class="dot filled-n"></div><div class="dot empty"></div><div class="dot empty"></div><div class="dot empty"></div><div class="dot empty"></div>
+        </div>
+      </td>
+      <td class="non-col">
+        Very high — beyond Hence's primary value zone
+        <div class="dots">
+          <div class="dot filled-n"></div><div class="dot filled-n"></div><div class="dot filled-n"></div><div class="dot filled-n"></div><div class="dot filled-n"></div>
+        </div>
+      </td>
+      <td class="non-col">
+        Medium-high — literate but oriented toward speculation
+        <div class="dots">
+          <div class="dot filled-n"></div><div class="dot filled-n"></div><div class="dot filled-n"></div><div class="dot empty"></div><div class="dot empty"></div>
+        </div>
+      </td>
+    </tr>
+
+    <tr class="data-row">
+      <td class="dim-col">Planning horizon</td>
+      <td class="target-col">Long-term but vague; knows she should be thinking 20 years out</td>
+      <td class="target-col">Explicit long-term need (parents, college, retirement converging)</td>
+      <td class="target-col">Near-to-medium term; triggered by an imminent decision (home purchase, career pivot)</td>
+      <td class="div-cell"></td>
+      <td class="non-col">Near-term only; can't get to long-term thinking</td>
+      <td class="non-col">Full spectrum; has modeled every horizon already</td>
+      <td class="non-col">Short-term; long-term feels irrelevant given upside bets</td>
+    </tr>
+
+    <tr class="data-row">
+      <td class="dim-col">Relationship to tools</td>
+      <td class="target-col">Tool fatigue — has cycled through Mint, YNAB, spreadsheets; each added data but not clarity; auto-transfers set and never revisited</td>
+      <td class="target-col">Tool-skeptical; prior tools felt like lead-gen funnels</td>
+      <td class="target-col">Serial adopter — Monarch, Copilot, Notion templates; high setup energy, low follow-through; drops when it starts feeling like work</td>
+      <td class="div-cell"></td>
+      <td class="non-col">Downloads tools, never opens them</td>
+      <td class="non-col">Power user of multiple tools; builds his own on top</td>
+      <td class="non-col">Uses trading/portfolio apps daily; not planning tools</td>
+    </tr>
+
+    <!-- SECTION: FINANCIAL SELF-AWARENESS -->
+    <tr class="section-row">
+      <td class="dim-col">Financial self-awareness</td>
+      <td class="target-col" colspan="3"></td>
+      <td class="div-cell"></td>
+      <td class="non-col" colspan="3"></td>
+    </tr>
+
+    <tr class="data-row">
+      <td class="dim-col">Screener floor<br><span style="font-size:10px;font-weight:400;color:var(--ink-3);">Can name take-home, rough housing cost, and whether saving more or less than last year — without looking it up</span></td>
+      <td class="target-col" style="color:var(--green);font-weight:600;">✓ Passes — knows to the dollar</td>
+      <td class="target-col" style="color:var(--green);font-weight:600;">✓ Passes — knows without hesitation</td>
+      <td class="target-col" style="color:var(--green);font-weight:600;">✓ Passes — income yes, spending approximate</td>
+      <td class="div-cell"></td>
+      <td class="non-col" style="color:var(--red);font-weight:600;">✗ Fails — awareness stops at salary</td>
+      <td class="non-col" style="color:#888;font-weight:600;">✓ Passes — but over-qualified</td>
+      <td class="non-col" style="color:#888;font-weight:600;">✓ Passes — but wrong orientation</td>
+    </tr>
+
+    <tr class="data-row">
+      <td class="dim-col">Account check frequency</td>
+      <td class="target-col">Obsessively — multiple times a week, but inconsistently; goes through phases of heavy tracking then dropping off</td>
+      <td class="target-col">Weekly; deliberate. Knows his balances but doesn't enjoy the process</td>
+      <td class="target-col">Monthly, or when something prompts her; not habitual</td>
+      <td class="div-cell"></td>
+      <td class="non-col">Rarely to never by choice; only when forced (bill due, card declined)</td>
+      <td class="non-col">Daily; net worth tracked in a spreadsheet every week</td>
+      <td class="non-col">Multiple times daily — but checking portfolio positions, not accounts</td>
+    </tr>
+
+    <tr class="data-row">
+      <td class="dim-col">What they know cold</td>
+      <td class="target-col">Take-home, mortgage, savings rate — but not whether those numbers are right for her goals</td>
+      <td class="target-col">Income, housing, rough savings — but not what the advisor is actually doing with it</td>
+      <td class="target-col">Salary and rent; categories beyond that require checking</td>
+      <td class="div-cell"></td>
+      <td class="non-col">Salary only; everything else is deliberately unexamined</td>
+      <td class="non-col">Every account balance, rate, and allocation — precise and current</td>
+      <td class="non-col">Portfolio value and position sizes; household expenses are secondary</td>
+    </tr>
+
+    <!-- SECTION: TRUST & RECEPTIVITY -->
+    <tr class="section-row">
+      <td class="dim-col">Trust &amp; receptivity</td>
+      <td class="target-col" colspan="3"></td>
+      <td class="div-cell"></td>
+      <td class="non-col" colspan="3"></td>
+    </tr>
+
+    <tr class="data-row">
+      <td class="dim-col">Trust baseline</td>
+      <td class="target-col">Cautiously open; will try if it feels credible</td>
+      <td class="target-col">Low trust by default; needs explicit fiduciary proof</td>
+      <td class="target-col">Neutral; not burned, just hasn't needed to engage</td>
+      <td class="div-cell"></td>
+      <td class="non-col">Avoidance is the trust mechanism — distance = safety</td>
+      <td class="non-col">High standards; only trusts tools that match his sophistication</td>
+      <td class="non-col">Trusts his own instincts and trading signals over advice</td>
+    </tr>
+
+    <tr class="data-row">
+      <td class="dim-col">Receptivity to guidance</td>
+      <td class="target-col">High — wants to be told what to focus on</td>
+      <td class="target-col">High once trust is established; resistant before that</td>
+      <td class="target-col">Medium — accepts guidance if it's frictionless</td>
+      <td class="div-cell"></td>
+      <td class="non-col">Low — guidance triggers shame, not action</td>
+      <td class="non-col">Low — already has views; wants validation not direction</td>
+      <td class="non-col">Low — structural guidance feels like a constraint</td>
+    </tr>
+
+    <tr class="data-row">
+      <td class="dim-col">What earns trust</td>
+      <td class="target-col">Clarity, specificity, no jargon</td>
+      <td class="target-col">Transparent fees, no upsell, honest framing</td>
+      <td class="target-col">Low friction, no overwhelm, useful when needed</td>
+      <td class="div-cell"></td>
+      <td class="non-col">Gentleness — but this isn't a trust problem, it's avoidance</td>
+      <td class="non-col">Data depth, configurability, advanced controls</td>
+      <td class="non-col">Performance data, real-time information</td>
+    </tr>
+
+    <!-- SECTION: PRODUCT FIT -->
+    <tr class="section-row">
+      <td class="dim-col">Product fit</td>
+      <td class="target-col" colspan="3"></td>
+      <td class="div-cell"></td>
+      <td class="non-col" colspan="3"></td>
+    </tr>
+
+    <tr class="data-row">
+      <td class="dim-col">Value prop that lands</td>
+      <td class="target-col">"Know your financial shape. Stop guessing."</td>
+      <td class="target-col">"We work for you. No commissions, no referrals."</td>
+      <td class="target-col">"Ready when it matters. Not another thing to maintain."</td>
+      <td class="div-cell"></td>
+      <td class="non-col">No pitch lands — this is a motivation gap, not a UX gap</td>
+      <td class="non-col">Structural framing feels like a step backward</td>
+      <td class="non-col">Long-term structure conflicts with short-term orientation</td>
+    </tr>
+
+    <tr class="data-row">
+      <td class="dim-col">Risk if we design for them</td>
+      <td class="target-col" style="color:var(--green-mid);font-style:italic;">Core use case — no risk</td>
+      <td class="target-col" style="color:var(--green-mid);font-style:italic;">Core use case — no risk</td>
+      <td class="target-col" style="color:var(--green-mid);font-style:italic;">Core use case — no risk</td>
+      <td class="div-cell"></td>
+      <td class="non-col">Pulls product toward reassurance over honesty</td>
+      <td class="non-col">Pulls toward complexity and configuration over clarity</td>
+      <td class="non-col">Pulls toward portfolio tracking and performance metrics</td>
+    </tr>
+
+    <!-- VERDICT ROW -->
+    <tr class="verdict-row">
+      <td class="dim-col">ICP status</td>
+      <td class="target-col">✓ Primary target</td>
+      <td class="target-col">✓ Primary target</td>
+      <td class="target-col">✓ Primary target</td>
+      <td class="div-cell"></td>
+      <td class="non-col">✗ Motivation gap — not a product problem</td>
+      <td class="non-col">✗ Already served — complexity mismatch</td>
+      <td class="non-col">✗ Wrong orientation — value prop conflict</td>
+    </tr>
+
+  </tbody>
+</table>
+</div>
+
+<div class="footnote">
+  <strong>Key discriminating dimensions:</strong> The sharpest separator between target and non-target isn't income or financial literacy — it's the combination of <em>will to act</em> (Sandra fails this) + <em>unsatisfied by existing tools</em> (Trevor fails this) + <em>orientation toward structural health over performance</em> (Jordan fails this). All three targets share the same gap: they know something is off but lack the clarity to address it. Priya and Dani differ in <em>how</em> they've tried to solve it — Priya through anxious accumulation of data, Dani through serial novelty-seeking — but both arrive at Hence with the same unmet need. The acquisition path differs (Priya needs trust; Dani needs a hook), but the product response is the same.
+</div>
+
+</body>
+</html>
