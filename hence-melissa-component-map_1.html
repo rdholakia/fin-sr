@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hence — Cards &amp; Pages</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --plum:#4b2a39; --cream:#f3efe5; --cream-2:#e9e4d6; --ink:#2c1d24;
+  --lilac:#b57ce0; --dim:rgba(255,255,255,.72); --mute:#6b5f64;
+
+  --target:#1f7a6a;
+  --step:#2b5ea8;
+  --pack:#a56a12;
+  --priority:#9c3f56;
+  --other:#8b8288;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'Hanken Grotesk',-apple-system,sans-serif;
+  background:#d9d4c8;color:var(--ink);line-height:1.45;padding:0 28px 110px;
+}
+.wrap{max-width:1160px;margin:0 auto;}
+
+header{padding:68px 0 0;}
+.kicker{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#7a6f74;font-weight:700;}
+h1{font-family:'Newsreader',serif;font-size:clamp(38px,6vw,58px);font-weight:400;line-height:1.02;margin-top:12px;}
+
+.sect{margin-top:62px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;}
+.sect h2{font-family:'Newsreader',serif;font-size:28px;font-weight:400;}
+.sect .hint{font-size:13.5px;color:#7a6f74;}
+
+/* ============ real card ============ */
+.anat{display:flex;flex-direction:column;gap:16px;margin-top:24px;}
+.row{display:flex;gap:40px;align-items:flex-start;}
+@media(max-width:820px){.row{flex-direction:column;gap:22px;}}
+.spec{background:var(--plum);padding:26px 26px 24px;border-radius:14px;color:#fff;}
+.spec > h3{font-family:'Newsreader',serif;font-size:22px;font-weight:400;}
+.spec > .sub{font-size:12.5px;color:var(--dim);margin-top:3px;margin-bottom:24px;}
+
+.cardwrap{padding-left:52px;width:432px;flex:none;}
+@media(max-width:820px){.cardwrap{width:100%;}}
+
+.card{background:var(--cream);color:var(--ink);border-radius:9px;padding:15px 16px;position:relative;}
+.card.stepc{box-shadow:0 0 0 1.5px var(--step);}
+.card.packc{box-shadow:0 0 0 1.5px var(--pack);}
+.card.pric{box-shadow:0 0 0 1.5px var(--priority);}
+.rank{display:inline-block;font-size:8.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  background:#e8d3d9;color:#7d3247;border-radius:4px;padding:4px 8px;}
+.chev{font-size:15px;color:#9c948a;position:absolute;right:16px;top:50%;transform:translateY(-50%);}
+.rg{position:relative;}
+.rg .mk{
+  position:absolute;left:-46px;top:1px;width:17px;height:17px;border-radius:50%;
+  background:rgba(255,255,255,.9);color:var(--plum);
+  font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center;
+}
+.rg .mk::after{
+  content:"";position:absolute;left:17px;top:8px;width:29px;height:1px;background:rgba(255,255,255,.35);
+}
+/* markers inside the two-column row sit further out so every marker
+   lines up on the same gutter, clear of the number badge */
+.rg.deep .mk{left:-83px;}
+.rg.deep .mk::after{width:66px;}
+.rg.deep2 .mk{left:-46px;}
+.rg.deep2 .mk::after{width:29px;}
+
+.eyebrow{display:inline-block;font-size:8.5px;font-weight:700;letter-spacing:.08em;
+  color:#6b5f52;background:rgba(44,29,36,.055);border-radius:4px;padding:4px 8px;}
+.crow2{display:flex;gap:11px;margin-top:11px;}
+.num{flex:none;width:26px;height:26px;border:1px solid #9c948a;border-radius:5px;
+  display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;}
+.ctitle{font-family:'Newsreader',serif;font-size:19px;line-height:1.2;}
+.cbody{font-size:12.5px;line-height:1.45;color:var(--mute);margin-top:5px;}
+.btn-work{background:#2c1d24;color:#fff;border:0;font:inherit;font-size:12px;font-weight:700;
+  padding:9px 13px;border-radius:5px;margin-top:12px;display:inline-block;}
+.tagpill{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  padding:3px 8px;border-radius:20px;background:#d8d2c4;color:#4a4038;margin-top:12px;}
+
+.keys{flex:1;padding-top:4px;}
+.kk{display:grid;grid-template-columns:20px 88px 1fr;gap:0 12px;padding:9px 0;align-items:start;border-bottom:1px solid rgba(255,255,255,.14);}
+.kk:last-child{border-bottom:0;}
+.kk .kn{font-size:10px;font-weight:700;color:var(--dim);padding-top:2px;}
+.kk .kt{font-size:12.5px;font-weight:700;letter-spacing:.02em;}
+.kk .kd{font-size:12.5px;color:var(--dim);line-height:1.4;}
+
+/* ============ page minis ============ */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:24px;}
+@media(max-width:980px){.grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:560px){.grid{grid-template-columns:1fr;}}
+
+.page h4{font-size:13px;font-weight:700;margin-bottom:9px;letter-spacing:.02em;}
+.scr{background:var(--plum);border-radius:14px;padding:14px 13px 13px;min-height:260px;display:flex;flex-direction:column;}
+.top{display:flex;justify-content:space-between;align-items:center;height:14px;flex:none;}
+.hd{min-height:74px;display:flex;flex-direction:column;justify-content:flex-end;flex:none;margin-bottom:10px;}
+.title{height:10px;border-radius:2px;background:rgba(255,255,255,.5);width:72%;}
+.title.s{width:44%;background:rgba(255,255,255,.26);height:7px;margin-top:5px;}
+.wm{font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.6);font-weight:700;}
+.burger{display:flex;flex-direction:column;gap:2px;}
+.burger i{width:11px;height:1.2px;background:rgba(255,255,255,.55);display:block;}
+.av{width:22px;height:22px;border-radius:6px;background:var(--lilac);margin:0 auto 9px;}
+.heroline{height:8px;border-radius:2px;background:rgba(255,255,255,.5);margin:0 auto 5px;width:70%;}
+.heroline.s{width:48%;background:rgba(255,255,255,.28);height:6px;margin-bottom:0;}
+
+.stk{display:flex;flex-direction:column;gap:6px;}
+.blk{background:var(--cream);border-radius:6px;padding:8px 9px;font-size:11px;font-weight:600;color:var(--ink);border-left:4px solid;}
+.blk.step{border-color:var(--step);}
+.blk.pack{border-color:var(--pack);}
+.blk.priority{border-color:var(--priority);}
+.blk.target{border-color:var(--target);}
+.blk.other{border-color:var(--other);color:#6b5f64;font-weight:500;}
+.blk.cond{background:rgba(243,239,229,.55);}
+.blk.exc{background:rgba(243,239,229,.5);border-left-style:dashed;}
+.blk .exl{display:inline-block;font-size:8px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:#fff;background:var(--step);border-radius:3px;padding:2px 5px;margin-left:6px;vertical-align:1px;}
+
+.deck{position:relative;margin:0 4px;}
+.gh{position:absolute;left:10px;right:10px;top:9px;height:100%;background:#e4dfd2;border-radius:6px;}
+.gh.g2{left:20px;right:20px;top:18px;background:#d6d1c3;}
+.deck .blk{position:relative;}
+
+.tl{border:1.5px dashed rgba(255,255,255,.4);border-radius:7px;padding:7px;display:flex;flex-direction:column;gap:6px;}
+.tl .cap{font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);}
+
+.tabs{display:flex;gap:3px;}
+.tab{flex:1;text-align:center;font-size:8px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  padding:4px 2px;border-radius:4px;color:rgba(255,255,255,.5);background:rgba(255,255,255,.08);}
+.tab.on{background:var(--cream);color:var(--ink);}
+
+.spring{flex:1;min-height:10px;}
+.dockbar{background:#fff;border-radius:20px;padding:6px 7px 6px 11px;display:flex;justify-content:space-between;align-items:center;
+  font-size:9px;color:#8c8189;font-weight:500;margin-top:10px;}
+.dockbar i{width:16px;height:16px;border-radius:50%;background:var(--ink);display:block;}
+.myh{background:var(--cream-2);color:var(--ink);text-align:center;padding:7px;font-size:8.5px;font-weight:700;
+  letter-spacing:.14em;border-radius:6px;margin-top:7px;}
+
+.foot{display:flex;flex-wrap:wrap;gap:8px 24px;margin-top:26px;padding-top:15px;border-top:1px solid #bfb8ab;font-size:12.5px;color:#6b5f64;}
+.foot span{display:flex;align-items:center;gap:8px;}
+.chip{width:4px;height:15px;border-radius:2px;flex:none;}
+.chip.priority{background:var(--priority);}
+.chip.target{background:var(--target);}
+.chip.step{background:var(--step);}
+.chip.pack{background:var(--pack);}
+.chip.other{background:var(--other);}
+
+
+/* written sections */
+.defs{display:flex;flex-direction:column;gap:14px;margin-top:24px;}
+.def{background:#efeae0;border:1px solid #cfc8ba;padding:24px 26px 26px;}
+.def h3{font-family:'Newsreader',serif;font-size:23px;font-weight:400;}
+.def p{font-size:15px;color:#4d4048;margin-top:11px;line-height:1.5;max-width:78ch;}
+.def .lead{font-size:15.5px;color:#4d4048;max-width:78ch;}
+
+.rulez{background:var(--plum);color:#fff;border-radius:14px;padding:26px 28px 28px;margin-top:24px;}
+.rulez .rl{display:grid;grid-template-columns:42px 1fr;gap:0 14px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.14);}
+.rulez .rl:last-child{border-bottom:0;}
+.rulez .rl .id{font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.08em;padding-top:3px;}
+.rulez .rl .tx{font-size:15.5px;line-height:1.4;max-width:74ch;font-weight:600;}
+.rulez .rl .tx span{display:block;font-size:13.5px;color:var(--dim);font-weight:400;margin-top:5px;line-height:1.45;}
+
+.eyeb{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px;}
+@media(max-width:820px){.eyeb{grid-template-columns:1fr;}}
+.eyeb .side{background:#efeae0;border:1px solid #cfc8ba;padding:24px 26px;}
+.eyeb h3{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#7a6f74;}
+.eyeb ul{list-style:none;margin-top:14px;}
+.eyeb li{font-size:14.5px;line-height:1.45;padding:11px 0 11px 18px;position:relative;border-bottom:1px solid #d9d2c4;}
+.eyeb li:last-child{border-bottom:0;}
+.eyeb li::before{content:"—";position:absolute;left:0;color:#a89e93;}
+.eyeb li b{font-weight:700;}
+.eyeb .demo{background:var(--plum);border-radius:12px;padding:26px;display:flex;flex-direction:column;justify-content:center;}
+
+.opens{margin-top:24px;}
+.op{display:grid;grid-template-columns:1fr 150px;gap:0 22px;padding:20px 0;border-bottom:1px solid #c4bcb0;align-items:start;}
+.op:first-child{border-top:1px solid #6b5f64;}
+.op h4{font-size:16.5px;font-weight:700;letter-spacing:-.01em;}
+.op p{font-size:14px;color:#5e5259;margin-top:5px;line-height:1.45;max-width:64ch;}
+.op .own{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#8a7f75;text-align:right;padding-top:4px;font-weight:700;}
+.op .own b{display:block;color:#9c3f56;}
+@media(max-width:620px){.op{grid-template-columns:1fr;}.op .own{text-align:left;padding-top:10px;}}
+
+footer{margin-top:58px;padding-top:18px;border-top:1px solid #bfb8ab;font-size:11px;color:#7a6f74;line-height:1.8;letter-spacing:.02em;}
+@media print{body{background:#fff;padding:0;}.page,.spec{break-inside:avoid;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Hence · Information architecture</div>
+  <h1>Cards &amp; pages</h1>
+</header>
+
+<div class="sect">
+  <h2>The cards</h2>
+  <span class="hint">Two card types. Everything else is built from them.</span>
+</div>
+
+<div class="anat">
+
+  <!-- STEP -->
+  <div class="spec">
+    <h3>Step</h3>
+    <div class="sub">A single task. You do it, or Hence does.</div>
+    <div class="row">
+    <div class="cardwrap">
+      <div class="card stepc">
+        <div class="rg"><span class="mk">1</span>
+          <span class="eyebrow">BUY A HOME, CASH FLOW</span>
+        </div>
+        <div class="crow2">
+          <div class="num">2</div>
+          <div>
+            <div class="rg deep"><span class="mk">2</span>
+              <div class="ctitle">Find lenders who handle self-employed income</div>
+            </div>
+            <div class="rg deep"><span class="mk">3</span>
+              <div class="cbody">I'll shortlist the ones doing bank-statement loans or counting business reserves, and prepare your application.</div>
+            </div>
+            <div class="rg deep"><span class="mk">4</span>
+              <span class="btn-work">Send to Hence</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+      <div class="keys">
+      <div class="kk"><div class="kn">1</div><div class="kt">Eyebrow</div><div class="kd">Abbreviated priorities, then overflow.</div></div>
+      <div class="kk"><div class="kn">2</div><div class="kt">Header</div><div class="kd">One line, the outcome of the step.</div></div>
+      <div class="kk"><div class="kn">3</div><div class="kt">Body</div><div class="kd">One sentence on the work to be done.</div></div>
+      <div class="kk"><div class="kn">4</div><div class="kt">CTA</div><div class="kd">Send to Hence · Talk it through · Add information.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRIORITY -->
+  <div class="spec">
+    <h3>Priority</h3>
+    <div class="sub">A discrete outcome. User-generated and renameable.</div>
+    <div class="row">
+      <div class="cardwrap">
+        <div class="card pric">
+          <span class="chev">&#8250;</span>
+          <div class="rg"><span class="mk">1</span>
+            <span class="rank">Priority 1</span>
+          </div>
+          <div class="crow2">
+            <div>
+              <div class="rg deep2"><span class="mk">2</span>
+                <div class="ctitle">Clear credit card debt</div>
+              </div>
+              <div class="rg deep2"><span class="mk">3</span>
+                <div class="cbody">You're carrying $6,800 in debt that is costing you $120 a month.</div>
+              </div>
+              <div class="rg deep2"><span class="mk">4</span>
+                <span class="tagpill">3 of 5 actions</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="keys">
+        <div class="kk"><div class="kn">1</div><div class="kt">Rank</div><div class="kd">Where it sits in the plan. Drives the order of everything beneath it.</div></div>
+        <div class="kk"><div class="kn">2</div><div class="kt">Name</div><div class="kd">The outcome, in the user's own words. Renameable.</div></div>
+        <div class="kk"><div class="kn">3</div><div class="kt">Body</div><div class="kd">One sentence on where it stands, with her numbers.</div></div>
+        <div class="kk"><div class="kn">4</div><div class="kt">Progress</div><div class="kd">Against the target, or against the task list.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTION PACK -->
+  <div class="spec">
+    <h3>Action Pack</h3>
+    <div class="sub">A task needing more than one step.</div>
+    <div class="row">
+    <div class="cardwrap">
+      <div class="card packc">
+        <div class="rg"><span class="mk">1</span>
+          <span class="eyebrow">CREDIT CARD DEBT, INSURANCE GAPS, +2</span>
+        </div>
+        <div class="crow2">
+          <div class="num">1</div>
+          <div>
+            <div class="rg deep"><span class="mk">2</span>
+              <div class="ctitle">Make a 0% balance transfer</div>
+            </div>
+            <div class="rg deep"><span class="mk">3</span>
+              <div class="cbody">Make sure every dollar you pay goes toward the balance itself — not the bank's pocket.</div>
+            </div>
+            <div class="rg deep"><span class="mk">4</span>
+              <span class="tagpill">4 steps</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+      <div class="keys">
+      <div class="kk"><div class="kn">1</div><div class="kt">Eyebrow</div><div class="kd">Same construction as the step.</div></div>
+      <div class="kk"><div class="kn">2</div><div class="kt">Header</div><div class="kd">One line, the outcome of the action.</div></div>
+      <div class="kk"><div class="kn">3</div><div class="kt">Body</div><div class="kd">One sentence on why it's relevant, with her numbers where possible.</div></div>
+      <div class="kk"><div class="kn">4</div><div class="kt">Tag</div><div class="kd">How long it takes. Steps over 10 minutes, minutes under.</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="sect">
+  <h2>The core loop</h2>
+</div>
+
+<div class="grid">
+
+  <!-- ASK HOME -->
+  <div class="page">
+    <h4>Ask Home</h4>
+    <div class="scr">
+      <div class="top"><span class="wm">Hence</span><span class="burger"><i></i><i></i></span></div>
+      <div class="hd">
+        <div class="av"></div>
+        <div class="heroline"></div>
+        <div class="heroline s"></div>
+      </div>
+      <div class="deck">
+        <div class="gh g2"></div><div class="gh"></div>
+        <div class="blk step">Step</div>
+      </div>
+      <div class="spring"></div>
+      <div class="dockbar">Ask anything<i></i></div>
+      <div class="myh">MY HENCE</div>
+    </div>
+  </div>
+
+  <!-- PRIORITY DETAIL -->
+  <div class="page">
+    <h4>Priority Detail</h4>
+    <div class="scr">
+      <div class="top"><span class="wm">Priority</span><span class="burger"><i></i><i></i></span></div>
+      <div class="hd"><div class="title"></div><div class="title s"></div></div>
+      <div class="stk">
+        <div class="blk target">Target</div>
+        <div class="tl">
+          <div class="cap">Task list</div>
+          <div class="blk pack">Action Pack</div>
+          <div class="blk pack">Action Pack</div>
+          <div class="blk step exc">Step<span class="exl">Exception</span></div>
+        </div>
+        <div class="blk priority cond">Details</div>
+        <div class="blk priority cond">Progress</div>
+        <div class="blk priority cond">Monitoring</div>
+        <div class="blk priority">Related conversations</div>
+        <div class="blk priority">Ask me anything</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACTION PACK DETAIL -->
+  <div class="page">
+    <h4>Action Pack Detail</h4>
+    <div class="scr">
+      <div class="top"><span class="wm">Action Pack</span><span class="burger"><i></i><i></i></span></div>
+      <div class="hd"><div class="title"></div><div class="title s"></div></div>
+      <div class="stk">
+        <div class="blk step">Step</div>
+        <div class="blk step">Step</div>
+        <div class="blk step">Step</div>
+        <div class="blk step">Step</div>
+        <div class="blk priority">Associated priorities</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="sect">
+  <h2>My Hence</h2>
+  <span class="hint">Swipe up from Ask Home. Three views of one plan.</span>
+</div>
+
+<div class="grid">
+
+  <div class="page">
+    <h4>Calendar</h4>
+    <div class="scr">
+      <div class="top"><span class="wm">My Hence</span><span class="burger"><i></i><i></i></span></div>
+      <div class="hd"><div class="title"></div><div style="height:8px"></div><div class="tabs"><div class="tab on">Cal</div><div class="tab">Pri</div><div class="tab">Act</div></div></div>
+      <div class="stk">
+        <div class="blk other">Week</div>
+        <div class="blk pack">Action Pack</div>
+        <div class="blk step exc">Step<span class="exl">Exception</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page">
+    <h4>Priorities</h4>
+    <div class="scr">
+      <div class="top"><span class="wm">My Hence</span><span class="burger"><i></i><i></i></span></div>
+      <div class="hd"><div class="title"></div><div style="height:8px"></div><div class="tabs"><div class="tab">Cal</div><div class="tab on">Pri</div><div class="tab">Act</div></div></div>
+      <div class="stk">
+        <div class="blk priority">Priority</div>
+        <div class="blk priority">Priority</div>
+        <div class="blk priority">Priority</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page">
+    <h4>Actions</h4>
+    <div class="scr">
+      <div class="top"><span class="wm">My Hence</span><span class="burger"><i></i><i></i></span></div>
+      <div class="hd"><div class="title"></div><div style="height:8px"></div><div class="tabs"><div class="tab">Cal</div><div class="tab">Pri</div><div class="tab on">Act</div></div></div>
+      <div class="stk">
+        <div class="blk pack">Action Pack</div>
+        <div class="blk pack">Action Pack</div>
+        <div class="blk pack">Action Pack</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page">
+    <h4>Below the tabs</h4>
+    <div class="scr">
+      <div class="top"><span class="wm">My Hence</span><span class="burger"><i></i><i></i></span></div>
+      <div class="hd"><div class="title"></div><div class="title s"></div></div>
+      <div class="stk">
+        <div class="blk other">Foundations</div>
+        <div class="blk other">Conversation history</div>
+        <div class="blk priority">Ask me anything</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<div class="sect">
+  <h2>Priority components</h2>
+</div>
+<p class="def lead" style="background:none;border:0;padding:0;margin-top:14px;">A priority is a discrete outcome that helps a Hence user make progress against improving their financial health and/or achieving a personal goal. Priorities may contain:</p>
+
+<div class="defs">
+  <div class="def">
+    <h3>Target</h3>
+    <p>Attributes that define whether or not the priority has been achieved. This can contain specific financial thresholds, securing insurance coverage, or definition of a complex end goal like retirement or home buying where a target may include the downpayment, the mortgage rate, the location, and attributes about the house. Targets may be suggested by Hence but are refined and agreed upon by the user. Targets may be set by a step that opens a conversation with Hence.</p>
+    <p>Targets appear (and can be edited) on Priority detail pages and are generated in conversation with Hence.</p>
+  </div>
+
+  <div class="def">
+    <h3>Step</h3>
+    <p>A discrete, single-step task that can be completed by the user or completed by Hence. Steps are organized into prioritized lists called Action Packs or may appear as individual tasks on a priority detail page. Steps are the smallest component in the content system, and the home page curates the top three steps the user should take at any given time. Completing a step may require asking hence to do work on your behalf, engaging in a conversation with Hence to make a decision, or gathering specific documentation or data. CTAs for steps include "Send to Hence" for work Hence can complete autonomously, "Talk it through" for decisions, or "Add information" when the user needs to send in information.</p>
+  </div>
+
+  <div class="def">
+    <h3>Action Pack</h3>
+    <p>A task that requires more than one Step to complete. Action packs appear in a prioritized list on the Priority Detail Page and in the Plan section of the product in the Actions tab. Tapping an action pack opens the Action Pack Detail Page, which includes the action title and a prioritized list of Steps associated with that action. Actions are always associated with at least one priority.</p>
+  </div>
+
+  <div class="def">
+    <h3>Task List</h3>
+    <p>A prioritized list of action packs and/or steps a user completes to achieve their target. Task lists appear on the Priority Detail Page.</p>
+  </div>
+</div>
+
+<div class="sect">
+  <h2>The eyebrow</h2>
+  <span class="hint">The only place the many-to-many relationship becomes visible</span>
+</div>
+
+<div class="eyeb">
+  <div class="demo">
+    <div class="cardwrap" style="padding-left:0;width:100%">
+      <div class="card">
+        <span class="eyebrow">CREDIT CARD DEBT, INSURANCE GAPS, +2</span>
+        <div class="crow2">
+          <div class="num">1</div>
+          <div>
+            <div class="ctitle">Make a 0% balance transfer</div>
+            <div class="cbody">Make sure every dollar you pay goes toward the balance itself &mdash; not the bank's pocket.</div>
+            <span class="tagpill">4 steps</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="side">
+    <h3>Rules</h3>
+    <ul>
+      <li><b>Two named, then overflow.</b> Full names wrap and stop reading as an eyebrow at 390px.</li>
+      <li><b>No label.</b> The slot does the work; people learn it.</li>
+      <li><b>The engine shortens for display.</b> Priorities are user-generated and renameable, so abbreviation is a rendering concern, never a second name to maintain.</li>
+      <li><b>Always plural in form.</b> Taking the grammatical hit on the single-priority case keeps the pattern teaching the model on every card.</li>
+      <li><b>Tap resolves the overflow.</b> Opens the Action Pack Detail Page and its associated-priorities module.</li>
+      <li><b>Carried wherever nothing else names the priority.</b> On Ask Home, in the plan. Inside an Action Pack or a task list the container has already named it.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="sect">
+  <h2>Composition rules</h2>
+</div>
+
+<div class="rulez">
+  <div class="rl"><div class="id">R1</div><div class="tx">A task is the same item wherever it appears.<span>Completing it in one place completes it everywhere, because there is only one of it.</span></div></div>
+  <div class="rl"><div class="id">R2</div><div class="tx">An Action Pack appears on every priority it belongs to.<span>Always at least one, often more. Not duplication &mdash; the same component rendered wherever it's relevant.</span></div></div>
+  <div class="rl"><div class="id">R3</div><div class="tx">Every card names the priority it's working on.<span>The alternative is organising by a system nobody understands. Being imprecise about how many priorities a task belongs to is recoverable; being unreadable is not.</span></div></div>
+  <div class="rl"><div class="id">R4</div><div class="tx">The Priority Detail page is an assembly, not a template.<span>Target and task list are the spine; every other module is conditional on the priority.</span></div></div>
+  <div class="rl"><div class="id">R5</div><div class="tx">The step is what surfaces on Ask Home.<span>Not the pack, not the priority. Home shows the smallest unit a person can finish.</span></div></div>
+  <div class="rl"><div class="id">R6</div><div class="tx">A step standing alone in a list is the exception.<span>Packs are the norm in a task list and in the plan.</span></div></div>
+</div>
+
+<div class="foot">
+  <span><i class="chip priority"></i> Priority</span>
+  <span><i class="chip target"></i> Target</span>
+  <span><i class="chip pack"></i> Action Pack</span>
+  <span><i class="chip step"></i> Step</span>
+  <span><i class="chip other"></i> Other module</span>
+</div>
+
+<footer>
+  Hence — cards, pages &amp; composition rules · working document
+</footer>
+
+</div>
+</body>
+</html>
