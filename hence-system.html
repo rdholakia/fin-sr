@@ -1,0 +1,2036 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hence — System Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --plum:#4b2a39; --cream:#f3efe5; --cream-2:#e9e4d6; --ink:#2c1d24;
+  --lilac:#b57ce0; --dim:rgba(255,255,255,.72); --mute:#6b5f64;
+  --line:#ddd6c8; --line-2:#cfc8ba;
+  --target:#1f7a6a; --step:#2b5ea8; --pack:#a56a12; --priority:#9c3f56; --other:#8b8288;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Hanken Grotesk',-apple-system,sans-serif;background:#dcd7cc;color:var(--ink);line-height:1.45;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px 120px;}
+
+/* ---------------- nav ---------------- */
+.bar{position:sticky;top:0;z-index:50;background:#dcd7cc;border-bottom:1px solid var(--line-2);}
+.bar .in{max-width:1180px;margin:0 auto;padding:16px 28px;display:flex;align-items:baseline;gap:32px;flex-wrap:wrap;}
+.bar .lg{font-family:'Newsreader',serif;font-size:19px;}
+.bar nav{display:flex;gap:4px;flex-wrap:wrap;}
+.bar nav button{border:0;background:transparent;font:inherit;font-size:13.5px;font-weight:600;color:#7a6f74;
+  padding:7px 13px;border-radius:20px;cursor:pointer;transition:.15s;}
+.bar nav button:hover{background:rgba(0,0,0,.05);}
+.bar nav button.on{background:var(--plum);color:#fff;}
+
+.pg{display:none;}
+.pg.on{display:block;}
+
+header.ph{padding:58px 0 0;}
+.kicker{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#7a6f74;font-weight:700;}
+h1{font-family:'Newsreader',serif;font-size:clamp(34px,5.2vw,52px);font-weight:400;line-height:1.02;margin-top:12px;}
+.lede{font-size:16px;color:#5e5259;margin-top:14px;max-width:62ch;line-height:1.5;}
+
+.sect{margin-top:58px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;}
+.sect h2{font-family:'Newsreader',serif;font-size:27px;font-weight:400;}
+.sect .hint{font-size:13.5px;color:#7a6f74;}
+
+/* ---------------- real cards ---------------- */
+.card{background:var(--cream);color:var(--ink);border-radius:9px;padding:15px 16px;position:relative;}
+.card.pric{box-shadow:0 0 0 1.5px var(--priority);padding:24px 20px 20px;}
+.card.pric .ctitle{font-size:26px;}
+.card.pric .cbody{font-size:13.5px;margin-top:9px;}
+.card.packc{box-shadow:0 0 0 1.5px var(--pack);padding:20px 18px 16px;}
+.card.packc .ctitle{font-size:22px;}
+.card.packc .cbody{margin-top:8px;}
+.card.stepc{box-shadow:0 0 0 1.5px var(--step);}
+
+.eyebrow{display:inline-block;font-size:8.5px;font-weight:700;letter-spacing:.08em;
+  color:#6b5f52;background:rgba(44,29,36,.055);border-radius:4px;padding:4px 8px;}
+.rank{display:inline-block;font-size:8.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  background:#e8d3d9;color:#7d3247;border-radius:4px;padding:4px 8px;}
+.crow2{display:flex;gap:11px;margin-top:11px;}
+.num{flex:none;width:26px;height:26px;border:1px solid #9c948a;border-radius:5px;
+  display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;}
+.ctitle{font-family:'Newsreader',serif;font-size:19px;line-height:1.2;}
+.cbody{font-size:12.5px;line-height:1.45;color:var(--mute);margin-top:5px;}
+.btn-work{background:#41242f;color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:4px;
+  margin-top:11px;display:inline-block;letter-spacing:.01em;}
+.gorow{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);
+  margin-top:12px;padding-top:11px;font-size:11.5px;font-weight:700;letter-spacing:.05em;
+  text-transform:uppercase;color:#7a6f74;}
+.gorow .cv{font-size:17px;color:#9c948a;}
+.prog{margin-top:16px;border-top:1px solid var(--line);padding-top:14px;}
+.prog .ptrack{height:7px;border-radius:20px;background:#ded7c9;overflow:hidden;}
+.prog .ptrack i{display:block;height:100%;background:var(--priority);border-radius:20px;}
+.prog .plab{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;color:#7a6f74;}
+.prog .plab .cv{font-size:16px;color:#9c948a;text-transform:none;letter-spacing:0;line-height:1;}
+
+/* card suite */
+.suite{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:24px;align-items:start;}
+@media(max-width:860px){.suite{grid-template-columns:1fr;}}
+.suite .sl{font-size:10.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:#7a6f74;margin-bottom:9px;}
+
+/* ---------------- definition + diagram rows ---------------- */
+.defrow{display:grid;grid-template-columns:1fr 400px;gap:32px;margin-top:14px;
+  background:#efeae0;border:1px solid var(--line-2);padding:26px 28px 28px;align-items:start;}
+@media(max-width:940px){.defrow{grid-template-columns:1fr;gap:24px;}}
+.defrow h3{font-family:'Newsreader',serif;font-size:24px;font-weight:400;}
+.defrow p{font-size:15px;color:#4d4048;margin-top:11px;line-height:1.5;}
+.dia{padding-left:46px;}
+.rg{position:relative;}
+.rg .mk{position:absolute;left:-46px;top:1px;width:17px;height:17px;border-radius:50%;
+  background:var(--plum);color:#fff;font-size:9.5px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;}
+.rg .mk::after{content:"";position:absolute;left:17px;top:8px;width:29px;height:1px;background:#c3bbae;}
+.rg.deep .mk{left:-83px;}
+.rg.deep .mk::after{width:66px;}
+.rg.deep2 .mk{left:-46px;}
+.rg.deep2 .mk::after{width:29px;}
+.keys{margin-top:18px;}
+.kk{display:grid;grid-template-columns:18px 84px 1fr;gap:0 11px;padding:8px 0;align-items:start;
+  border-bottom:1px solid var(--line);}
+.kk:last-child{border-bottom:0;}
+.kk .kn{font-size:10.5px;font-weight:700;color:#8a7f75;padding-top:2px;}
+.kk .kt{font-size:12.5px;font-weight:700;}
+.kk .kd{font-size:12.5px;color:#5e5259;line-height:1.4;}
+.ctas{margin-top:20px;padding-top:16px;border-top:1px solid var(--line);}
+.ctalbl{font-size:9.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:#8a7f75;margin-bottom:12px;}
+.ctarow{display:grid;grid-template-columns:132px 1fr;gap:0 14px;padding:9px 0;align-items:start;
+  border-bottom:1px solid var(--line);}
+.ctarow:last-child{border-bottom:0;}
+.ctarow .btn-work{margin-top:0;text-align:center;font-size:12px;padding:4px 10px;}
+.ctarow span:last-child{font-size:12.5px;color:#5e5259;line-height:1.4;padding-top:3px;}
+.phold{border:1.5px dashed #b9b0a4;border-radius:9px;padding:34px 20px;text-align:center;
+  font-size:12.5px;color:#8a7f75;line-height:1.5;}
+.phold b{display:block;color:#5e5259;font-size:13px;font-weight:700;margin-bottom:4px;}
+
+/* ---------------- screen minis (CREAM) ---------------- */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:24px;}
+.grid.three{grid-template-columns:repeat(3,1fr);align-items:start;}
+.grid.two{grid-template-columns:repeat(2,1fr);max-width:660px;}
+.grid.big .scr{min-height:470px;padding:18px 16px 16px;border-radius:20px;}
+.grid.big.three .scr{min-height:560px;}
+.grid.big .page h4{font-size:14.5px;margin-bottom:11px;}
+.grid.big .blk{font-size:12px;padding:12px 13px;}
+.grid.big .blk.pack{padding:16px 13px 26px;}
+.grid.big .blk.priority{padding:16px 13px 34px;}
+.grid.big .hd{margin:22px 0 18px;}
+.grid.big .title{height:14px;border-radius:4px;}
+.grid.big .title.s{height:10px;margin-top:9px;}
+.grid.big .av{width:30px;height:30px;border-radius:8px;margin-bottom:14px;}
+.grid.big .heroline{height:12px;margin-bottom:8px;}
+.grid.big .heroline.s{height:9px;}
+.grid.big .wm{font-size:10px;}
+.grid.big .burger i{width:14px;height:1.5px;}
+.grid.big .top{min-height:26px;}
+.grid.big .tab{font-size:9px;padding:6px 3px;}
+.grid.big .srch{font-size:10.5px;padding:8px 13px;}
+.grid.big .filt .f{font-size:9px;padding:4px 9px;}
+.grid.big .bub{font-size:12px;padding:10px 12px;}
+@media(max-width:760px){.grid.two{grid-template-columns:1fr;max-width:340px;}}
+@media(max-width:860px){.grid.three{grid-template-columns:1fr;}}
+.scr.tall{min-height:470px;padding-top:0;}
+.drawer.top-handle{margin:-18px -16px 4px;padding:9px 7px 7px;background:transparent;border-radius:0;
+  font-size:0;letter-spacing:0;}
+.drawer.top-handle .grab{margin:0 auto;width:34px;height:4px;background:#c2b8ad;}
+.belowline{margin:14px 0 10px;border-top:1px solid var(--line);}
+@media(max-width:980px){.grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:560px){.grid{grid-template-columns:1fr;}}
+.page h4{font-size:13px;font-weight:700;margin-bottom:9px;letter-spacing:.02em;}
+.page h4 .alt{font-weight:500;color:#9c948a;}
+.scr{background:var(--cream);border:1px solid var(--line-2);border-radius:14px;padding:14px 13px 13px;
+  min-height:280px;display:flex;flex-direction:column;}
+.scr.ask{background:var(--plum);border-color:var(--plum);}
+.top{display:flex;justify-content:space-between;align-items:center;min-height:22px;flex:none;}
+.wm{font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:#9c948a;font-weight:700;line-height:1;}
+.scr.ask .wm{color:rgba(255,255,255,.6);}
+.burger{display:flex;flex-direction:column;gap:2.5px;}
+.burger i{width:11px;height:1.2px;background:#a89e93;display:block;}
+.scr.ask .burger i{background:rgba(255,255,255,.55);}
+.hd{display:flex;flex-direction:column;flex:none;margin:16px 0 14px;}
+.title{height:10px;border-radius:3px;background:#ded7c9;width:72%;}
+.title.s{width:44%;background:#e7e1d4;height:7px;margin-top:6px;}
+.scr.ask .title{background:rgba(255,255,255,.42);}
+.scr.ask .title.s{background:rgba(255,255,255,.2);}
+.scr.ask .wm{color:rgba(255,255,255,.6);}
+.scr.ask .burger i{background:rgba(255,255,255,.5);}
+.av{width:22px;height:22px;border-radius:6px;background:var(--lilac);margin:0 auto 11px;}
+.heroline{height:8px;border-radius:2px;background:#ded7c9;margin:0 auto 5px;width:70%;}
+.scr.ask .heroline{background:rgba(255,255,255,.5);}
+.scr.ask .heroline.s{background:rgba(255,255,255,.26);}
+.heroline.s{width:48%;background:#e7e1d4;height:6px;}
+
+.stk{display:flex;flex-direction:column;gap:6px;}
+.blk{background:#fff;border-radius:6px;padding:10px 11px;font-size:11px;font-weight:600;color:var(--ink);
+  border-left:4px solid;}
+.blk.step{border-color:var(--step);}
+.blk.pack{border-color:var(--pack);padding:14px 11px 22px;}
+.blk.priority{border-color:var(--priority);padding:14px 11px 30px;}
+.blk.target{border-color:var(--target);}
+.blk.other{border-color:var(--other);color:#6b5f64;font-weight:500;}
+.blk.thinking{border-color:var(--lilac);color:#5d3f70;}
+.blk.fnd .rings{display:grid;grid-template-columns:repeat(3,max-content);gap:9px 14px;
+  margin-top:11px;justify-content:center;}
+.blk.fnd .rings i{width:19px;height:19px;border-radius:50%;display:block;border:2px solid;}
+.grid.big .blk.fnd .rings i{width:24px;height:24px;}
+.grid.big .blk.fnd .rings{gap:11px 18px;}
+.rings .cash{border-color:#4d8a5c;background:#e0efe3;}
+.rings .safety{border-color:#c9843c;background:#f7e9d8;}
+.rings .prot{border-color:#c05a4e;background:#f8e2de;}
+.rings .debt{border-color:#c9a13c;background:#f8f0d8;}
+.rings .long{border-color:#7a9b4d;background:#eaf2dd;}
+.rings .tax{border-color:#4d7f8a;background:#dcecef;}
+.blk.cond{background:rgba(255,255,255,.55);}
+.blk .exl{display:inline-block;font-size:7.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:#42556f;background:#dee7f4;border-radius:3px;padding:2px 5px;margin-left:6px;vertical-align:1px;}
+.deck{position:relative;margin:0 2px 26px;}
+.gh{position:absolute;left:9px;right:9px;top:0;bottom:-7px;background:#e8e3d6;border-radius:6px;
+  border:1px solid rgba(0,0,0,.05);}
+.scr.ask .gh{background:#cfc7bb;}
+.scr.ask .gh.g2{background:#b6ada2;}
+.gh.g2{left:18px;right:18px;bottom:-13px;background:#ddd7c9;}
+.deck .blk{position:relative;}
+.tl{border:1.5px dashed #b0a69c;border-radius:7px;padding:7px;display:flex;flex-direction:column;gap:6px;}
+.tl.think{border-color:#c8aede;background:#faf6fd;}
+.tl .cap{font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a7f75;}
+.srch{background:#fff;border:1px solid var(--line);border-radius:20px;padding:6px 11px;
+  font-size:9.5px;color:#9c948a;font-weight:500;display:flex;align-items:center;gap:7px;}
+.srch .mag{font-size:10px;transform:rotate(-45deg);display:inline-block;}
+.filt{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:2px;}
+.filt .f{font-size:8px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  background:#e4dfd2;color:#7a6f74;border-radius:20px;padding:3px 8px;}
+.filt .f.on{background:var(--plum);color:#fff;}
+.filt.time{margin-top:-2px;}
+.filt.time .f{background:transparent;border:1px solid var(--line-2);color:#8a7f75;}
+.hbtn{align-self:flex-start;margin-top:10px;width:22px;height:22px;border-radius:50%;
+  background:var(--plum);color:#fff;font-family:'Newsreader',serif;font-size:13px;
+  display:flex;align-items:center;justify-content:center;line-height:1;}
+.grid.big .hbtn{width:26px;height:26px;font-size:15px;margin-top:12px;}
+.scrnote b{color:#2c1d24;font-weight:700;}
+.tabs{display:flex;gap:3px;}
+.tab{flex:1;text-align:center;font-size:8px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;
+  padding:4px 2px;border-radius:4px;color:#8a7f75;background:#e4dfd2;}
+.tab.on{background:var(--plum);color:#fff;}
+.spring{flex:1;min-height:10px;}
+.dockbar{background:#fff;border-radius:20px;padding:6px 7px 6px 11px;display:flex;justify-content:space-between;
+  align-items:center;font-size:9px;color:#8c8189;font-weight:500;margin-top:10px;border:1px solid var(--line);}
+.dockbar i{width:16px;height:16px;border-radius:50%;background:var(--plum);display:block;}
+.scr.ask .dockbar{border-color:transparent;}
+.drawer{background:var(--cream-2);color:var(--ink);text-align:center;padding:9px 7px 7px;font-size:8.5px;
+  font-weight:700;letter-spacing:.14em;border-radius:10px 10px 0 0;margin:9px -13px -13px;}
+.drawer .grab{display:block;width:28px;height:3px;border-radius:2px;background:#b0a69c;margin:0 auto 6px;}
+.scrnote{font-size:11.5px;color:#7a6f74;line-height:1.4;margin-top:9px;}
+
+/* ---------------- Ask modes ---------------- */
+.modes{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:24px;}
+@media(max-width:1080px){.modes{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:600px){.modes{grid-template-columns:1fr;}}
+.mode .mcta{display:block;font-size:9.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:#8a7f75;}
+.mode .mn{font-size:13.5px;font-weight:700;margin:3px 0 11px;}
+.asklbl{font-size:10.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:#7a6f74;
+  margin-top:28px;padding-bottom:9px;border-bottom:1px solid var(--line-2);}
+.asklbl + .grid,.asklbl + .modes{margin-top:16px;}
+.ask-scr{background:var(--plum);border-radius:14px;padding:14px 13px 13px;min-height:330px;
+  display:flex;flex-direction:column;}
+.bub{border-radius:9px;padding:9px 11px;font-size:11px;line-height:1.4;margin-bottom:7px;}
+.bub.h{background:rgba(255,255,255,.11);color:#f0e9ec;}
+.bub.u{background:var(--cream);color:var(--ink);margin-left:22px;}
+.wrk{background:rgba(181,124,224,.22);border:1px solid var(--lilac);border-radius:9px;padding:10px 11px;margin-bottom:7px;}
+.wrk .wt{font-size:8.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:#d7bcee;}
+.wrk .wi{font-size:10.5px;color:#efe6f5;line-height:1.45;margin-top:5px;padding-left:13px;position:relative;}
+.wrk .wi::before{content:"\2713";position:absolute;left:0;color:var(--lilac);}
+.wrk .wi.now::before{content:"\25CB";}
+.drop{border:1.5px dashed rgba(255,255,255,.42);border-radius:9px;padding:16px 11px;text-align:center;
+  font-size:10.5px;color:var(--dim);margin-bottom:7px;}
+.drop b{display:block;color:#fff;font-size:11.5px;margin-bottom:3px;}
+.opt{background:var(--cream);color:var(--ink);border-radius:9px;padding:9px 11px;margin-bottom:6px;font-size:10.5px;line-height:1.35;}
+.opt .ot{font-weight:700;font-size:11.5px;}
+.opt.pick{box-shadow:0 0 0 1.5px var(--priority);}
+.stp{display:grid;grid-template-columns:19px 1fr;gap:0 9px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.13);}
+.stp:last-child{border-bottom:0;}
+.stp .si{width:17px;height:17px;border-radius:50%;border:1px solid rgba(255,255,255,.4);color:#fff;
+  font-size:9px;display:flex;align-items:center;justify-content:center;}
+.stp.on .si{background:var(--lilac);border-color:var(--lilac);color:#2c1d24;font-weight:700;}
+.stp .sx{font-size:10.5px;color:var(--dim);line-height:1.4;}
+.stp.on .sx{color:#fff;}
+.link{display:block;background:rgba(255,255,255,.13);border-radius:7px;padding:8px 10px;font-size:10px;color:#e7dce9;margin-top:7px;}
+.link b{color:#fff;}
+.flnote{font-size:14px;color:#5e5259;margin-top:14px;max-width:70ch;line-height:1.5;}
+.fl{margin-top:26px;background:#efeae0;border:1px solid var(--line-2);padding:20px 22px 22px;}
+.flh{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+.flt{font-family:'Newsreader',serif;font-size:20px;}
+.flc{font-size:9.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:#8a7f75;}
+.flr{display:grid;grid-template-columns:1fr 18px 1fr 18px 1fr 18px 1fr;gap:0 6px;align-items:start;}
+@media(max-width:900px){.flr{grid-template-columns:1fr;gap:14px;}.fa{display:none;}}
+.fa{font-size:16px;color:#b0a69c;text-align:center;padding-top:70px;}
+.mini{background:var(--cream);border:1px solid var(--line-2);border-radius:10px;padding:10px;min-height:168px;}
+.mini.ask{background:var(--plum);border-color:var(--plum);}
+.mini.lock{background:#3a2029;border-color:#3a2029;display:flex;flex-direction:column;justify-content:center;text-align:center;}
+.mini.lock .lt{font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:9px;}
+.mini.lock .notif{background:rgba(255,255,255,.93);border-radius:8px;padding:9px 10px;text-align:left;font-size:10px;line-height:1.4;color:var(--ink);}
+.mini.lock .notif b{display:block;font-size:8px;letter-spacing:.13em;text-transform:uppercase;color:#8a7f75;margin-bottom:4px;}
+.mc{box-shadow:none;border:1px solid var(--line);padding:11px 12px;}
+.mc .ctitle{font-size:15px;}
+.mc .cbody{font-size:11px;margin-top:5px;}
+.mc .btn-work{font-size:10.5px;padding:3px 9px;margin-top:9px;}
+.mini .bub{font-size:9.5px;padding:7px 9px;margin-bottom:5px;}
+.mini .wrk{padding:8px 9px;margin-bottom:5px;}
+.mini .wi{font-size:9px;margin-top:4px;}
+.mini .drop{padding:12px 9px;font-size:9px;margin-bottom:5px;}
+.mini .drop b{font-size:10px;}
+.mini .opt{font-size:9px;padding:7px 9px;margin-bottom:5px;}
+.mini .opt .ot{font-size:10px;}
+.mini .link{font-size:9px;padding:6px 8px;margin:5px 0;}
+.mini .stp{padding:6px 0;grid-template-columns:17px 1fr;gap:0 7px;}
+.mini .stp .si{width:15px;height:15px;font-size:8px;}
+.mini .stp .sx{font-size:9px;}
+.dn{margin-top:7px;background:rgba(181,124,224,.24);border:1px solid var(--lilac);border-radius:6px;
+  padding:5px 8px;font-size:8.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#e6cff6;text-align:center;}
+.flsub{font-size:13.5px;color:#5e5259;line-height:1.5;margin:-6px 0 16px;max-width:80ch;}
+.mw{font-size:7.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#a89e93;}
+.mb{display:flex;flex-direction:column;gap:2px;}
+.mb i{width:9px;height:1.1px;background:#a89e93;display:block;}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:7.5px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;border-radius:20px;padding:3px 8px;}
+.pill.run{background:#e8dcf3;color:#5d3f70;}
+.pill.run.onplum{background:rgba(181,124,224,.3);color:#eadcf7;}
+.pill.done{background:var(--lilac);color:#2c1d24;}
+.pill.done.onplum{background:var(--lilac);color:#2c1d24;}
+.pill .pd{width:5px;height:5px;border-radius:50%;background:currentColor;display:block;}
+.toast{margin-top:7px;background:rgba(255,255,255,.93);border-radius:7px;padding:7px 9px;
+  font-size:9px;line-height:1.35;color:var(--ink);}
+.revrow{display:flex;align-items:center;gap:9px;margin-top:8px;}
+.rlink{font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6);}
+
+/* animated demo */
+.demo2{display:grid;grid-template-columns:1fr 300px;gap:36px;margin-top:20px;align-items:start;}
+@media(max-width:860px){.demo2{grid-template-columns:1fr;}.dright{justify-self:center;}}
+.dstep{display:grid;grid-template-columns:26px 1fr;gap:0 13px;padding:13px 14px 13px 10px;cursor:pointer;
+  border-radius:8px;transition:background .18s;align-items:start;}
+.dstep:hover{background:rgba(0,0,0,.03);}
+.dstep.on{background:#e6ddea;}
+.dn2{width:22px;height:22px;border-radius:50%;background:#d6cec3;color:#6b5f64;font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;transition:.18s;}
+.dstep.on .dn2{background:var(--plum);color:#fff;}
+.dt{font-size:15px;font-weight:700;letter-spacing:-.01em;}
+.dd{font-size:13px;color:#5e5259;line-height:1.45;margin-top:3px;}
+.dctl{display:inline-flex;align-items:center;gap:4px;padding:5px;background:var(--plum);border-radius:26px;}
+.dctl.top{margin:0 0 20px 10px;}
+.dctl button{border:0;background:transparent;font:inherit;font-size:14px;font-weight:600;
+  color:rgba(255,255,255,.72);padding:8px 14px;border-radius:20px;cursor:pointer;line-height:1.1;
+  transition:background .15s,color .15s;}
+.dctl button:hover{background:rgba(255,255,255,.14);color:#fff;}
+.dctl button.pl{background:#fff;color:var(--plum);font-weight:700;padding:8px 22px;}
+.dctl button.pl:hover{background:#f2ece5;}
+.dsep{width:1px;height:18px;background:rgba(255,255,255,.22);margin:0 3px;}
+
+.phone{width:270px;background:var(--cream);border-radius:22px;padding:14px 13px 52px;position:relative;
+  overflow:hidden;min-height:410px;box-shadow:0 3px 0 rgba(0,0,0,.05);
+  transition:background .5s ease;}
+.phone.plum{background:var(--plum);}
+.phchrome{display:flex;align-items:center;gap:8px;height:20px;margin-bottom:12px;position:relative;}
+.phw{font-size:8px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#a89e93;transition:color .4s;}
+.phone.plum .phw{color:rgba(255,255,255,.55);}
+.phb{display:flex;flex-direction:column;gap:2px;margin-left:auto;}
+.phb i{width:11px;height:1.2px;background:#a89e93;display:block;transition:background .4s;}
+.phone.plum .phb i{background:rgba(255,255,255,.5);}
+.pillx{position:absolute;right:0;top:-1px;display:inline-flex;align-items:center;gap:5px;
+  font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:20px;
+  padding:4px 9px;background:#e8dcf3;color:#5d3f70;
+  opacity:0;transform:scale(.4);transition:opacity .35s ease,transform .45s cubic-bezier(.2,.8,.3,1),background .3s,color .3s;}
+.pillx.show{opacity:1;transform:scale(1);}
+.phone.plum .pillx{background:rgba(181,124,224,.32);color:#eadcf7;}
+.pillx.ready,.phone.plum .pillx.ready{background:var(--lilac);color:#2c1d24;}
+.pillx .pd{width:5px;height:5px;border-radius:50%;background:currentColor;display:block;
+  animation:bl 1.1s ease-in-out infinite;}
+.pillx.ready .pd{display:none;}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.25}}
+
+.cursor{position:absolute;width:19px;height:19px;z-index:30;pointer-events:none;opacity:0;
+  transition:left .55s cubic-bezier(.35,0,.2,1),top .55s cubic-bezier(.35,0,.2,1),opacity .3s;}
+.cursor::before{content:"";position:absolute;inset:0;border-radius:50%;
+  background:rgba(75,42,57,.9);box-shadow:0 0 0 4px rgba(75,42,57,.22);}
+.cursor.show{opacity:1;}
+.cursor.tap::after{content:"";position:absolute;left:50%;top:50%;width:19px;height:19px;margin:-9.5px 0 0 -9.5px;
+  border-radius:50%;border:2px solid rgba(75,42,57,.55);animation:tp .6s ease-out;}
+.phone.plum .cursor::before{background:rgba(255,255,255,.92);box-shadow:0 0 0 4px rgba(255,255,255,.24);}
+.phone.plum .cursor.tap::after{border-color:rgba(255,255,255,.6);}
+@keyframes tp{0%{transform:scale(.5);opacity:1}100%{transform:scale(2.6);opacity:0}}
+.phbody{}
+.lay{display:none;}
+.lay.on{display:block;animation:fu .4s ease both;}
+#l5.on{animation:xin .42s cubic-bezier(.25,.9,.3,1) both;}
+@keyframes xin{from{opacity:0;transform:scale(.94) translateY(10px)}to{opacity:1;transform:none}}
+@keyframes fu{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+.pc{box-shadow:none;border:1px solid var(--line);padding:12px 13px;margin-bottom:9px;overflow:hidden;
+  transition:transform .6s cubic-bezier(.4,0,.2,1),opacity .5s ease;transform-origin:center;}
+.pc .ctitle{font-size:16px;}
+.pc .cbody{font-size:11.5px;margin-top:5px;}
+.pc .btn-work{font-size:11px;padding:4px 10px;margin-top:9px;}
+.pc.dimcard{opacity:.45;}
+.pc.readyc{border:1.5px solid var(--lilac);background:#f7f1fb;}
+.readyrow{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #e3d6ee;
+  margin-top:11px;padding-top:10px;}
+.rtag{font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  background:var(--lilac);color:#2c1d24;border-radius:20px;padding:3px 9px;}
+.cvx{font-size:16px;color:#a892bb;}
+.pc.press{transform:scale(.975);box-shadow:0 0 0 2px var(--lilac);border-color:var(--lilac);
+  transition:transform .14s ease,box-shadow .16s ease,border-color .16s ease;}
+.pc.lift{transform:translateY(-4px) scale(1.02);border-color:var(--lilac);
+  box-shadow:0 0 0 2px var(--lilac),0 10px 22px rgba(75,42,57,.18);
+  transition:transform .3s cubic-bezier(.2,.8,.3,1),box-shadow .3s ease,border-color .16s ease;}
+.pc .btn-work{transition:transform .12s ease,background .2s ease;}
+.pc.press .btn-work{transform:scale(.93);background:var(--lilac);color:#2c1d24;}
+.pc.gone{transform-origin:top right;transform:scale(.08) translate(118px,-118px);opacity:0;
+  height:0;margin:0;padding:0;border-width:0;box-shadow:none;
+  transition:transform 1.05s cubic-bezier(.34,.02,.2,1),
+             opacity .45s ease .5s,
+             height .5s ease .7s, margin .5s ease .7s, padding .5s ease .7s, border-width .5s ease .7s;}
+
+.cmp{width:100%;border-collapse:collapse;background:var(--cream);border-radius:9px;overflow:hidden;
+  margin-bottom:7px;font-size:9.5px;color:var(--ink);}
+.cmp th,.cmp td{padding:6px 8px;text-align:left;border-bottom:1px solid #e2dbcd;}
+.cmp tr:last-child td{border-bottom:0;}
+.cmp th{font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7a6f74;
+  background:#e9e3d5;}
+.cmp th.sel{background:var(--lilac);color:#2c1d24;}
+.pickbtn{display:inline-block;font-size:8px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  background:#41242f;color:#fff;border-radius:4px;padding:3px 9px;transition:transform .13s ease,background .2s ease;}
+.pickbtn.press{transform:scale(.9);background:var(--lilac);color:#2c1d24;}
+.cmp td:first-child{color:#8a7f75;font-size:8.5px;text-transform:uppercase;letter-spacing:.05em;font-weight:700;width:34%;}
+.cmp td.bad{color:#a33c3c;font-weight:700;}
+.cmp td.ok{color:#3f6b3d;font-weight:700;}
+.askdock{position:absolute;left:13px;right:13px;bottom:14px;opacity:0;pointer-events:none;transition:opacity .3s ease;z-index:20;background:#fff;border-radius:20px;
+  padding:6px 7px 6px 12px;display:flex;justify-content:space-between;align-items:center;
+  font-size:9.5px;color:#9c948a;font-weight:500;}
+.askdock i{width:16px;height:16px;border-radius:50%;background:var(--plum);display:block;}
+.askdock.on{opacity:1;}
+.askdock .dtxt{overflow:hidden;white-space:nowrap;}
+.askdock.typed{color:var(--ink);}
+.askdock.typed i{background:var(--lilac);}
+.taskdone{margin-top:8px;background:transparent;border:1px solid rgba(255,255,255,.22);border-radius:7px;
+  padding:9px 11px;}
+.tdh{font-size:8px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
+  color:rgba(255,255,255,.5);display:flex;align-items:center;gap:5px;}
+.tdh::before{content:"\2713";font-size:9px;}
+.tdt{font-size:11.5px;font-weight:600;color:rgba(255,255,255,.9);margin-top:3px;line-height:1.25;}
+.tdd{font-size:10px;color:rgba(255,255,255,.55);margin-top:3px;line-height:1.35;}
+.bubx{border-radius:9px;padding:9px 11px;font-size:11px;line-height:1.4;margin-bottom:7px;
+  background:rgba(255,255,255,.12);color:#f0e9ec;}
+.bubx.nextturn{margin-top:26px;}
+.bubx.u{background:transparent;border:1px solid var(--lilac);color:#efe2fa;margin-left:34px;
+  border-radius:9px 9px 2px 9px;}
+.toastx{margin-top:9px;background:rgba(255,255,255,.94);border-radius:9px;padding:9px 11px;
+  font-size:10.5px;line-height:1.4;color:var(--ink);animation:fu .45s ease both;}
+.revrowx{display:flex;align-items:center;gap:10px;margin-top:10px;}
+.rlinkx{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.6);}
+.logbtn{margin-left:auto;display:inline-flex;align-items:center;gap:7px;padding:4px 9px;border-radius:20px;
+  background:#e4dfd2;transition:background .4s;}
+.phone.plum .logbtn{background:rgba(255,255,255,.14);}
+.lglbl{font-size:8.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:#7a6f74;transition:color .4s;}
+.phone.plum .lglbl{color:rgba(255,255,255,.72);}
+.logbtn.working .lglbl,.logbtn.ready .lglbl{color:#5d3f70;}
+.phone.plum .logbtn.working .lglbl,.phone.plum .logbtn.ready .lglbl{color:#efe2fa;}
+.logbtn.ready,.phone.plum .logbtn.ready{background:var(--lilac);}
+.logbtn.ready .lglbl,.phone.plum .logbtn.ready .lglbl{color:#2c1d24;}
+.lgbar{display:block;width:0;height:4px;border-radius:20px;background:#cfc7bb;overflow:hidden;
+  transition:width .4s cubic-bezier(.2,.8,.3,1);}
+.phone.plum .lgbar{background:rgba(255,255,255,.24);}
+.logbtn.working .lgbar,.logbtn.ready .lgbar{width:34px;}
+.phone.plum .logbtn.working .lgbar{background:rgba(255,255,255,.28);}
+.phone.plum .logbtn.ready .lgbar{background:rgba(44,29,36,.22);}
+.lgct{font-size:8.5px;font-weight:700;background:#2c1d24;color:#fff;border-radius:20px;
+  padding:1px 6px;opacity:0;transform:scale(.4);transition:.35s cubic-bezier(.2,.8,.3,1);}
+.lgct.on{opacity:1;transform:scale(1);}
+.lgbar i{display:block;height:100%;width:0;border-radius:20px;background:var(--lilac);
+  transition:width 2.6s cubic-bezier(.3,0,.4,1);}
+.logbtn.working .lgbar i{width:64%;}
+.logbtn.ready .lgbar i{width:100%;background:#2c1d24;transition:width .5s ease;}
+.logsheet{background:var(--cream);border-radius:11px;padding:13px;}
+.lshead{font-size:8.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:#8a7f75;margin-bottom:11px;}
+.lsrow{display:grid;grid-template-columns:64px 1fr;gap:0 9px;padding:9px 0;border-top:1px solid var(--line);
+  font-size:10.5px;line-height:1.35;color:#4d4048;align-items:start;}
+.lsrow.rdy{background:#f4ecfa;margin:0 -13px;padding:9px 13px;border-top:0;position:relative;z-index:2;
+  transition:transform .2s ease,box-shadow .25s ease;}
+.lsrow.rdy.press{transform:scale(.975);box-shadow:0 0 0 2px var(--lilac);}
+.lsrow.rdy.expand{animation:xp .5s cubic-bezier(.3,0,.2,1) forwards;}
+@keyframes xp{
+  0%{transform:scale(1);box-shadow:0 0 0 2px var(--lilac);}
+  100%{transform:scale(1.06) translateY(-16px);box-shadow:0 0 0 2px var(--lilac),0 14px 30px rgba(44,29,36,.3);opacity:0;}
+}
+.logsheet{transition:opacity .3s ease,transform .35s ease;}
+.lsrow.rdy.expand ~ .lsrow{opacity:.25;transition:opacity .3s ease;}
+.backto{font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.55);
+  padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.16);}
+.states{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:22px;align-items:start;}
+@media(max-width:1080px){.states{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:620px){.states{grid-template-columns:1fr;}}
+.sc{border:1px solid var(--line);box-shadow:none;padding:13px 14px;}
+.sc .ctitle{font-size:16px;}
+.sc .cbody{font-size:11.5px;margin-top:5px;}
+.sc .btn-work{font-size:11px;padding:4px 10px;}
+.sc.inprog{border-color:#a89e93;}
+.sc.working{border:1.5px solid var(--lilac);background:#f9f5fc;}
+.sc.readyc{border:1.5px solid var(--lilac);background:#f4ecfa;}
+.sc.donec{background:#efeae0;border-color:#d6cec3;}
+.sc.donec .ctitle{color:#6b5f64;}
+.sc.donec .cbody{color:#8a7f75;}
+.sc.donec .eyebrow{background:rgba(44,29,36,.04);color:#9c948a;}
+.sc.donec .strow{border-top:1px solid #ddd6c8;padding-top:9px;}
+.pbar{height:5px;border-radius:20px;background:#ded7c9;overflow:hidden;margin-top:11px;}
+.pbar i{display:block;height:100%;background:#8a7f75;border-radius:20px;}
+.strow{display:flex;justify-content:space-between;align-items:center;gap:9px;margin-top:10px;}
+.sc.inprog .strow{justify-content:flex-start;}
+.stag{display:inline-flex;align-items:center;gap:5px;font-size:9px;font-weight:700;letter-spacing:.08em;
+  text-transform:uppercase;border-radius:20px;padding:3px 9px;}
+.stag.grey{background:#e4dfd2;color:#6b5f64;}
+.stag.lil{background:#ece0f6;color:#5d3f70;}
+.stag.lilfull{background:var(--lilac);color:#2c1d24;}
+.stag.done{background:transparent;border:1px solid #a89e93;color:#6b5f64;}
+.stag.done::before{content:"\2713";margin-right:1px;}
+.stag .pd{width:5px;height:5px;border-radius:50%;background:currentColor;animation:bl 1.1s ease-in-out infinite;}
+.stn{font-size:12px;color:#5e5259;line-height:1.45;margin-top:10px;}
+.stn b{display:block;color:#2c1d24;font-size:12.5px;font-weight:700;margin-bottom:2px;}
+.fc{font-size:11.5px;color:#5e5259;line-height:1.4;margin-top:9px;}
+.fc b{color:#2c1d24;font-weight:700;}
+.mkey{font-size:12px;color:#5e5259;line-height:1.45;margin-top:11px;}
+.mkey b{color:#2c1d24;font-weight:700;}
+
+/* ---------------- flows ---------------- */
+.flow{background:#efeae0;border:1px solid var(--line-2);padding:24px 26px 26px;margin-top:16px;}
+.flowh{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;}
+.flowt{font-family:'Newsreader',serif;font-size:22px;}
+.flowc{font-size:9.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:#8a7f75;}
+.flowsub{font-size:13.5px;color:#5e5259;line-height:1.5;margin-top:6px;max-width:80ch;}
+.strip{display:grid;grid-template-columns:repeat(6,1fr);gap:14px 12px;margin-top:20px;align-items:start;}
+@media(max-width:980px){.strip{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:560px){.strip{grid-template-columns:repeat(2,1fr);}}
+.fstep .fn{display:inline-block;width:19px;height:19px;border-radius:50%;background:var(--plum);color:#fff;
+  font-size:10px;font-weight:700;text-align:center;line-height:19px;margin-bottom:8px;}
+.mini2{background:var(--cream);border:1px solid var(--line-2);border-radius:14px;padding:11px 10px;
+  aspect-ratio:9/18;display:flex;flex-direction:column;overflow:hidden;}
+.mini2.plum{background:var(--plum);border-color:var(--plum);}
+.m2top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;min-height:12px;}
+.m2w{font-size:7px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#a89e93;}
+.mini2.plum .m2w{color:rgba(255,255,255,.5);}
+.m2h{font-family:'Newsreader',serif;font-size:14px;line-height:1.2;color:var(--ink);margin-bottom:6px;}
+.mini2.plum .m2h{color:#fff;}
+.m2b{font-size:9px;line-height:1.45;color:#6b5f64;}
+.mini2.plum .m2b{color:rgba(255,255,255,.66);}
+.m2bub{border-radius:8px;padding:7px 9px;font-size:9px;line-height:1.4;margin-bottom:5px;
+  background:rgba(255,255,255,.12);color:#f0e9ec;}
+.m2bub.u{background:transparent;border:1px solid var(--lilac);color:#efe2fa;margin-left:16px;border-radius:7px 7px 1px 7px;}
+.m2dock{margin-top:auto;background:#fff;border-radius:20px;padding:4px 5px 4px 9px;display:flex;
+  justify-content:space-between;align-items:center;font-size:8px;color:#9c948a;}
+.m2dock i{width:12px;height:12px;border-radius:50%;background:var(--plum);display:block;}
+.m2rec{font-size:8.5px;line-height:1.5;color:#efe6f5;padding-left:11px;position:relative;margin-top:4px;}
+.m2rec::before{content:"\2713";position:absolute;left:0;color:var(--lilac);}
+.m2card{background:#fff;border-left:3px solid;border-radius:5px;padding:7px 8px;font-size:9px;
+  font-weight:600;color:var(--ink);margin-bottom:5px;}
+.m2card.p{border-color:var(--priority);} .m2card.a{border-color:var(--pack);}
+.m2card.t{border-color:var(--step);} .m2card.o{border-color:var(--other);color:#6b5f64;font-weight:500;}
+.m2tbl{width:100%;border-collapse:collapse;background:var(--cream);border-radius:6px;overflow:hidden;font-size:8px;}
+.m2tbl th,.m2tbl td{padding:4px 5px;text-align:left;border-bottom:1px solid #e2dbcd;color:var(--ink);}
+.m2tbl th{background:#e9e3d5;font-size:7px;letter-spacing:.06em;text-transform:uppercase;color:#7a6f74;}
+.m2tbl tr:last-child td{border-bottom:0;}
+.m2rings{display:grid;grid-template-columns:repeat(3,max-content);gap:6px 9px;justify-content:center;margin:6px 0;}
+.m2rings i{width:15px;height:15px;border-radius:50%;border:2px solid;display:block;}
+.m2rings .g{border-color:#4d8a5c;background:#e0efe3;} .m2rings .a2{border-color:#c9843c;background:#f7e9d8;}
+.m2rings .r{border-color:#c05a4e;background:#f8e2de;} .m2rings .y{border-color:#c9a13c;background:#f8f0d8;}
+.m2rings .n{border-color:#c2bab0;background:#eeeae2;}
+.m2opts{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;}
+.m2opts span{font-size:7.5px;font-weight:600;border:1px solid rgba(255,255,255,.28);border-radius:20px;
+  padding:2px 6px;color:rgba(255,255,255,.66);}
+.m2opts span.on{background:var(--lilac);border-color:var(--lilac);color:#2c1d24;}
+.m2sl{margin:5px 0;} .m2sl .tr{height:3px;border-radius:9px;background:rgba(255,255,255,.2);}
+.m2sl .tr i{display:block;height:100%;border-radius:9px;background:var(--lilac);}
+.m2sl .lb{font-size:7px;color:rgba(255,255,255,.6);margin-top:3px;display:flex;justify-content:space-between;}
+.fcap{font-size:11px;color:#5e5259;line-height:1.4;margin-top:8px;}
+.fcap b{color:#2c1d24;font-weight:700;}
+.fout{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;color:#5e5259;line-height:1.5;}
+.fout b{color:#2c1d24;font-weight:700;}
+
+/* ---------------- rules, tests, example ---------------- */
+.tests{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px;}
+@media(max-width:820px){.tests{grid-template-columns:1fr;}}
+.test{background:var(--plum);color:#fff;border-radius:14px;padding:26px 28px 28px;}
+.test h3{font-family:'Newsreader',serif;font-size:22px;font-weight:400;}
+.test .q{font-size:15px;color:var(--dim);margin-top:6px;font-style:italic;}
+.br{padding:15px 0;border-bottom:1px solid rgba(255,255,255,.14);}
+.br:last-child{border-bottom:0;}
+.br .a{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);}
+.br .r{font-size:16px;font-weight:700;margin-top:4px;}
+.br .r em{font-style:normal;color:#e6b9c6;}
+.br .n{font-size:13.5px;color:var(--dim);line-height:1.5;margin-top:6px;}
+.notes{margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.16);}
+.notes p{font-size:13.5px;color:var(--dim);line-height:1.5;margin-top:9px;}
+.notes p:first-child{margin-top:0;}
+.notes b{color:#fff;font-weight:600;}
+.rulez{background:var(--plum);color:#fff;border-radius:14px;padding:26px 28px 28px;margin-top:24px;}
+.rulez .rl{display:grid;grid-template-columns:42px 1fr;gap:0 14px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.14);}
+.rulez .rl:last-child{border-bottom:0;}
+.rulez .rl .id{font-size:11px;font-weight:700;color:var(--dim);letter-spacing:.08em;padding-top:3px;}
+.rulez .rl .tx{font-size:15.5px;line-height:1.4;max-width:74ch;font-weight:600;}
+.rulez .rl .tx span{display:block;font-size:13.5px;color:var(--dim);font-weight:400;margin-top:5px;line-height:1.45;}
+.eyeb{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px;}
+@media(max-width:820px){.eyeb{grid-template-columns:1fr;}}
+.eyeb .side{background:#efeae0;border:1px solid var(--line-2);padding:24px 26px;}
+.eyeb h3{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#7a6f74;}
+.eyeb ul{list-style:none;margin-top:14px;}
+.eyeb li{font-size:14.5px;line-height:1.45;padding:11px 0 11px 18px;position:relative;border-bottom:1px solid #d9d2c4;}
+.eyeb li:last-child{border-bottom:0;}
+.eyeb li::before{content:"—";position:absolute;left:0;color:#a89e93;}
+.eyeb .demo{background:var(--plum);border-radius:12px;padding:26px;display:flex;flex-direction:column;justify-content:center;}
+.pri-row{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0 18px;}
+.pri-chip{background:#efdfe4;border:1.5px solid var(--priority);color:#7d3247;border-radius:6px;padding:9px 14px;font-size:13.5px;font-weight:700;}
+.exp{background:#efeae0;border:1px solid var(--line-2);margin-bottom:12px;}
+.exp > .hdr{padding:16px 20px;border-bottom:1px solid var(--line);}
+.exp .pk{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--pack);}
+.exp .pn{font-family:'Newsreader',serif;font-size:21px;font-weight:400;margin-top:3px;}
+.exp .serves{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;}
+.exp .sv{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;background:#efdfe4;color:#7d3247;border-radius:20px;padding:3px 9px;}
+.tk{display:grid;grid-template-columns:1fr 1.15fr;border-bottom:1px solid #e2dbcd;}
+.tk:last-child{border-bottom:0;}
+.tk .tkl{padding:14px 20px;border-right:1px solid #e2dbcd;}
+.tk .tkr{padding:14px 20px;background:#e9e3d5;}
+.tk .tn{font-size:14.5px;font-weight:700;line-height:1.3;}
+.tk .ts{font-size:13px;color:#5e5259;margin-top:4px;line-height:1.4;}
+.tk .cta{display:inline-block;background:#41242f;color:#fff;font-size:10.5px;font-weight:700;padding:6px 11px;border-radius:5px;margin-top:9px;}
+.tk .il{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a7f75;margin-bottom:7px;}
+.tk ol{margin:0;padding-left:17px;}
+.tk li{font-size:13px;color:#4d4048;line-height:1.4;padding:3px 0;}
+.exhead{display:grid;grid-template-columns:1fr 1.15fr;background:#e2dbcd;border-bottom:1px solid var(--line-2);}
+.exhead div{padding:8px 20px;font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7a6f74;}
+.exhead div:first-child{border-right:1px solid var(--line-2);}
+@media(max-width:700px){.tk,.exhead{grid-template-columns:1fr;}.tk .tkl{border-right:0;}}
+.flagline{background:#efdfe4;border-left:4px solid var(--priority);padding:16px 20px;margin-top:16px;
+  font-size:14px;line-height:1.5;color:#5e3040;}
+.flagline b{font-weight:700;}
+.foot{display:flex;flex-wrap:wrap;gap:8px 24px;margin-top:26px;padding-top:15px;border-top:1px solid var(--line-2);font-size:12.5px;color:#6b5f64;}
+.foot span{display:flex;align-items:center;gap:8px;}
+.chip{width:4px;height:15px;border-radius:2px;flex:none;}
+.chip.priority{background:var(--priority);} .chip.target{background:var(--target);}
+.chip.pack{background:var(--pack);} .chip.step{background:var(--step);} .chip.thinking{background:var(--lilac);}
+.chip.other{background:var(--other);}
+</style>
+</head>
+<body>
+
+<div class="bar">
+  <div class="in">
+    <span class="lg">Hence</span>
+    <nav>
+      <button data-p="components" class="on">Components</button>
+      <button data-p="screens">Screens</button>
+      <button data-p="flows">Flows</button>
+      <button data-p="rules">Rules &amp; tests</button>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ================= COMPONENTS ================= -->
+<div class="pg on" id="p-components">
+  <header class="ph">
+    <div class="kicker">Hence · Information architecture</div>
+    <h1>Components</h1>
+    <p class="lede">Six components. Three have cards; the rest are modules that live inside a page.</p>
+  </header>
+
+  <div class="sect">
+    <h2>The card suite</h2>
+    <span class="hint">Largest to smallest. Read by foot and by height.</span>
+  </div>
+
+  <div class="suite">
+    <div>
+      <div class="sl">Priority</div>
+      <div class="card pric">
+        <span class="rank">Priority 1</span>
+        <div class="crow2"><div>
+          <div class="ctitle">Clear credit card debt</div>
+          <div class="cbody">You're carrying $6,800 in debt that is costing you $120 a month.</div>
+          <div class="prog">
+            <div class="ptrack"><i style="width:38%"></i></div>
+            <div class="plab"><span>$6,800 &rarr; $0 &middot; 38%</span><span class="cv">&#8250;</span></div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+    <div>
+      <div class="sl">Action</div>
+      <div class="card packc">
+        <span class="eyebrow">CREDIT CARD DEBT, INSURANCE GAPS, +2</span>
+        <div class="crow2"><div class="num">1</div><div>
+          <div class="ctitle">Make a 0% balance transfer</div>
+          <div class="cbody">Make sure every dollar you pay goes toward the balance itself &mdash; not the bank's pocket.</div>
+          <div class="gorow"><span>4 tasks &middot; 30 min</span><span class="cv">&#8250;</span></div>
+        </div></div>
+      </div>
+    </div>
+    <div>
+      <div class="sl">Task</div>
+      <div class="card stepc">
+        <span class="eyebrow">BUY A HOME, CASH FLOW</span>
+        <div class="crow2"><div class="num">2</div><div>
+          <div class="ctitle">Find lenders who handle self-employed income</div>
+          <div class="cbody">I'll shortlist the ones doing bank-statement loans or counting business reserves.</div>
+          <span class="btn-work">Send to Hence</span>
+        </div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sect"><h2>Definitions</h2></div>
+
+  <!-- PRIORITY -->
+  <div class="defrow">
+    <div>
+      <h3>Priority</h3>
+      <p>A discrete outcome that helps a Hence user make progress against improving their financial health and/or achieving a personal goal. Priorities are mostly generated by completing the Foundations process or as the result of an Ask conversation, and can also be created by the user directly. They are renameable. A priority is reached when its Target is met; some priorities, like improving your cash margin, are ongoing and never complete.</p>
+      <p>A priority contains a Target and a To-Do List, plus whatever other modules its subject requires.</p>
+    </div>
+    <div class="dia">
+      <div class="card pric">
+        <div class="rg"><span class="mk">1</span><span class="rank">Priority 1</span></div>
+        <div class="crow2"><div>
+          <div class="rg deep2"><span class="mk">2</span><div class="ctitle">Clear credit card debt</div></div>
+          <div class="rg deep2"><span class="mk">3</span><div class="cbody">You're carrying $6,800 in debt that is costing you $120 a month.</div></div>
+          <div class="rg deep2"><span class="mk">4</span>
+            <div class="prog">
+              <div class="ptrack"><i style="width:38%"></i></div>
+              <div class="plab"><span>$6,800 &rarr; $0 &middot; 38%</span><span class="cv">&#8250;</span></div>
+            </div>
+          </div>
+        </div></div>
+      </div>
+      <div class="keys">
+        <div class="kk"><div class="kn">1</div><div class="kt">Rank</div><div class="kd">Where it sits in the plan.</div></div>
+        <div class="kk"><div class="kn">2</div><div class="kt">Name</div><div class="kd">The outcome, in the user's own words. Renameable.</div></div>
+        <div class="kk"><div class="kn">3</div><div class="kt">Body</div><div class="kd">One sentence on where it stands, with her numbers.</div></div>
+        <div class="kk"><div class="kn">4</div><div class="kt">Progress</div><div class="kd">Distance to the target when it is finite; the level being held when it is ongoing. Never a task count.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TARGET -->
+  <div class="defrow">
+    <div>
+      <h3>Target</h3>
+      <p>Attributes that define whether or not the priority has been achieved. This can contain specific financial thresholds, securing insurance coverage, or definition of a complex end goal like retirement or home buying where a target may include the downpayment, the mortgage rate, the location, and attributes about the house. Targets may be discrete and finite, or ongoing, like an optimization. Targets may be suggested by Hence but are refined and agreed upon by the user. Targets may be set by a step that opens a conversation with Hence.</p>
+      <p>Targets appear (and can be edited) on Priority detail pages and are generated in conversation with Hence.</p>
+    </div>
+    <div class="dia" style="padding-left:0">
+      <div class="phold"><b>Target module</b>Not yet drawn</div>
+    </div>
+  </div>
+
+  <!-- ACTION -->
+  <div class="defrow">
+    <div>
+      <h3>Action</h3>
+      <p>A unit of work that requires more than one Task to complete. Actions appear in a prioritized list on the Priority Detail Page and in the To-Do List in My Hence. Tapping an action opens the Action Detail Page, which includes the action title and a prioritized list of the Tasks it contains. Actions are always associated with at least one priority, and may be associated with several. An action card carries its task count and its duration together. Because an action has an order and an end state, it can be handed to Hence to run: Hence completes what it can on its own and brings the user in only where a decision or an input is needed.</p>
+    </div>
+    <div class="dia">
+      <div class="card packc">
+        <div class="rg"><span class="mk">1</span><span class="eyebrow">CREDIT CARD DEBT, INSURANCE GAPS, +2</span></div>
+        <div class="crow2"><div class="num">1</div><div>
+          <div class="rg deep"><span class="mk">2</span><div class="ctitle">Make a 0% balance transfer</div></div>
+          <div class="rg deep"><span class="mk">3</span><div class="cbody">Make sure every dollar you pay goes toward the balance itself &mdash; not the bank's pocket.</div></div>
+          <div class="rg deep"><span class="mk">4</span><div class="gorow"><span>4 tasks &middot; 30 min</span><span class="cv">&#8250;</span></div></div>
+        </div></div>
+      </div>
+      <div class="keys">
+        <div class="kk"><div class="kn">1</div><div class="kt">Eyebrow</div><div class="kd">Abbreviated priorities, then overflow.</div></div>
+        <div class="kk"><div class="kn">2</div><div class="kt">Header</div><div class="kd">One line, the outcome of the action.</div></div>
+        <div class="kk"><div class="kn">3</div><div class="kt">Body</div><div class="kd">One sentence on why it's relevant, with her numbers where possible.</div></div>
+        <div class="kk"><div class="kn">4</div><div class="kt">Go row</div><div class="kd">Task count and duration, shown together, with a chevron. An action opens a page; it is not worked from the card.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TASK -->
+  <div class="defrow">
+    <div>
+      <h3>Task</h3>
+      <p>A discrete unit of work that can be completed by the user or completed by Hence. Tasks are organized into prioritized lists called Actions or may appear as individual tasks on a priority detail page. Tasks are the smallest component with a card of their own, and Ask Home curates the top three tasks the user should take at any given time. Completing a task may require asking Hence to do work on your behalf, engaging in a conversation with Hence to make a decision, or gathering specific documentation or data. CTAs for tasks include "Send to Hence" for work Hence can complete autonomously, "Talk it through" for decisions, or "Add information" when the user needs to send in information. Every CTA opens the Ask experience.</p>
+    </div>
+    <div class="dia">
+      <div class="card stepc">
+        <div class="rg"><span class="mk">1</span><span class="eyebrow">BUY A HOME, CASH FLOW</span></div>
+        <div class="crow2"><div class="num">2</div><div>
+          <div class="rg deep"><span class="mk">2</span><div class="ctitle">Find lenders who handle self-employed income</div></div>
+          <div class="rg deep"><span class="mk">3</span><div class="cbody">I'll shortlist the ones doing bank-statement loans or counting business reserves, and prepare your application.</div></div>
+          <div class="rg deep"><span class="mk">4</span><span class="btn-work">Send to Hence</span></div>
+        </div></div>
+      </div>
+      <div class="keys">
+        <div class="kk"><div class="kn">1</div><div class="kt">Eyebrow</div><div class="kd">Abbreviated priorities, then overflow.</div></div>
+        <div class="kk"><div class="kn">2</div><div class="kt">Header</div><div class="kd">One line, the outcome of the task.</div></div>
+        <div class="kk"><div class="kn">3</div><div class="kt">Body</div><div class="kd">One sentence on the work to be done.</div></div>
+        <div class="kk"><div class="kn">4</div><div class="kt">CTA</div><div class="kd">Which of the four below, matched to the work.</div></div>
+      </div>
+
+      <div class="ctas">
+        <div class="ctalbl">The CTAs</div>
+        <div class="ctarow"><span class="btn-work">Send to Hence</span>
+          <span>Work Hence can complete on its own. The user starts it and leaves.</span></div>
+        <div class="ctarow"><span class="btn-work">Add information</span>
+          <span>The user has something Hence needs &mdash; a document, a number, an account detail.</span></div>
+        <div class="ctarow"><span class="btn-work">Talk it through</span>
+          <span>A decision or trade-off only the user can settle.</span></div>
+        <div class="ctarow"><span class="btn-work">Walk me through it</span>
+          <span>A process the user carries out on a live site, with Hence alongside.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSTRUCTION -->
+  <div class="defrow">
+    <div>
+      <h3>Instruction</h3>
+      <p>The smallest, most discrete steps required to complete a task. Instructions are delivered in the Ask experience — every task CTA opens Ask — in one of four modes: delegating work to Hence, asking the user to supply documents or information, working through a decision or trade-off, or walking the user through a multi-step process. Instructions always appear as a series to be completed in one sitting. They have no card design and no independent existence: they carry no eyebrow, can't be re-prioritized, and only surface once a task is underway. The task subhead describes its instructions in a single sentence.</p>
+    </div>
+    <div class="dia" style="padding-left:0">
+      <div class="phold"><b>No card by definition</b>The four modes are drawn on the Ask page</div>
+    </div>
+  </div>
+
+  <!-- TO-DO LIST -->
+  <div class="defrow">
+    <div>
+      <h3>To-Do List</h3>
+      <p>A prioritized list of actions and/or tasks. Any group of actions and tasks is a to-do list, so the module appears wherever such a group is shown: on the Priority Detail Page, where it holds the work for that priority, and in My Hence, where it holds everything across the plan.</p>
+      <p>The To-Do List in My Hence holds every action and task across the plan, so it carries search and filtering &mdash; by priority, and by time: this week, due soon, urgent.</p>
+    </div>
+    <div class="dia" style="padding-left:0">
+      <div class="phold"><b>To-Do List module</b>Not yet drawn</div>
+    </div>
+  </div>
+
+  <div class="flagline">
+    <b>Naming.</b> Step has been renamed <b>Task</b>, following the decision that "step" reads as too small for a unit that can take several moves to finish. "Steps" now survives only as plain English inside the Instruction definition. The container of tasks is <b>Action</b>, and any group of actions and tasks is a <b>To-Do List</b>.
+  </div>
+</div>
+
+<!-- ================= SCREENS ================= -->
+<div class="pg" id="p-screens">
+  <header class="ph">
+    <div class="kicker">Hence · Information architecture</div>
+    <h1>Screens</h1>
+    <p class="lede">Plum is the working environment: where thinking and deciding happen. Cream is the record: what has been decided and what still needs work.</p>
+  </header>
+
+  <div class="sect">
+    <h2>Ask surfaces</h2>
+    <span class="hint">Plum is the working environment &mdash; where decisions get made</span>
+  </div>
+
+  <div class="grid two big">
+    <div class="page">
+      <h4>Ask Home</h4>
+      <div class="scr ask">
+        <div class="top"><span class="wm">Hence</span><span class="burger"><i></i><i></i></span></div>
+        <div class="hd"><div class="av"></div><div class="heroline"></div><div class="heroline s"></div></div>
+        <div class="deck">
+          <div class="gh g2"></div><div class="gh"></div>
+          <div class="blk step">Task</div>
+        </div>
+        <div class="spring"></div>
+        <div class="dockbar">Ask anything<i></i></div>
+        <div class="drawer"><span class="grab"></span>MY HENCE</div>
+      </div>
+      <div class="scrnote">An Ask surface, so it is plum. Top three tasks, stacked; My Hence is a drawer at the bottom.</div>
+    </div>
+
+    <div class="page">
+      <h4>Ask</h4>
+      <div class="scr ask">
+        <div class="top"><span class="wm">Ask</span><span class="burger"><i></i><i></i></span></div>
+        <div class="hd"><div class="title"></div><div class="title s"></div></div>
+        <div class="stk">
+          <div class="bub h">Hence</div>
+          <div class="bub u">User</div>
+          <div class="bub h">Hence</div>
+        </div>
+        <div class="spring"></div>
+        <div class="dockbar">Ask anything<i></i></div>
+      </div>
+      <div class="scrnote">An open conversation, entered from the dock on Home.</div>
+    </div>
+  </div>
+
+  <div class="sect">
+    <h2>My Hence</h2>
+    <span class="hint">A drawer pulled up from Ask Home. Cream, so leaving Ask is legible. Three views of one plan. The modules under the divider stay put.</span>
+  </div>
+
+  <div class="grid three big">
+    <div class="page">
+      <h4>Calendar</h4>
+      <div class="scr tall">
+        <div class="drawer top-handle"><span class="grab"></span></div>
+        <div class="top"><span class="wm">My Hence</span><span class="burger"><i></i><i></i></span></div>
+        <div class="hd"><div class="title"></div><div style="height:8px"></div>
+          <div class="tabs"><div class="tab on">Cal</div><div class="tab">Pri</div><div class="tab">To-do</div></div></div>
+        <div class="stk">
+          <div class="blk other">Week</div>
+          <div class="tl">
+            <div class="cap">To-do list</div>
+            <div class="blk pack">Action</div>
+            <div class="blk pack">Action</div>
+            <div class="blk step exc">Task<span class="exl">Exception</span></div>
+            <div class="blk pack">Action</div>
+            <div class="blk step exc">Task<span class="exl">Exception</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page">
+      <h4>Priorities <span class="alt">(Plan?)</span></h4>
+      <div class="scr tall">
+        <div class="drawer top-handle"><span class="grab"></span></div>
+        <div class="top"><span class="wm">My Hence</span><span class="burger"><i></i><i></i></span></div>
+        <div class="hd"><div class="title"></div><div style="height:8px"></div>
+          <div class="tabs"><div class="tab">Cal</div><div class="tab on">Pri</div><div class="tab">To-do</div></div></div>
+        <div class="stk">
+          <div class="blk priority">Priority</div>
+          <div class="blk priority">Priority</div>
+          <div class="blk priority">Priority</div>
+        </div>
+        <div class="belowline"></div>
+        <div class="stk">
+          <div class="tl">
+            <div class="cap">To-do list</div>
+            <div class="blk pack">Action</div>
+            <div class="blk pack">Action</div>
+            <div class="blk step exc">Task<span class="exl">Exception</span></div>
+            <div class="blk pack">Action</div>
+            <div class="blk pack">Action</div>
+          </div>
+          <div class="tl think">
+            <div class="cap">Thinking about</div>
+            <div class="blk thinking">Thinking about</div>
+            <div class="blk thinking">Thinking about</div>
+            <div class="blk thinking">Thinking about</div>
+          </div>
+          <div class="blk other fnd">Foundations
+            <span class="rings">
+              <i class="cash"></i><i class="safety"></i><i class="prot"></i>
+              <i class="debt"></i><i class="long"></i><i class="tax"></i>
+            </span>
+          </div>
+          <div class="blk other">Conversation history</div>
+          <div class="blk priority">Ask me anything</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page">
+      <h4>To-Do List</h4>
+      <div class="scr tall">
+        <div class="drawer top-handle"><span class="grab"></span></div>
+        <div class="top"><span class="wm">My Hence</span><span class="burger"><i></i><i></i></span></div>
+        <div class="hd"><div class="title"></div><div style="height:8px"></div>
+          <div class="tabs"><div class="tab">Cal</div><div class="tab">Pri</div><div class="tab on">To-do</div></div></div>
+        <div class="stk">
+          <div class="srch"><span class="mag">&#9906;</span>Search</div>
+          <div class="filt"><span class="f on">All</span><span class="f">Credit card debt</span><span class="f">Insurance</span><span class="f">+2</span></div>
+          <div class="filt time"><span class="f">This week</span><span class="f">Due soon</span><span class="f">Urgent</span></div>
+          <div class="blk pack">Action</div>
+          <div class="blk pack">Action</div>
+          <div class="blk step exc">Task<span class="exl">Exception</span></div>
+          <div class="blk pack">Action</div>
+          <div class="blk step exc">Task<span class="exl">Exception</span></div>
+          <div class="blk pack">Action</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sect">
+    <h2>Detail surfaces</h2>
+    <span class="hint">Opened from the plan</span>
+  </div>
+
+  <div class="grid two big">
+    <div class="page">
+      <h4>Priority Detail</h4>
+      <div class="scr">
+        <div class="top"><span class="wm">Priority</span><span class="burger"><i></i><i></i></span></div>
+        <div class="hd"><div class="title"></div><div class="title s"></div></div>
+        <div class="stk">
+          <div class="blk target">Target</div>
+          <div class="tl">
+            <div class="cap">To-do list</div>
+            <div class="blk pack">Action</div>
+            <div class="blk pack">Action</div>
+            <div class="blk step exc">Task<span class="exl">Exception</span></div>
+          </div>
+          <div class="blk priority cond">Details</div>
+          <div class="blk priority cond">Progress</div>
+          <div class="blk priority cond">Monitoring</div>
+          <div class="blk priority">Related conversations</div>
+          <div class="blk priority">Ask me anything</div>
+        </div>
+      </div>
+      <div class="scrnote">An assembly. Which modules appear depends on the priority.</div>
+    </div>
+
+    <div class="page">
+      <h4>Action Detail</h4>
+      <div class="scr">
+        <div class="top"><span class="wm">Action</span><span class="burger"><i></i><i></i></span></div>
+        <div class="hd"><div class="title"></div><div class="title s"></div><span class="hbtn">H</span></div>
+        <div class="stk">
+          <div class="blk step">Task</div>
+          <div class="blk step">Task</div>
+          <div class="blk step">Task</div>
+          <div class="blk step">Task</div>
+          <div class="blk priority">Associated priorities</div>
+        </div>
+      </div>
+      <div class="scrnote">Tasks only, in order. No eyebrows &mdash; the page already names the priority.<br><b>H</b> hands the whole sequence to Hence: it starts and completes everything it can on its own, and brings the user in only where a decision or an input is needed. The only place this is offered, because an action has an order and an end state.</div>
+    </div>
+  </div>
+
+  <div class="sect">
+    <h2>Completing tasks with Ask</h2>
+  </div>
+
+  <p class="flnote">Every task CTA lands in Ask. A task begins on a card and ends when it is settled &mdash; delegated work comes back to be approved, decisions are made by choosing, and nothing Hence finishes interrupts what the user is doing. The session log in the top right holds what has been done and decided, and is where work in progress waits.</p>
+
+  <div class="fl">
+
+    <div class="demo2">
+      <div class="dleft">
+        <div class="dctl top"><button id="dplay" class="pl">Play</button><span class="dsep"></span><button id="dback">&#8249;</button><button id="dfwd">&#8250;</button></div>
+        <div class="dstep on" data-s="0"><div class="dn2">1</div>
+          <div><div class="dt">Send to Hence</div>
+          <div class="dd">Two tasks on the Action Detail page. The user taps Send to Hence on the first &mdash; work Hence can do alone.</div></div></div>
+        <div class="dstep" data-s="1"><div class="dn2">2</div>
+          <div><div class="dt">Talk it through</div>
+          <div class="dd">The sent card shrinks into the session log and the next task moves up. Tapping it opens Ask, the surface turns plum, and the log carries across showing work running.</div></div></div>
+        <div class="dstep" data-s="2"><div class="dn2">3</div>
+          <div><div class="dt">Hence finishes</div>
+          <div class="dd">The log fills and turns lilac. Nothing else changes &mdash; the user is mid-decision and is not pulled out of it.</div></div></div>
+        <div class="dstep" data-s="3"><div class="dn2">4</div>
+          <div><div class="dt">Settle the decision</div>
+          <div class="dd">The decision is recorded as a completed task, not as another message, and Ask offers the next question rather than dead-ending.</div></div></div>
+        <div class="dstep" data-s="4"><div class="dn2">5</div>
+          <div><div class="dt">Open the log</div>
+          <div class="dd">Tapping the log opens a roll-up of what has been finished and decided, with the quotes waiting at the top.</div></div></div>
+        <div class="dstep" data-s="5"><div class="dn2">6</div>
+          <div><div class="dt">Review inline</div>
+          <div class="dd">What Hence prepared opens in the same session as a comparison, with the way back visible.</div></div></div>
+        <div class="dstep" data-s="6"><div class="dn2">7</div>
+          <div><div class="dt">Approve</div>
+          <div class="dd">Approving completes the task &mdash; recorded the same way as the first &mdash; and the session picks up where it left off.</div></div></div>
+
+      </div>
+
+      <div class="dright">
+        <div class="phone" id="ph"><span class="cursor" id="cur"></span>
+          <div class="phchrome">
+            <span class="phw" id="phw">Action</span>
+            <span class="logbtn" id="logbtn">
+              <span class="lgbar" id="lgbar"><i></i></span>
+              <span class="lglbl" id="lglbl">Log</span><span class="lgct" id="lgct">1</span>
+            </span>
+          </div>
+          <div class="askdock" id="askdock"><span class="dtxt" id="dtxt">Ask a question</span><i></i></div>
+          <div class="phbody">
+
+            <div class="lay" id="l0">
+              <div class="card stepc pc" id="flycard">
+                <span class="eyebrow">INSURANCE GAPS, BUY A HOUSE</span>
+                <div class="ctitle">Get quotes at that coverage level</div>
+                <div class="cbody">I'll shop the carriers at the coverage we agreed and bring you a comparison.</div>
+                <span class="btn-work">Send to Hence</span>
+              </div>
+              <div class="card stepc pc" id="risecard">
+                <span class="eyebrow">CREDIT CARD DEBT</span>
+                <div class="ctitle">Pick a 0% card or a personal loan</div>
+                <div class="cbody">Let's weigh the transfer fee against the rate and pick one.</div>
+                <span class="btn-work">Talk it through</span>
+              </div>
+            </div>
+
+            <div class="lay" id="l1">
+              <div class="bubx h">Two ways to go. The fee is real money, so it depends how fast you'd clear it.</div>
+              <table class="cmp">
+                <tr><th></th><th>0% card</th><th>Loan</th></tr>
+                <tr><td>Rate</td><td>0% for 18 mo</td><td>7.9% fixed</td></tr>
+                <tr><td>Up front</td><td>$204 fee</td><td>None</td></tr>
+                <tr><td>Clear by</td><td>Month 18</td><td>Month 24</td></tr>
+                <tr><td>Total cost</td><td>$204</td><td>$494</td></tr>
+              </table>
+            </div>
+
+            <div class="lay" id="l1a">
+              <table class="cmp">
+                <tr><th></th><th>0% card</th><th>Loan</th></tr>
+                <tr><td>Up front</td><td>$204 fee</td><td>None</td></tr>
+                <tr><td>Total cost</td><td>$204</td><td>$494</td></tr>
+              </table>
+              <div class="bubx u">What happens if I don't clear it in 18 months?</div>
+            </div>
+
+            <div class="lay" id="l1b">
+              <div class="bubx u">What happens if I don't clear it in 18 months?</div>
+              <div class="bubx h">The rate jumps to 24.99% on whatever is left. At your pace that is about $1,900 &mdash; so the risk is real.</div>
+              <table class="cmp">
+                <tr><th></th><th>0% card</th><th>Loan</th></tr>
+                <tr><td>If you slip</td><td class="bad">24.99% on $1,900</td><td class="ok">No change</td></tr>
+                <tr><td>Total cost</td><td>$204 &ndash; $680</td><td>$494</td></tr>
+              </table>
+            </div>
+
+            <div class="lay" id="l1bb">
+              <div class="bubx h">The rate jumps to 24.99% on whatever is left. At your pace that is about $1,900.</div>
+              <table class="cmp">
+                <tr><th></th><th>0% card</th><th>Loan</th></tr>
+                <tr><td>If you slip</td><td class="bad">24.99% on $1,900</td><td class="ok">No change</td></tr>
+              </table>
+              <div class="bubx u">I'd rather not have a deadline hanging over me.</div>
+            </div>
+
+            <div class="lay" id="l1cc">
+              <div class="bubx u">I'd rather not have a deadline hanging over me.</div>
+              <div class="bubx h">Then the loan is the safer of the two. It's your call &mdash; pick one and I'll prepare it.</div>
+              <table class="cmp">
+                <tr><th></th><th>0% card</th><th>Loan</th></tr>
+                <tr><td>If you slip</td><td class="bad">24.99% on $1,900</td><td class="ok">No change</td></tr>
+                <tr><td>Total cost</td><td>$204 &ndash; $680</td><td>$494</td></tr>
+                <tr><td></td><td><span class="pickbtn">Choose</span></td><td><span class="pickbtn" id="pickloan">Choose</span></td></tr>
+              </table>
+            </div>
+
+            <div class="lay" id="l1c">
+              <div class="bubx h">Then the loan is the safer of the two. It's your call &mdash; pick one and I'll prepare it.</div>
+              <table class="cmp">
+                <tr><th></th><th>0% card</th><th class="sel">Loan &#10003;</th></tr>
+                <tr><td>If you slip</td><td class="bad">24.99% on $1,900</td><td class="ok">No change</td></tr>
+                <tr><td>Total cost</td><td>$204 &ndash; $680</td><td>$494</td></tr>
+              </table>
+              <div class="taskdone">
+                <div class="tdh">Task complete</div>
+                <div class="tdt">Pick a 0% card or a personal loan</div>
+                <div class="tdd">Decided: personal loan at 7.9%. Application prepared.</div>
+              </div>
+            </div>
+
+            <div class="lay" id="l3">
+              <table class="cmp">
+                <tr><th></th><th>0% card</th><th class="sel">Loan &#10003;</th></tr>
+                <tr><td>Total cost</td><td>$204 &ndash; $680</td><td>$494</td></tr>
+              </table>
+              <div class="taskdone">
+                <div class="tdh">Task complete</div>
+                <div class="tdt">Pick a 0% card or a personal loan</div>
+                <div class="tdd">Decided: personal loan at 7.9%. Application prepared.</div>
+              </div>
+              <div class="bubx h nextturn">Ready to move on to the next task? We need to set the payment date to land after payday.</div>
+            </div>
+
+            <div class="lay" id="l4">
+              <div class="logsheet">
+                <div class="lshead">This session &middot; 2 items</div>
+                <div class="lsrow rdy" id="rdyrow"><span class="stag lilfull">Ready</span><span>Get quotes at that coverage level &mdash; 14 checked, 3 beat your premium</span></div>
+                <div class="lsrow"><span class="stag done">Decided</span><span>Personal loan at 7.9% over the 0% card</span></div>
+              </div>
+            </div>
+
+            <div class="lay" id="l5">
+              <div class="backto">&#8249; Back to your session</div>
+              <div class="bubx h">Three came in under what you pay now. Two of them drop flood cover. It's your call &mdash; pick one and I'll apply.</div>
+              <table class="cmp">
+                <tr><th></th><th>Amica</th><th>Lemonade</th></tr>
+                <tr><td>Premium</td><td>$1,840/yr</td><td>$1,790/yr</td></tr>
+                <tr><td>vs now</td><td class="ok">&minus;$310</td><td class="ok">&minus;$360</td></tr>
+                <tr><td>Flood</td><td class="ok">Kept</td><td class="bad">Dropped</td></tr>
+                <tr><td></td><td><span class="pickbtn" id="pickamica">Choose</span></td><td><span class="pickbtn">Choose</span></td></tr>
+              </table>
+              <div class="rlinkx" style="margin-top:8px;display:block">See all 14</div>
+            </div>
+
+            <div class="lay" id="l6">
+              <table class="cmp">
+                <tr><th></th><th class="sel">Amica &#10003;</th><th>Lemonade</th></tr>
+                <tr><td>Premium</td><td>$1,840/yr</td><td>$1,790/yr</td></tr>
+                <tr><td>Flood</td><td class="ok">Kept</td><td class="bad">Dropped</td></tr>
+              </table>
+              <div class="taskdone">
+                <div class="tdh">Task complete</div>
+                <div class="tdt">Get quotes at that coverage level</div>
+                <div class="tdd">Approved Amica at $1,840. Application sent &mdash; I'll confirm when it binds.</div>
+              </div>
+              <div class="bubx h nextturn">Back where you were &mdash; ready to set the loan payment date to land after payday?</div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sect" style="margin-top:44px"><h2>Task states</h2>
+    <span class="hint">A card is not binary. Interruption and delegation both need a state of their own.</span></div>
+
+  <div class="states">
+    <div class="stc">
+      <div class="card stepc sc">
+        <span class="eyebrow">CREDIT CARD DEBT</span>
+        <div class="ctitle">Pick a 0% card or a personal loan</div>
+        <div class="cbody">Let's weigh the transfer fee against the rate and pick one.</div>
+        <span class="btn-work">Talk it through</span>
+      </div>
+      <div class="stn"><b>Default</b>Not started. The CTA names who acts.</div>
+    </div>
+
+    <div class="stc">
+      <div class="card sc inprog">
+        <span class="eyebrow">CREDIT CARD DEBT</span>
+        <div class="ctitle">Pick a 0% card or a personal loan</div>
+        <div class="cbody">You compared two offers. One thing left to settle.</div>
+        <div class="pbar"><i style="width:66%"></i></div>
+        <div class="strow"><span class="btn-work">Pick up where you left off</span></div>
+      </div>
+      <div class="stn"><b>In progress</b>The series was interrupted. It has to be resumable. Progress is shown as a bar rather than a count &mdash; a decision flow has no reliable step count.</div>
+    </div>
+
+    <div class="stc">
+      <div class="card sc working">
+        <span class="eyebrow">INSURANCE GAPS, BUY A HOUSE</span>
+        <div class="ctitle">Get quotes at that coverage level</div>
+        <div class="cbody">Shopping carriers at the coverage you set.</div>
+        <div class="strow"><span class="stag lil"><i class="pd"></i>Hence is on it</span><span class="cvx">&#8250;</span></div>
+      </div>
+      <div class="stn"><b>Working</b>Handed over. Tapping it shows what Hence has done so far.</div>
+    </div>
+
+    <div class="stc">
+      <div class="card sc readyc">
+        <span class="eyebrow">INSURANCE GAPS, BUY A HOUSE</span>
+        <div class="ctitle">Get quotes at that coverage level</div>
+        <div class="cbody">14 carriers checked. Three beat your premium.</div>
+        <div class="strow"><span class="stag lilfull">Ready for review</span><span class="cvx">&#8250;</span></div>
+      </div>
+      <div class="stn"><b>Ready for review</b>Hence finished. The task is not complete until the user approves or submits.</div>
+    </div>
+
+    <div class="stc">
+      <div class="card sc donec">
+        <span class="eyebrow">INSURANCE GAPS, BUY A HOUSE</span>
+        <div class="ctitle">Get quotes at that coverage level</div>
+        <div class="cbody">Switched to Amica. Saving $310 a year.</div>
+        <div class="strow"><span class="stag done">Complete</span><span class="cvx">&#8250;</span></div>
+      </div>
+      <div class="stn"><b>Complete</b>Settled and stays settled. Recessive rather than faded &mdash; still readable, but visibly closed.</div>
+    </div>
+  </div>
+
+  <!-- MODE 2 -->
+  <div class="fl">
+    <div class="flh"><span class="flt">The user supplies something</span><span class="flc">Add information</span></div>
+    <div class="flr">
+      <div class="fs">
+        <div class="mini">
+          <div class="card stepc mc">
+            <span class="eyebrow">CREDIT CARD DEBT</span>
+            <div class="ctitle">List every card balance, APR and minimum payment</div>
+            <div class="cbody">Upload your statements and I'll pull the numbers into one place.</div>
+            <span class="btn-work">Add information</span>
+          </div>
+        </div>
+        <div class="fc">The task card.</div>
+      </div>
+      <div class="fa">&rarr;</div>
+      <div class="fs">
+        <div class="mini ask">
+          <div class="bub h">Send me whatever you have &mdash; statement, photo or screenshot.</div>
+          <div class="drop"><b>Drop your statements here</b>PDF, photo or screenshot</div>
+        </div>
+        <div class="fc">Drag and drop lives <b>inside Ask</b>, not in a separate uploader.</div>
+      </div>
+      <div class="fa">&rarr;</div>
+      <div class="fs">
+        <div class="mini ask">
+          <div class="bub u">chase-june.pdf, amex-june.pdf</div>
+          <div class="bub h">The Amex is a summary rather than a statement &mdash; I can't see the APR. Send the full one, or tell me the rate?</div>
+          <div class="bub u">24.99%</div>
+        </div>
+        <div class="fc"><b>Hence checks the document is the right one</b> and asks again when it isn't.</div>
+      </div>
+      <div class="fa">&rarr;</div>
+      <div class="fs">
+        <div class="mini ask">
+          <div class="bub h">Got it all. $6,800 across three cards, blended rate 22.4%, $210 in minimums.</div>
+          <div class="dn">Task complete</div>
+        </div>
+        <div class="fc">The data lands where the rest of the plan can use it.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODE 3 -->
+  <div class="fl">
+    <div class="flh"><span class="flt">A decision gets settled</span><span class="flc">Talk it through</span></div>
+    <div class="flr">
+      <div class="fs">
+        <div class="mini">
+          <div class="card stepc mc">
+            <span class="eyebrow">CREDIT CARD DEBT, BUY A HOUSE</span>
+            <div class="ctitle">Pick a 0% card or a personal loan</div>
+            <div class="cbody">Let's weigh the transfer fee against the rate and pick one.</div>
+            <span class="btn-work">Talk it through</span>
+          </div>
+        </div>
+        <div class="fc">The task card.</div>
+      </div>
+      <div class="fa">&rarr;</div>
+      <div class="fs">
+        <div class="mini ask">
+          <div class="bub h">Two ways to go. The fee is real money, so it depends how fast you'd clear it.</div>
+          <div class="opt"><div class="ot">0% card, 18 months</div>3% fee &mdash; $204 now, nothing after</div>
+          <div class="opt"><div class="ot">Personal loan, 7.9%</div>No fee, fixed, clears in 24 months</div>
+        </div>
+        <div class="fc">Options with the trade-off stated. <b>Not a recommendation.</b></div>
+      </div>
+      <div class="fa">&rarr;</div>
+      <div class="fs">
+        <div class="mini ask">
+          <div class="bub u">I'd rather not have a deadline hanging over me.</div>
+          <div class="bub h">Then the loan. It costs about $290 more in interest and removes the cliff at month 18.</div>
+        </div>
+        <div class="fc">The user's reason shapes the answer, and the cost of it is named.</div>
+      </div>
+      <div class="fa">&rarr;</div>
+      <div class="fs">
+        <div class="mini ask">
+          <div class="bub h">Locked in. I'll prepare the application and add it to your list.</div>
+          <div class="dn">Task complete</div>
+        </div>
+        <div class="fc"><b>The task is done when the choice is made</b> &mdash; that is the one thing settled.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODE 4 -->
+  <div class="fl">
+    <div class="flh"><span class="flt">Step by step, on a live site</span><span class="flc">Walk me through it</span></div>
+    <div class="flr">
+      <div class="fs">
+        <div class="mini">
+          <div class="card stepc mc">
+            <span class="eyebrow">RETIREMENT SAVINGS</span>
+            <div class="ctitle">Request the rollover from your old plan</div>
+            <div class="cbody">I'll walk you through it on their site, one move at a time.</div>
+            <span class="btn-work">Walk me through it</span>
+          </div>
+        </div>
+        <div class="fc">The task card.</div>
+      </div>
+      <div class="fa">&rarr;</div>
+      <div class="fs">
+        <div class="mini ask">
+          <div class="bub h">Four moves. I'll stay with you &mdash; tell me when each one's done.</div>
+          <div class="link">fidelity.com &middot; <b>login in your vault</b></div>
+          <div class="stp on"><span class="si">1</span><span class="sx">Sign in and open the transfer page</span></div>
+        </div>
+        <div class="fc">Hence supplies the URL and, where it's in the Vault, the login.</div>
+      </div>
+      <div class="fa">&rarr;</div>
+      <div class="fs">
+        <div class="mini ask">
+          <div class="stp"><span class="si">&#10003;</span><span class="sx">Sign in and open the transfer page</span></div>
+          <div class="stp"><span class="si">&#10003;</span><span class="sx">Choose &ldquo;from another institution&rdquo;</span></div>
+          <div class="stp on"><span class="si">3</span><span class="sx">Enter plan number 4471-08822</span></div>
+          <div class="stp"><span class="si">4</span><span class="sx">Confirm and send me the reference</span></div>
+        </div>
+        <div class="fc"><b>One move at a time,</b> advancing as the user confirms.</div>
+      </div>
+      <div class="fa">&rarr;</div>
+      <div class="fs">
+        <div class="mini ask">
+          <div class="bub u">Reference is TR-99420.</div>
+          <div class="bub h">Logged. Money usually lands in 7&ndash;10 days &mdash; I'll watch for it and tell you when to invest it.</div>
+          <div class="dn">Task complete</div>
+        </div>
+        <div class="fc">Hence takes the thread back where waiting is involved.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flagline">
+    <b>What is the same across all four.</b> The series is completed in one sitting, and finishing it completes the task. Stop partway and nothing is done &mdash; which is why none of these has a card, an eyebrow, or a place in the to-do list.
+  </div>
+
+  <div class="foot">
+    <span><i class="chip priority"></i> Priority</span>
+    <span><i class="chip target"></i> Target</span>
+    <span><i class="chip pack"></i> Action</span>
+    <span><i class="chip step"></i> Task</span>
+    <span><i class="chip thinking"></i> Thinking about</span>
+    <span><i class="chip other"></i> Other module</span>
+  </div>
+</div>
+
+
+<!-- ================= FLOWS ================= -->
+<div class="pg" id="p-flows">
+  <header class="ph">
+    <div class="kicker">Hence &middot; Information architecture</div>
+    <h1>Flows</h1>
+    <p class="lede">Three ways a plan gets built. All of them end in cream &mdash; the record &mdash; and everything before that happens in plum.</p>
+  </header>
+
+  <div class="sect"><h2>Foundations</h2><span class="hint">Values first, then data, then a full plan</span></div>
+  <div class="flow">
+    <div class="flowh"><span class="flowt">Building the foundation</span><span class="flowc">No question needed</span></div>
+    <p class="flowsub">The user arrives without a question. Hence starts with what they want, takes one required number, extracts the rest from documents, and scores what it can.</p>
+    <div class="strip">
+    <div class="fstep">
+      <span class="fn">1</span>
+      <div class="mini2 plum">
+        <div class="m2top"><span class="m2w">Hence</span></div>
+        <div class="m2h">What do you want your money to make possible?</div>
+        <div class="m2b">No numbers yet. Start with what matters.</div>
+        <div class="m2dock">Speak or type<i></i></div>
+      </div>
+      <div class="fcap">Values first. The assessment comes later &mdash; a long form up front does not get finished.</div>
+    </div>
+    <div class="fstep">
+      <span class="fn">2</span>
+      <div class="mini2 plum">
+        <div class="m2top"><span class="m2w">Hence</span></div>
+        <div class="m2bub">So: room to travel, and not being trapped in a job. Anything you are worried about?</div>
+        <div class="m2bub u">Mostly that one bad month would wreck us.</div>
+        <div class="m2dock">Speak or type<i></i></div>
+      </div>
+      <div class="fcap">The worry sizes the plan later &mdash; a worrier gets a bigger cushion target.</div>
+    </div>
+    <div class="fstep">
+      <span class="fn">3</span>
+      <div class="mini2 plum">
+        <div class="m2top"><span class="m2w">Hence</span></div>
+        <div class="m2h">One number to start.</div>
+        <div class="m2b">Gross household income. Everything else I can work out or ask for.</div>
+        <div class="m2sl"><div class="tr"><i style="width:40%"></i></div><div class="lb"><span>Income</span><span>required</span></div></div>
+        <div class="m2dock">$148,000<i></i></div>
+      </div>
+      <div class="fcap">Income is the one required field. It gates savings rate, retirement and take-home.</div>
+    </div>
+    <div class="fstep">
+      <span class="fn">4</span>
+      <div class="mini2 plum">
+        <div class="m2top"><span class="m2w">Hence</span></div>
+        <div class="m2bub">Send me what you have &mdash; a pay stub, a statement, a benefits summary.</div>
+        <div class="m2rec">Read 3 statements</div>
+        <div class="m2rec">Found 2 retirement accounts</div>
+        <div class="m2rec">Pulled housing and transport</div>
+        <div class="m2dock">Ask anything<i></i></div>
+      </div>
+      <div class="fcap"><b>Extraction, not recall.</b> Most people cannot list their expenses; documents can.</div>
+    </div>
+    <div class="fstep">
+      <span class="fn">5</span>
+      <div class="mini2">
+        <div class="m2top"><span class="m2w">Foundations</span></div>
+        <div class="m2h">Your foundation</div>
+        <div class="m2rings"><i class="g"></i><i class="a2"></i><i class="r"></i><i class="y"></i><i class="a2"></i><i class="n"></i></div>
+        <div class="m2b">Five scored. Taxes is grey &mdash; tell me your filing status and I&rsquo;ll score it.</div>
+      </div>
+      <div class="fcap">Tiered confidence. Missing data reads grey rather than a partial score.</div>
+    </div>
+    <div class="fstep">
+      <span class="fn">6</span>
+      <div class="mini2">
+        <div class="m2top"><span class="m2w">My Hence</span></div>
+        <div class="m2card p">Build a 6-month cushion</div>
+        <div class="m2card p">Close the protection gap</div>
+        <div class="m2card p">Fix the retirement pace</div>
+        <div class="m2card p">Lower credit card debt</div>
+        <div class="m2card o">3 more</div>
+      </div>
+      <div class="fcap">A full plan: several priorities, ranked, each with its own to-do list.</div>
+    </div>
+    </div>
+    <div class="fout"><b>Outcome</b> &mdash; a scored foundation and a plan with several ranked priorities. The heaviest path, and the only one that produces a complete picture.</div>
+  </div>
+
+  <div class="sect"><h2>Simple Ask</h2><span class="hint">One question, one priority</span></div>
+  <div class="flow">
+    <div class="flowh"><span class="flowt">A bounded question</span><span class="flowc">Ask</span></div>
+    <p class="flowsub">One thing underneath the question. Hence asks why first, names the variables, takes only the data the answer needs, and gives a verdict.</p>
+    <div class="strip">
+    <div class="fstep">
+      <span class="fn">1</span>
+      <div class="mini2 plum">
+        <div class="m2top"><span class="m2w">Hence</span></div>
+        <div class="m2h">What&rsquo;s on your money mind?</div>
+        <div class="m2dock">Should I refinance my student loans?<i></i></div>
+      </div>
+      <div class="fcap">The question, typed into the dock.</div>
+    </div>
+    <div class="fstep">
+      <span class="fn">2</span>
+      <div class="mini2 plum">
+        <div class="m2top"><span class="m2w">Ask</span></div>
+        <div class="m2bub">Good question &mdash; tell me a little more about why you&rsquo;re asking.</div>
+        <div class="m2bub u">I keep seeing ads for lower rates. Money&rsquo;s tight and it feels like I&rsquo;m falling behind.</div>
+        <div class="m2dock">Speak or type<i></i></div>
+      </div>
+      <div class="fcap"><b>Why before what.</b> The motivation is asked before a single number.</div>
+    </div>
+    <div class="fstep">
+      <span class="fn">3</span>
+      <div class="mini2 plum">
+        <div class="m2top"><span class="m2w">Ask</span></div>
+        <div class="m2bub">Refinancing usually comes down to two things &mdash; the rate you&rsquo;d get, and what you give up to get it.</div>
+        <div class="m2b">Federal or private?</div>
+        <div class="m2opts"><span>Federal</span><span class="on">Private</span></div>
+        <div class="m2b" style="margin-top:6px">Balance?</div>
+        <div class="m2opts"><span>&lt;$20K</span><span class="on">$20&ndash;60K</span><span>$60K+</span></div>
+      </div>
+      <div class="fcap">The variables named, then banded questions in quick succession.</div>
+    </div>
+    <div class="fstep">
+      <span class="fn">4</span>
+      <div class="mini2 plum">
+        <div class="m2top"><span class="m2w">Ask</span></div>
+        <div class="m2h">Don&rsquo;t refinance.</div>
+        <div class="m2b">At $41K and 7% you&rsquo;d save $20&ndash;30 a month and lose income-based protection if things got tight.</div>
+        <table class="m2tbl">
+          <tr><th></th><th>Refi</th><th>IDR plan</th></tr>
+          <tr><td>Monthly</td><td>&minus;$27</td><td>&minus;$188</td></tr>
+          <tr><td>Protection</td><td>Lost</td><td>Kept</td></tr>
+        </table>
+      </div>
+      <div class="fcap">A verdict, with the option surface behind it rather than a bare recommendation.</div>
+    </div>
+    <div class="fstep">
+      <span class="fn">5</span>
+      <div class="mini2 plum">
+        <div class="m2top"><span class="m2w">Ask</span></div>
+        <div class="m2bub">Here&rsquo;s the roll-up, and the moves worth more than the refi.</div>
+        <div class="m2rec">Switch to an income-driven plan</div>
+        <div class="m2rec">Re-price your insurance</div>
+        <div class="m2rec">Benchmark your salary</div>
+        <div class="m2b" style="margin-top:7px">Save this as a priority?</div>
+      </div>
+      <div class="fcap">The roll-up, then the ask to save. Account creation comes last, not first.</div>
+    </div>
+    <div class="fstep">
+      <span class="fn">6</span>
+      <div class="mini2">
+        <div class="m2top"><span class="m2w">Priority</span></div>
+        <div class="m2card p">Increase cash margin</div>
+        <div class="m2card a">Switch to an income-driven plan</div>
+        <div class="m2card a">Re-price your insurance</div>
+        <div class="m2card t">Benchmark your salary</div>
+      </div>
+      <div class="fcap"><b>One priority</b> with its actions, saved to the plan.</div>
+    </div>
+    </div>
+    <div class="fout"><b>Outcome</b> &mdash; one priority with its actions. The foundation is still unscored; the plan grows from here.</div>
+  </div>
+
+  <div class="sect"><h2>Complex Ask</h2><span class="hint">One question, two priorities</span></div>
+  <div class="flow">
+    <div class="flowh"><span class="flowt">A question with something in the way</span><span class="flowc">Ask</span></div>
+    <p class="flowsub">Same shape, more underneath it. The theoretical answer and the real one diverge, the assumptions are worth playing with, and a second problem surfaces on the way.</p>
+    <div class="strip">
+    <div class="fstep">
+      <span class="fn">1</span>
+      <div class="mini2 plum">
+        <div class="m2top"><span class="m2w">Hence</span></div>
+        <div class="m2h">What&rsquo;s on your money mind?</div>
+        <div class="m2dock">Should we buy a house or keep renting?<i></i></div>
+      </div>
+      <div class="fcap">The question, typed into the dock.</div>
+    </div>
+    <div class="fstep">
+      <span class="fn">2</span>
+      <div class="mini2 plum">
+        <div class="m2top"><span class="m2w">Ask</span></div>
+        <div class="m2bub">Good question &mdash; tell me a little more about why you&rsquo;re asking.</div>
+        <div class="m2bub u">We&rsquo;ve rented three years and it feels like we should have bought by now.</div>
+        <div class="m2dock">Speak or type<i></i></div>
+      </div>
+      <div class="fcap"><b>Why before what.</b> The answer to this changes which answer is right.</div>
+    </div>
+    <div class="fstep">
+      <span class="fn">3</span>
+      <div class="mini2 plum">
+        <div class="m2top"><span class="m2w">Ask</span></div>
+        <div class="m2bub">This usually comes down to two things &mdash; how long you stay, and what else the money could have done.</div>
+        <div class="m2b">Household income?</div>
+        <div class="m2opts"><span>$100&ndash;150K</span><span>$150&ndash;250K</span><span class="on">$250K+</span></div>
+        <div class="m2bub u" style="margin-top:7px">I work for myself, but I have 1.8 years of salary in the business.</div>
+      </div>
+      <div class="fcap">Banded questions, fast &mdash; with a free-text channel that catches what was never asked.</div>
+    </div>
+    <div class="fstep">
+      <span class="fn">4</span>
+      <div class="mini2 plum">
+        <div class="m2top"><span class="m2w">Ask</span></div>
+        <div class="m2h">$930K on paper. $652K in reality.</div>
+        <div class="m2b">The ratios say one thing; your actual cash says another. $130K down plus $20K closing exhausts your savings.</div>
+        <table class="m2tbl">
+          <tr><th>Down</th><th>Price</th><th>PMI</th></tr>
+          <tr><td>20%</td><td>$652K</td><td>No</td></tr>
+          <tr><td>10%</td><td>$780K</td><td>Yes</td></tr>
+        </table>
+      </div>
+      <div class="fcap">The real constraint derived from the theoretical one, with the option surface shown.</div>
+    </div>
+    <div class="fstep">
+      <span class="fn">5</span>
+      <div class="mini2 plum">
+        <div class="m2top"><span class="m2w">Ask</span></div>
+        <div class="m2b">Where, and for how long?</div>
+        <div class="m2sl"><div class="tr"><i style="width:56%"></i></div><div class="lb"><span>Stay 8 yrs</span><span>break even 6</span></div></div>
+        <div class="m2sl"><div class="tr"><i style="width:34%"></i></div><div class="lb"><span>Yonkers</span><span>tax 1.8%</span></div></div>
+        <div class="m2b">Property tax is the local factor &mdash; $15&ndash;30K a year on a $700K home.</div>
+      </div>
+      <div class="fcap">A place to move the assumptions rather than read about them.</div>
+    </div>
+    <div class="fstep">
+      <span class="fn">6</span>
+      <div class="mini2">
+        <div class="m2top"><span class="m2w">My Hence</span></div>
+        <div class="m2card p">Buy a house</div>
+        <div class="m2card p">Get lender-ready</div>
+        <div class="m2card a">Clear the card balance</div>
+        <div class="m2b" style="margin-top:6px">Serves both.</div>
+      </div>
+      <div class="fcap"><b>Two priorities</b> &mdash; the purchase, and the qualifying problem in front of it. One action belongs to both.</div>
+    </div>
+    </div>
+    <div class="fout"><b>Outcome</b> &mdash; two priorities, and an action that belongs to both. The first place a user meets the many-to-many relationship.</div>
+  </div>
+</div>
+
+<!-- ================= RULES ================= -->
+<div class="pg" id="p-rules">
+  <header class="ph">
+    <div class="kicker">Hence · Information architecture</div>
+    <h1>Rules &amp; tests</h1>
+  </header>
+
+  <div class="sect">
+    <h2>Telling them apart</h2>
+    <span class="hint">Two tests, applied in order</span>
+  </div>
+
+  <div class="tests">
+    <div class="test">
+      <h3>The boundary test</h3>
+      <div class="q">Can you stop here and have something?</div>
+      <div class="br" style="margin-top:14px">
+        <div class="a">No</div>
+        <div class="r">It is inside a task. It is an <em>instruction</em>.</div>
+        <div class="n">Instructions are the series of steps required to complete a task. Stop halfway and nothing is done. This is why an instruction has no card, no eyebrow, and cannot be re-prioritized: a half-finished series has produced nothing to show.</div>
+      </div>
+      <div class="br">
+        <div class="a">Yes</div>
+        <div class="r">It is a task, an action, or a priority.</div>
+        <div class="n">Which one depends on scale.</div>
+      </div>
+    </div>
+
+    <div class="test">
+      <h3>The scale test</h3>
+      <div class="q">What is settled when this is done?</div>
+      <div class="br" style="margin-top:14px">
+        <div class="a">One thing</div>
+        <div class="r"><em>Task</em></div>
+        <div class="n">One decision reached, or one change made. It stays settled after the user walks away. Completed in one sitting.</div>
+      </div>
+      <div class="br">
+        <div class="a">A phase of the work</div>
+        <div class="r"><em>Action</em></div>
+        <div class="n">Several tasks that together move the work to a later stage: the account exists, the money has moved, the debt is consolidated. A phase must be nameable without listing what is in it. If it cannot be named that way, it is not a phase.</div>
+      </div>
+      <div class="br">
+        <div class="a">An outcome</div>
+        <div class="r"><em>Priority</em></div>
+        <div class="n">The financial or personal result the work is for. Finite, or ongoing like an optimization.</div>
+      </div>
+      <div class="notes">
+        <p><b>Instructions execute decisions. They do not make them.</b> Where a step appears to contain a choice, the choice was made at the task level: "request a Direct Rollover" is an instruction because direct versus indirect was settled above it.</p>
+        <p><b>Completing one level does not complete the level above it.</b> Finishing a task does not finish its action; finishing an action does not finish its priority. This holds above the instruction boundary and not below it, which is what the boundary test depends on.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sect">
+    <h2>The eyebrow</h2>
+    <span class="hint">The only place the many-to-many relationship becomes visible</span>
+  </div>
+
+  <div class="eyeb">
+    <div class="demo">
+      <div class="card packc">
+        <span class="eyebrow">CREDIT CARD DEBT, INSURANCE GAPS, +2</span>
+        <div class="crow2"><div class="num">1</div><div>
+          <div class="ctitle">Make a 0% balance transfer</div>
+          <div class="cbody">Make sure every dollar you pay goes toward the balance itself &mdash; not the bank's pocket.</div>
+          <div class="gorow"><span>4 tasks &middot; 30 min</span><span class="cv">&#8250;</span></div>
+        </div></div>
+      </div>
+    </div>
+    <div class="side">
+      <h3>Rules</h3>
+      <ul>
+        <li><b>Two named, then overflow.</b> Full names wrap and stop reading as an eyebrow at 390px.</li>
+        <li><b>No label.</b> The slot does the work; people learn it.</li>
+        <li><b>The engine shortens for display.</b> Priorities are user-generated and renameable, so abbreviation is a rendering concern, never a second name to maintain.</li>
+        <li><b>Always plural in form.</b> Taking the grammatical hit on the single-priority case keeps the pattern teaching the model on every card.</li>
+        <li><b>Carried by both cards.</b> On Ask Home and in a to-do list a card can appear far from its priority, so it names it. Dropped on the Action Detail Page, where the context is already set.</li>
+        <li><b>Tap resolves the overflow.</b> Opens the Action Detail Page and its associated-priorities module.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="sect"><h2>Composition rules</h2></div>
+
+  <div class="rulez">
+    <div class="rl"><div class="id">R1</div><div class="tx">A task is the same item wherever it appears.<span>Completing it in one place completes it everywhere, because there is only one of it.</span></div></div>
+    <div class="rl"><div class="id">R2</div><div class="tx">An action appears on every priority it belongs to.<span>Always at least one, often more. Not duplication &mdash; the same component rendered wherever it's relevant.</span></div></div>
+    <div class="rl"><div class="id">R3</div><div class="tx">Every card names the priorities it belongs to.<span>The alternative is organising by a system nobody understands. Being imprecise about how many priorities something belongs to is recoverable; being unreadable is not.</span></div></div>
+    <div class="rl"><div class="id">R4</div><div class="tx">The Priority Detail page is an assembly, not a template.<span>Target and to-do list are the spine; every other module is conditional on the priority.</span></div></div>
+    <div class="rl"><div class="id">R5</div><div class="tx">The task is what surfaces on Ask Home.<span>Not the action, not the priority. Home shows the smallest unit a person can finish.</span></div></div>
+    <div class="rl"><div class="id">R6</div><div class="tx">A card is read by its foot and its height.<span>A priority is the largest and ends in progress against its target. An action is next, ending in a task count, a duration and a chevron. A task is the smallest, ending in a CTA. Priorities and actions open a page; tasks open Ask.</span></div></div>
+    <div class="rl"><div class="id">R7</div><div class="tx">Only an action can be handed to Hence to run.<span>An action has an order and an end state, so running it means something finishable. A to-do list is ranked, not sequenced, and completing it settles nothing &mdash; so it filters and searches instead.</span></div></div>
+    <div class="rl"><div class="id">R8</div><div class="tx">A task standing alone in a list is the exception.<span>Actions are the norm in a to-do list.</span></div></div>
+    <div class="rl"><div class="id">R9</div><div class="tx">Plum is for deciding, cream is for the record.<span>Plum surfaces are the working environment &mdash; Ask, and Home, which is an Ask surface. Cream surfaces hold what has been decided and what still needs work. A user always knows which one they are in.</span></div></div>
+  </div>
+
+  <div class="sect">
+    <h2>Worked example</h2>
+    <span class="hint">Three priorities, sharing actions</span>
+  </div>
+
+  <div class="pri-row">
+    <span class="pri-chip">Lower credit card debt</span>
+    <span class="pri-chip">Cover insurance gaps</span>
+    <span class="pri-chip">Buy a house</span>
+  </div>
+
+  <div class="exp">
+    <div class="hdr">
+      <div class="pk">Action</div>
+      <div class="pn">Consolidate credit cards</div>
+      <div class="serves"><span class="sv">Credit card debt</span><span class="sv">Buy a house</span></div>
+      <div class="gorow" style="max-width:260px"><span>4 tasks &middot; 45 min</span><span class="cv">&#8250;</span></div>
+    </div>
+    <div class="exhead"><div>Tasks</div><div>Instructions</div></div>
+    <div class="tk">
+      <div class="tkl"><div class="tn">List every card balance, APR and minimum payment</div>
+        <div class="ts">Upload your statements and I'll pull the numbers into one place.</div>
+        <span class="cta">Add information</span></div>
+      <div class="tkr"><div class="il">One sitting</div><ol>
+        <li>Upload or photograph each card statement</li>
+        <li>Confirm the balances I read off them</li>
+        <li>Fill in anything I couldn't find</li></ol></div>
+    </div>
+    <div class="tk">
+      <div class="tkl"><div class="tn">Ask your current issuers for a lower rate</div>
+        <div class="ts">Let's get you a script and work out which cards are worth calling.</div>
+        <span class="cta">Talk it through</span></div>
+      <div class="tkr"><div class="il">One sitting</div><ol>
+        <li>Decide which cards are worth the call</li>
+        <li>Get the retention line and a script for each</li>
+        <li>Record what each issuer offered</li></ol></div>
+    </div>
+    <div class="tk">
+      <div class="tkl"><div class="tn">Pick a 0% card or a personal loan</div>
+        <div class="ts">Let's weigh the transfer fee against the rate and pick one.</div>
+        <span class="cta">Talk it through</span></div>
+      <div class="tkr"><div class="il">One sitting</div><ol>
+        <li>Compare the offers I've shortlisted</li>
+        <li>Weigh the transfer fee against the interest saved</li>
+        <li>Choose one and I'll prepare the application</li></ol></div>
+    </div>
+    <div class="tk">
+      <div class="tkl"><div class="tn">Move the balances over</div>
+        <div class="ts">I'll walk you through the transfer on each card, one at a time.</div>
+        <span class="cta">Walk me through it</span></div>
+      <div class="tkr"><div class="il">One sitting</div><ol>
+        <li>Open the new issuer's transfer page</li>
+        <li>Enter each old card and the amount, in the order I give you</li>
+        <li>Confirm the transfers posted</li></ol></div>
+    </div>
+  </div>
+
+  <div class="exp">
+    <div class="hdr">
+      <div class="pk">Action</div>
+      <div class="pn">Shop your property coverage</div>
+      <div class="serves"><span class="sv">Insurance gaps</span><span class="sv">Buy a house</span></div>
+      <div class="gorow" style="max-width:260px"><span>2 tasks &middot; 30 min</span><span class="cv">&#8250;</span></div>
+    </div>
+    <div class="exhead"><div>Tasks</div><div>Instructions</div></div>
+    <div class="tk">
+      <div class="tkl"><div class="tn">Decide how much coverage you actually need</div>
+        <div class="ts">Let's work out what you'd need to rebuild and replace, then set the number.</div>
+        <span class="cta">Talk it through</span></div>
+      <div class="tkr"><div class="il">One sitting</div><ol>
+        <li>Work through what you'd need to rebuild and replace</li>
+        <li>Decide on a deductible you could cover tomorrow</li>
+        <li>Settle the coverage number</li></ol></div>
+    </div>
+    <div class="tk">
+      <div class="tkl"><div class="tn">Get quotes at that coverage level</div>
+        <div class="ts">I'll shop the carriers and bring you a comparison.</div>
+        <span class="cta">Send to Hence</span></div>
+      <div class="tkr"><div class="il">Hence runs this</div><ol>
+        <li>Shop the carriers at the agreed coverage</li>
+        <li>Compare on price, deductible and exclusions</li>
+        <li>Return a shortlist with what each one leaves out</li></ol></div>
+    </div>
+  </div>
+
+  <div class="flagline">
+    <b>What the overlap shows.</b> Consolidating cards lowers what you owe and improves the debt-to-income ratio a lender looks at, so the same action belongs to two priorities. Property coverage is its own gap and a condition of the mortgage, so it belongs to two as well. Neither action is duplicated &mdash; it is one action, appearing on every priority it belongs to, with the eyebrow naming them.
+  </div>
+</div>
+
+</div>
+
+<script>
+document.querySelectorAll('.bar nav button').forEach(function(b){
+  b.onclick=function(){
+    document.querySelectorAll('.bar nav button').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');
+    document.querySelectorAll('.pg').forEach(function(p){p.classList.remove('on');});
+    document.getElementById('p-'+b.dataset.p).classList.add('on');
+    window.scrollTo(0,0);
+    if(b.dataset.p==='screens' && window.__demoReset) window.__demoReset();
+  };
+});
+</script>
+<script>
+(function(){
+  var ph=document.getElementById('ph'); if(!ph) return;
+  var cur2=document.getElementById('cur'), logb=document.getElementById('logbtn'),
+      lgct=document.getElementById('lgct'),
+      phw=document.getElementById('phw'), fly=document.getElementById('flycard'),
+      steps=[].slice.call(document.querySelectorAll('.dstep')),
+      LAYS=['l0','l1','l1a','l1b','l1bb','l1cc','l1c','l3','l4','l5','l6'], timer=null, cur=0, MAX=6;
+
+  // lay, plum, dot(0 none/1 running/2 ready), cursor, tap
+  var ST=[
+    {lay:'l0', plum:0, dot:1, pt:[114,152], tap:1},
+    {lay:'l1', plum:1, dot:1, pt:[100,116], tap:1},
+    {lay:'l1c', plum:1, dot:2, pt:null,      tap:0},
+    {lay:'l3',  plum:1, dot:2, pt:null,      tap:0},
+    {lay:'l4',  plum:1, dot:2, pt:[236,6],   tap:1},
+    {lay:'l5',  plum:1, dot:2, pt:[120,86],  tap:1},
+    {lay:'l6',  plum:1, dot:0, pt:[120,232], tap:1}
+  ];
+
+  var dock=document.getElementById('askdock'), dtxt=document.getElementById('dtxt'), tt=null;
+  function type(str){
+    if(tt) clearInterval(tt);
+    dock.classList.add('typed'); dtxt.textContent='';
+    var i=0;
+    tt=setInterval(function(){
+      i++; dtxt.textContent=str.slice(0,i);
+      if(i>=str.length){ clearInterval(tt); tt=null; }
+    },26);
+  }
+  function untype(){
+    if(tt){ clearInterval(tt); tt=null; }
+    dock.classList.remove('typed'); dtxt.textContent='Ask a question';
+  }
+  var DOCKED={l1:1,l1a:1,l1b:1,l1bb:1,l1cc:1,l1c:1,l3:1,l5:1,l6:1};
+  function lay(id){
+    LAYS.forEach(function(k){
+      var e=document.getElementById(k); if(e) e.classList.toggle('on',k===id); });
+    dock.classList.toggle('on', !!DOCKED[id]);
+  }
+
+  function point(p,tap){
+    if(!p){ cur2.classList.remove('show','tap'); return; }
+    cur2.classList.remove('tap');
+    cur2.style.left=p[0]+'px'; cur2.style.top=p[1]+'px';
+    cur2.classList.add('show');
+    if(tap) setTimeout(function(){ cur2.classList.add('tap'); },300);
+  }
+
+  var t0=null, TQ=[];
+  function clr(){ TQ.forEach(clearTimeout); TQ=[]; if(t0){ clearTimeout(t0); t0=null; } qd=0; }
+
+  function go(n,anim){
+    cur=n; var c=ST[n];
+    clr();
+    steps.forEach(function(st,k){ st.classList.toggle('on',k===n); });
+
+    if(n===0){
+      // rest: both tasks, dark CTAs, nothing running
+      ph.classList.remove('plum'); phw.textContent='Action';
+      lay('l0');
+      fly.classList.remove('gone','lift','press');
+      logb.classList.remove('working','ready'); count(0);
+      cur2.classList.remove('show','tap'); untype();
+      if(anim) seq0();
+      return;
+    }
+
+    if(n===1){
+      // rest: one task left, Ask open, work running
+      ph.classList.remove('plum'); phw.textContent='Action';
+      lay('l0');
+      fly.classList.add('gone'); fly.classList.remove('press','lift');
+      logb.classList.add('working'); logb.classList.remove('ready'); count(1);
+      cur2.classList.remove('show','tap'); untype();
+      if(anim) seq1(); else { ph.classList.add('plum'); phw.textContent='Ask'; lay('l1'); }
+      return;
+    }
+
+    ph.classList.toggle('plum', !!c.plum);
+    phw.textContent = c.plum ? 'Ask' : 'Action';
+    lay(c.lay);
+    fly.classList.remove('press','lift'); fly.classList.add('gone');
+    count(2);
+
+    // step 5 — tap the log pill, the sheet opens
+    if(anim && n===4){
+      lay('l3');
+      cur2.classList.remove('show','tap');
+      TQ.push(setTimeout(function(){ point(c.pt,1); },500));
+      TQ.push(setTimeout(function(){ lay('l4'); cur2.classList.remove('show','tap'); },1300));
+      logb.classList.toggle('ready', c.dot===2);
+      untype();
+      return;
+    }
+
+    // step 7 — choose a carrier, then the task completes
+    if(anim && n===6){
+      lay('l5'); cur2.classList.remove('show','tap');
+      var pb=document.getElementById('pickamica');
+      if(pb) pb.classList.remove('press');
+      TQ.push(setTimeout(function(){ point(c.pt,1); },520));
+      TQ.push(setTimeout(function(){ if(pb) pb.classList.add('press'); },900));
+      TQ.push(setTimeout(function(){ lay('l6'); cur2.classList.remove('show','tap'); },1350));
+      logb.classList.remove('working','ready');
+      untype();
+      return;
+    }
+
+    // step 6 — the log is open; tap the ready row and let it expand into the review
+    if(anim && n===5){
+      lay('l4');
+      cur2.classList.remove('show','tap');
+      var row=document.getElementById('rdyrow');
+      if(row) row.classList.remove('press','expand');
+      TQ.push(setTimeout(function(){ point(c.pt,1); },500));
+      TQ.push(setTimeout(function(){ if(row) row.classList.add('press'); },820));
+      TQ.push(setTimeout(function(){
+        cur2.classList.remove('show','tap');
+        if(row){ row.classList.remove('press'); row.classList.add('expand'); }
+      },1050));
+      TQ.push(setTimeout(function(){
+        lay('l5');
+        if(row) row.classList.remove('expand');
+      },1550));
+      logb.classList.toggle('ready', c.dot===2);
+      untype();
+      return;
+    }
+
+    if(n===2 && anim){
+      logb.classList.add('working'); logb.classList.remove('ready'); count(1);
+      TQ.push(setTimeout(function(){                     // the bar completes, then it turns
+        logb.classList.remove('working'); logb.classList.add('ready');
+      },900));
+    } else {
+      logb.classList.toggle('working', c.dot===1);
+      logb.classList.toggle('ready', c.dot===2);
+    }
+    point(c.pt, c.tap); untype();
+  }
+
+  // step 1 — tap Send to Hence, card travels to the log
+  function seq0(){
+    t0=setTimeout(function(){
+      point(ST[0].pt, 1);
+      t0=setTimeout(function(){
+        fly.classList.add('press');
+        t0=setTimeout(function(){
+          fly.classList.remove('press'); fly.classList.add('lift');
+          cur2.classList.remove('show','tap');
+          t0=setTimeout(function(){
+            fly.classList.remove('lift'); fly.classList.add('gone');
+            t0=setTimeout(function(){ logb.classList.add('working'); count(1); },700);
+          },300);
+        },320);
+      },340);
+    },500);
+  }
+
+  // step 2 — open Ask, two rounds of question and answer, then the pick
+  function seq1(){
+    qd=0;
+    q(520,  function(){ point(ST[1].pt,1); });
+    q(780,  function(){ ph.classList.add('plum'); phw.textContent='Ask'; lay('l1'); hide(); });
+
+    q(1500, function(){ point([120,366],1); });                       // reach for the bar
+    q(700,  function(){ type("What happens if I don't clear it in 18 months?"); });
+    q(1900, function(){ point([236,366],1); });                       // send
+    q(600,  function(){ untype(); lay('l1a'); hide(); });             // their words land
+    q(1500, function(){ lay('l1b'); });                               // Hence answers, table refines
+
+    q(2000, function(){ point([120,366],1); });                       // second turn
+    q(700,  function(){ type("I'd rather not have a deadline hanging over me."); });
+    q(1800, function(){ point([236,366],1); });
+    q(600,  function(){ untype(); lay('l1bb'); hide(); });
+    q(1500, function(){ lay('l1cc'); });                              // Hence hands the choice back
+    q(1400, function(){ point([196,214],1); });                       // the user chooses
+    q(700,  function(){ var b=document.getElementById('pickloan'); if(b) b.classList.add('press'); });
+    q(450,  function(){ lay('l1c'); hide(); count(2); });
+  }
+  function hide(){ cur2.classList.remove('show','tap'); }
+  function count(n){ if(!n){ lgct.classList.remove('on'); return; } lgct.textContent=n; lgct.classList.add('on'); }
+  var qd=0;
+  function q(ms,fn){ qd+=ms; TQ.push(setTimeout(fn,qd)); }
+
+  steps.forEach(function(st,k){ st.onclick=function(){ stop(); go(k,true); }; });
+  function stop(){ if(timer){clearInterval(timer);timer=null;document.getElementById('dplay').textContent='Play';} }
+  document.getElementById('dplay').onclick=function(){
+    if(timer){ stop(); return; }
+    this.textContent='Pause';
+    if(cur>=MAX) go(0,false);
+    go(cur,true);
+    timer=setInterval(function(){ if(cur>=MAX){ stop(); return; } go(cur+1,true); },3000);
+  };
+  window.__demoReset=function(){ stop(); go(0,false); };
+  document.getElementById('dback').onclick=function(){ stop(); go(Math.max(0,cur-1),true); };
+  document.getElementById('dfwd').onclick=function(){ stop(); go(Math.min(MAX,cur+1),true); };
+  go(0,false);
+
+  // the demo sits on a hidden tab at load, so play it when it is actually seen
+  if(window.IntersectionObserver){
+    new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(!e.isIntersecting && !timer) go(0,false);   // reset when scrolled away
+      });
+    },{threshold:.2}).observe(ph);
+  }
+})();
+</script>
+</body>
+</html>
